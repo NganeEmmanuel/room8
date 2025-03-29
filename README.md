@@ -132,7 +132,7 @@ npm run dev
 #### Installation:
 ```sh
 # Clone repository
-git clone https://github.com/your-repo.git
+git clone https://github.com/NganeEmmanuel/room8
 cd backend
 
 # Build and run services
@@ -140,10 +140,40 @@ mvn clean install
 mvn spring-boot:run
 ```
 
+#### Individual service setup
+For setting up individual services locally, see their respective readme files for instructions
+
 ### **VPS Setup**
 - Provision a **Virtual Private Server (VPS)** using Terraform.
 - Install **java, Docker, Kubernetes, and necessary dependencies**.
 - Deploy services using **Kubernetes manifests and Helm charts**.
+
+---
+
+## Contribution Guidelines & Code Standards
+We follow industry-standard best practices for writing clean, maintainable, and efficient code.
+
+### **General Guidelines**
+- Follow a **modular** approach to separate concerns.
+- Ensure **clear, concise, and well-documented** code.
+- Use meaningful **variable and function names**.
+- Avoid code duplication by following **DRY (Don't Repeat Yourself)** principles.
+- Follow **SOLID principles** for object-oriented programming.
+
+### **Backend Code Standards (Java Spring Boot)**
+- Use **Spring Boot's built-in features** like Feign clients, Eureka, and Gateway for service communication.
+- Follow **RESTful API design principles**.
+- Use **DTOs (Data Transfer Objects)** to separate entity logic.
+- Implement **exception handling** with meaningful error responses.
+- Write **unit and integration tests** using JUnit and Mockito.
+- Format code using **Google Java Format**.
+
+### **Frontend Code Standards (React.js)**
+- Use a **component-based architecture** for UI design.
+- Follow the **Single Responsibility Principle (SRP)** when structuring components.
+- Manage state using **React Context API or Redux** when necessary.
+- Keep UI logic **separate from business logic**.
+- Write clean and reusable CSS using **Tailwind CSS**.
 
 ---
 
@@ -153,6 +183,8 @@ We welcome contributions! Please follow these steps:
 2. Create a new branch (`feature-branch-name`).
 3. Commit your changes with descriptive messages.
 4. Push to your fork and submit a pull request.
+
+**NB**: All contributions must follow the code standard as defined in the **contribution guidelines and code standard** section 
 
 ---
 
