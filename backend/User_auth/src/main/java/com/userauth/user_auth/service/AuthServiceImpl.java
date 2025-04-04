@@ -38,8 +38,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<AuthenticationResponse> tenantSignup(RegisterRequest request) {
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-
         if (isEmailExist(request.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthenticationResponse());
         }

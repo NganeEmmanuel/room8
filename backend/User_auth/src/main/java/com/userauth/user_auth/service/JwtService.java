@@ -21,8 +21,8 @@ public class JwtService {
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY") != null
             ? System.getenv("JWT_SECRET_KEY")
             : "DE79AF2BD6D2F70D654D80B16DDFCA5487A75795E8C33A906F990C64522C45BE";
-    private TokenBlacklistRepository tokenBlacklistRepository;
-    private JwtBlacklistService jwtBlacklistService;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final JwtBlacklistService jwtBlacklistService;
 
     /**
      * Extract user's email address from the jwt token
