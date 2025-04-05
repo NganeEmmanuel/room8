@@ -1,6 +1,7 @@
 package com.userauth.user_auth.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -68,11 +69,19 @@ public class JwtService {
         if (jwtBlacklistService.isTokenBlacklisted(jwtToken)) {
             return false;
         }
-        return extractExpiration(jwtToken).after(new Date());
+        try {
+            return extractExpiration(jwtToken).after(new Date());
+        }catch (ExpiredJwtException e) {
+            return false;
+        }
     }
 
     public boolean isJwtTokenExpired(String jwtToken) {
-        return extractExpiration(jwtToken).before(new Date());
+        try {
+            return extractExpiration(jwtToken).before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     /**

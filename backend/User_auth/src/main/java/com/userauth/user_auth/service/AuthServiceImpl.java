@@ -1,6 +1,5 @@
 package com.userauth.user_auth.service;
 
-import com.userauth.user_auth.auth.AuthenticationRefreshResponse;
 import com.userauth.user_auth.auth.AuthenticationRequest;
 import com.userauth.user_auth.auth.AuthenticationResponse;
 import com.userauth.user_auth.auth.RegisterRequest;
@@ -194,7 +193,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<AuthenticationRefreshResponse> refreshToken(String refreshToken) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(String refreshToken) {
         try {
             if (jwtService.isJwtTokenExpired(refreshToken)) {
                 throw new TokenExpiredException();
@@ -217,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
             // Store new refresh token
             refreshTokenService.storeRefreshToken(userEmail, newRefreshToken, 60 * 24); // 1 day expiration
 
-            return ResponseEntity.ok(AuthenticationRefreshResponse.builder()
+            return ResponseEntity.ok(AuthenticationResponse.builder()
                     .token(newJwtToken)
                     .refreshToken(newRefreshToken)
                     .build());

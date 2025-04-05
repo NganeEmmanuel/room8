@@ -1,7 +1,6 @@
 package com.userauth.user_auth.service;
 
 
-import com.userauth.user_auth.auth.AuthenticationRefreshResponse;
 import com.userauth.user_auth.auth.AuthenticationRequest;
 import com.userauth.user_auth.auth.AuthenticationResponse;
 import com.userauth.user_auth.auth.RegisterRequest;
@@ -52,7 +51,7 @@ public interface AuthService {
      * @return a refreshed authentication jwt token on success
      * @throws TokenExpiredException if token has expired
      */
-    ResponseEntity<AuthenticationRefreshResponse> refreshToken(String refreshToken);
+    ResponseEntity<AuthenticationResponse> refreshToken(String refreshToken);
 
     /**
      * Registers a new user in the system.

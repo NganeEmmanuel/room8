@@ -1,4 +1,4 @@
-package com.userauth.user_auth.security.jwt;
+package com.userauth.user_auth.security.filter;
 
 import com.userauth.user_auth.repository.UserRepository;
 import com.userauth.user_auth.service.AuthService;
