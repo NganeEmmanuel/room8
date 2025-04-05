@@ -5,6 +5,7 @@ import com.userauth.user_auth.auth.AuthenticationRequest;
 import com.userauth.user_auth.auth.AuthenticationResponse;
 import com.userauth.user_auth.auth.RegisterRequest;
 import com.userauth.user_auth.model.UserDTO;
+import com.userauth.user_auth.model.UserInfoDTO;
 import com.userauth.user_auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,12 +26,12 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
         return authService.tenantSignup(request);
-    } //good
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request){
         return authService.login(request);
-    } //good
+    }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
@@ -52,7 +53,6 @@ public class AuthController {
         }
     }
 
-    //todo properly implement this
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationRefreshResponse> refreshToken(@RequestBody String refreshToken) {
         return authService.refreshToken(refreshToken);
@@ -75,6 +75,16 @@ public class AuthController {
             return authService.getLoggedInUserId(token);
         }else{
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/get-user-info")
+    public ResponseEntity<UserInfoDTO> getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader, @RequestParam Long userId) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            return authService.getUserInfo(token, userId);
+        }else {
+            return new ResponseEntity<>(new UserInfoDTO(), HttpStatus.BAD_REQUEST);
         }
     }
 

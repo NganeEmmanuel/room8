@@ -1,6 +1,5 @@
 package com.userauth.user_auth.service;
 
-import com.userauth.user_auth.repository.TokenBlacklistRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,7 +20,6 @@ public class JwtService {
     private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY") != null
             ? System.getenv("JWT_SECRET_KEY")
             : "DE79AF2BD6D2F70D654D80B16DDFCA5487A75795E8C33A906F990C64522C45BE";
-    private final TokenBlacklistRepository tokenBlacklistRepository;
     private final JwtBlacklistService jwtBlacklistService;
 
     /**
@@ -73,14 +71,6 @@ public class JwtService {
         return extractExpiration(jwtToken).after(new Date());
     }
 
-//    public boolean isJwtTokenValid(String jwtToken) {
-//        if (isTokenBlacklisted(jwtToken)) {
-//            return false;
-//        }
-//        final String email = extractUserEmail(jwtToken);
-//        return (email != null && !isJwtTokenExpired(jwtToken));
-//    }
-
     public boolean isJwtTokenExpired(String jwtToken) {
         return extractExpiration(jwtToken).before(new Date());
     }
@@ -107,14 +97,4 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
-//    /**
-//     * Check if a jwt token is blacklisted by the system
-//     *
-//     * @param token String token to check against a list of blacklisted token
-//     * @return true if the token is found in the list of blacklisted tokens and false if not
-//     */
-//    private boolean isTokenBlacklisted(String token) {
-//        return tokenBlacklistRepository.findByToken(token).isPresent();
-//    }
 }

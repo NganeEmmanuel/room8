@@ -6,9 +6,8 @@ import com.userauth.user_auth.auth.AuthenticationResponse;
 import com.userauth.user_auth.auth.RegisterRequest;
 import com.userauth.user_auth.enums.UserAuthority;
 import com.userauth.user_auth.exception.*;
-import com.userauth.user_auth.model.User;
-import com.userauth.user_auth.model.UserDTO;
-import com.userauth.user_auth.repository.TokenBlacklistRepository;
+import com.userauth.user_auth.model.*;
+import com.userauth.user_auth.repository.UserInfoRepository;
 import com.userauth.user_auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,10 +25,11 @@ import java.util.regex.Pattern;
 public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final UserRepository userRepository;
-    private final MapperService<UserDTO, User> mapperService;
+    private final UserInfoRepository userInfoRepository;
+    private final MapperService<UserDTO, User> userMapperService;
+    private final MapperService<UserInfoDTO, UserInfo> userInfoMapperService;
     private final RefreshTokenService refreshTokenService;
     private final JwtBlacklistService jwtBlacklistService;
 
@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthenticationResponse());
         }
 
-        var user = User.builder()
+        var user = Tenant.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -53,6 +53,13 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+
+        // save userinfo for the newly created user
+        var userInfo = UserInfo.builder()
+                .user(user)
+                .build();
+
+        userInfoRepository.save(userInfo);
 
         // Generate JWT token using the username
         var jwtToken =  jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 5); //5 minutes
@@ -74,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthenticationResponse());
         }
 
-        var user = User.builder()
+        var user = LandLord.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
@@ -113,6 +120,38 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public ResponseEntity<UserInfoDTO> getUserInfo(String token, Long userId) {
+        // extract email from token, no need to check validity since auth filter already did before sending request here
+        String userEmail = jwtService.extractUserEmail(token);
+
+        //get user from database
+        var requestedInfoUser = userRepository.findById(userId);
+        var user = userRepository.findByEmail(userEmail).orElseThrow(
+                () -> new UserNotFoundException(String.format("User with email %s not found", userEmail))
+        );
+
+        //check if user is present in tha database
+        if (requestedInfoUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        //* check for authorization
+        //* first check if it's the same loggedIn user's information we are trying to get using the emails. Users have authority to view their own info
+        //* secondly, if it's not the same user, check if the loggedIn user has admin permission, since admins are the only other kind of users with permission to view other user's information
+        if(!userEmail.equals(requestedInfoUser.get().getEmail()) && !user.getAuthority().equals(UserAuthority.ADMIN)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        //get the requested user information from the database
+        var userInfo = userInfoRepository.findByUser(user).orElseThrow(
+                () -> new UserNotFoundException(String.format("User with email %s not found", userEmail)) //todo creat custom userinfo exception
+        );
+
+        //Return the userinfo dto for data control
+        return ResponseEntity.ok(userInfoMapperService.toDTO(userInfo));
+    }
+
+    @Override
     public ResponseEntity<AuthenticationResponse> login(AuthenticationRequest request) {
         try {
             var user = userRepository.findByEmail(request.getEmail()).orElseThrow(
@@ -147,45 +186,12 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-//    @Override
-//    public ResponseEntity<String> logout(String token) {
-//        var tokenBlacklist = TokenBlacklist.builder()
-//                .token(token)
-//                .expirationDate(jwtService.extractExpiration(token))
-//                .build();
-//        tokenBlacklistRepository.save(tokenBlacklist);
-//        return ResponseEntity.ok("success");
-//    }
-
     @Override
     public ResponseEntity<String> logout(String token) {
         Date expiration = jwtService.extractExpiration(token);
         jwtBlacklistService.blacklistToken(token, expiration);
         return ResponseEntity.ok("success");
     }
-
-//    @Override
-//    public ResponseEntity<AuthenticationRefreshResponse> refreshToken(String refreshToken) {
-//        try {
-//            if (jwtService.isJwtTokenExpired(refreshToken)) {
-//                throw new TokenExpiredException();
-//            }
-//            var userEmail = jwtService.extractUserEmail(refreshToken);
-//            var user = userRepository.findByEmail(userEmail).orElseThrow(
-//                    () -> new NoMatchingUserFoundException(userEmail)
-//            );
-//            var newJwtToken = jwtService.generateJwtToken(user.getEmail());
-//            return ResponseEntity.ok(AuthenticationRefreshResponse.builder()
-//                    .token(newJwtToken)
-//                    .build());
-//        } catch (TokenExpiredException expired) {
-//            logger.info("Expired token while refreshing token: {}", refreshToken);
-//            throw new RuntimeException(expired);
-//        } catch (NoMatchingUserFoundException ex) {
-//            logger.info("Error getting user from refresh token: {}", refreshToken);
-//            throw new RuntimeException(ex);
-//        }
-//    }
 
     @Override
     public ResponseEntity<AuthenticationRefreshResponse> refreshToken(String refreshToken) {
@@ -255,7 +261,7 @@ public class AuthServiceImpl implements AuthService {
                     () -> new NoMatchingUserFoundException(userEmail)
             );
 
-            return ResponseEntity.ok(mapperService.toDTO(user));
+            return ResponseEntity.ok(userMapperService.toDTO(user));
         } catch (NoMatchingUserFoundException ex) {
             logger.info("Error getting logged in user. No user found matching user from token: {}", token);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

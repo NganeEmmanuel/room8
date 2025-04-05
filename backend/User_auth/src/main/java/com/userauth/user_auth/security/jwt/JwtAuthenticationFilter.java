@@ -45,11 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.getWriter().write("Invalid token");
             return;
         }
-//        if (jwtService.isJwtTokenExpired(jwtToken)) {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.getWriter().write("Token expired");
-//            return;
-//        }
 
         email = jwtService.extractUserEmail(jwtToken); // Extract the email from JWT token
 

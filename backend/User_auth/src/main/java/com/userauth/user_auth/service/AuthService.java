@@ -8,6 +8,7 @@ import com.userauth.user_auth.auth.RegisterRequest;
 import com.userauth.user_auth.exception.AuthException;
 import com.userauth.user_auth.exception.TokenExpiredException;
 import com.userauth.user_auth.model.UserDTO;
+import com.userauth.user_auth.model.UserInfoDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
@@ -101,4 +102,12 @@ public interface AuthService {
      * @return true if string is a valid email format and false otherwise
      */
     Boolean isCorrectEmailFormat(String email);
+
+    /**
+     *
+     * @param token barrear token to verify the user
+     * @param userId id of the user whose information is to be gotten
+     * @return UserInfoDTO containing the specified user's information is authorized
+     */
+    ResponseEntity<UserInfoDTO> getUserInfo(String token, Long userId);
 }
