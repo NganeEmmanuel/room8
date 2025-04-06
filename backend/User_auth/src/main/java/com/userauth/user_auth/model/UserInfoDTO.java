@@ -52,7 +52,7 @@ public class UserInfoDTO {
 
     //financial responsibility
     private boolean willingToSplitUtilities; // yes or no (true or false respectively)
-    private Float monthlyIncome;
+    private Double monthlyIncome;
     private String incomeCurrency; // USD, EURO, POUND, CFA, NAIRA, etc
 
     // Bio/about

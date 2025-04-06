@@ -72,7 +72,7 @@ public class UserInfo {
 
     //financial responsibility
     private boolean willingToSplitUtilities; // yes or no (true or false respectively)
-    private Float monthlyIncome;
+    private Double monthlyIncome;
     private String incomeCurrency; // USD, EURO, POUND, CFA, NAIRA, etc
 
     // Todo this section can be added to the user posting about wanting a room mate without having any room. I the case that someone can see it and choose them
