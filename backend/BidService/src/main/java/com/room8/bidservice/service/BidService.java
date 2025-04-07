@@ -1,0 +1,57 @@
+package com.room8.bidservice.service;
+
+import com.room8.bidservice.exception.NoBidFoundException;
+import com.room8.bidservice.model.RequestBidDTO;
+import com.room8.bidservice.model.ResponseBidDTO;
+
+import java.util.List;
+
+public interface BidService {
+    /**
+     * Adds a new bid for listing
+     * @param requestBidDTO the bidding information
+     * @return the saved bid information
+     */
+    ResponseBidDTO addBid(RequestBidDTO requestBidDTO);
+
+    /**
+     * Updates the bid in the database
+     * @param requestBidDTO the updating bidding information
+     * @param id the bid id to be updated
+     * @return the updated bid information
+     */
+    ResponseBidDTO updateBid(RequestBidDTO requestBidDTO, Long id);
+
+    /**
+     * Removes bid from database
+     * @param id the bid id to be removed
+     * @return success if successful
+     * @throws Exception if an exception exception occurs
+     * @throws NoBidFoundException if no bid is found associated with the id
+     */
+    String removeBid(Long id) throws Exception, NoBidFoundException;
+
+    /**
+     * Gets the bid information associated with the provided id
+     * @param id The id of the bid
+     * @return the bid information requested
+     * @throws NoBidFoundException if no bid is found associated with the given id
+     */
+    ResponseBidDTO getBid(Long id) throws NoBidFoundException;
+
+    /**
+     * Get Bids associated with the provided listing id
+     * @param listingId id of the listing(room)
+     * @return a list of bid information
+     * @throws NoBidFoundException if no bid was found
+     */
+    List<ResponseBidDTO> getAllBidsByListingId(Long listingId) throws NoBidFoundException;
+
+    /**
+     * Get bids associated with the provided user id
+     * @param userId id of the user
+     * @return a list of bid information
+     * @throws NoBidFoundException if no bid was found
+     */
+    List<ResponseBidDTO> getAllBidsByUserId(Long userId) throws NoBidFoundException;
+}

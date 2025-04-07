@@ -6,6 +6,7 @@ import com.userauth.user_auth.auth.RegisterRequest;
 import com.userauth.user_auth.model.UserDTO;
 import com.userauth.user_auth.model.UserInfoDTO;
 import com.userauth.user_auth.service.AuthService;
+import com.userauth.user_auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @Operation(summary = "Register a new user account")
     @PostMapping("/signup")
@@ -84,6 +86,11 @@ public class AuthController {
         } else {
             return new ResponseEntity<>(new UserDTO(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/get-user")
+    public ResponseEntity<UserDTO> getUserFromId(@RequestParam Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @Operation(summary = "Retrieve the ID of the logged-in user")

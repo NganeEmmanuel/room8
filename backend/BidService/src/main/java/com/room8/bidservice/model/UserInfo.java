@@ -1,6 +1,6 @@
-package com.userauth.user_auth.model;
+package com.room8.bidservice.model;
 
-import com.userauth.user_auth.enums.*;
+import com.room8.bidservice.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +23,8 @@ public class UserInfo {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true) // Foreign key in UserInfo table
-    private User user;
+    @JoinColumn(name = "bid_id", referencedColumnName = "id", nullable = false, unique = true) // Foreign key in UserInfo table
+    private Bid bid;
     private String profileImagePath;
     private Date dateOfBirth;
     private String sex;
@@ -96,18 +96,4 @@ public class UserInfo {
     // Bio/About
     @Column(length = 5000)
     private String aboutMe;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(updatable = false)
-    private Date cratedDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdated;
-
-
-    @PrePersist
-    protected void onCreate() {
-        cratedDate = new Date();
-        lastUpdated = new Date();
-    }
 }

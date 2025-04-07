@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -31,4 +33,6 @@ public class ListingDTO {
     private String listingDescription;
     private ListingStyle listingStyle;
     private Integer numberOfHouseMates;
+    private Date listedDate;
+    private Date lastUpdated;
 }
