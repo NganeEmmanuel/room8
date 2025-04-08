@@ -1,6 +1,6 @@
 package com.room8.bidservice.service;
 
-import com.room8.bidservice.feignInterface.UserAuthServiceInterface;
+import com.room8.bidservice.client.UserAuthServiceInterface;
 import com.room8.bidservice.model.Bid;
 import com.room8.bidservice.model.RequestBidDTO;
 import com.room8.bidservice.model.ResponseBidDTO;

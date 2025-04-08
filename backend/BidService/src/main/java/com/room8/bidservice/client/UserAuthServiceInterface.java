@@ -1,4 +1,4 @@
-package com.room8.bidservice.feignInterface;
+package com.room8.bidservice.client;
 
 import com.room8.bidservice.model.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("USER-AUTH")
 public interface UserAuthServiceInterface {
     @GetMapping("/api/v1/auth/get-user")
-    public ResponseEntity<UserDTO> getUserFromId(@RequestParam Long id);
+    ResponseEntity<UserDTO> getUserFromId(@RequestParam Long id);
 }

@@ -280,8 +280,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Boolean> verifyEmail(String email, String token) {
-        return null;
+    public Boolean markedAsVerified(String email) throws UserNotFoundException{
+        var user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("No user found with email: " +email)
+        );
+        user.setIsEmailVerified(true);
+        try {
+            userRepository.save(user);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        return user.getIsEmailVerified();
     }
 
 

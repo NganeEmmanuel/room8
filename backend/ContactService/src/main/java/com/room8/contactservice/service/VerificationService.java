@@ -1,17 +1,12 @@
 package com.room8.contactservice.service;
 
+import com.room8.contactservice.client.UserAuthClient;
 import com.room8.contactservice.exception.*;
-import com.room8.contactservice.model.SendEmailRequest;
-import com.room8.contactservice.model.VerificationRequest;
-import com.room8.contactservice.model.VerifyEmailCodeRequest;
-import com.room8.contactservice.model.VerifySMSCodeRequest;
+import com.room8.contactservice.model.*;
 import com.room8.contactservice.util.EmailTemplateBuilder;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -26,13 +21,15 @@ public class VerificationService {
     private final EmailService emailService;
     private final StringRedisTemplate redisTemplate;
     private final JavaMailSender mailSender;
+    private final UserAuthClient userAuthClient;
 
-    private static final Duration TOKEN_EXPIRATION = Duration.ofMinutes(15);
+    private static final Duration TOKEN_EXPIRATION = Duration.ofMinutes(30);
+    private static final Duration SMS_EXPIRATION = Duration.ofMinutes(10);
 
     /**
      * Generates a verification token, stores it in Redis, and sends a formatted email to the user.
      */
-    public ResponseEntity<?> sendVerificationEmail(VerificationRequest request) {
+    public String sendVerificationEmail(VerificationRequest request) {
         String token = UUID.randomUUID().toString();
         String email = request.getEmail();
 
@@ -50,40 +47,40 @@ public class VerificationService {
         // Send the email
         emailService.sendHtmlEmail(email, "Verify Your Email Address", emailHtml);
 
-        return ResponseEntity.ok("Verification email sent successfully");
+        return "success";
     }
 
 
-    public ResponseEntity<?> verifyEmailToken(String email, String token) {
+    public String verifyEmailToken(String email, String token) {
         String key = "email_verification:" + token;
 
-        try {
-            String storedEmail = redisTemplate.opsForValue().get(key);
+        String storedEmail = redisTemplate.opsForValue().get(key);
 
-            if (storedEmail == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid or expired token.");
-            }
-
-            if (!storedEmail.equals(email)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Email and token mismatch.");
-            }
-
-            // Email is verified — clean up token
-            redisTemplate.delete(key);
-
-            // Optional: notify user_auth service (can be integrated here)
-            // userAuthClient.markEmailAsVerified(email);
-
-            return ResponseEntity.ok("Email verified successfully.");
-
-        } catch (Exception e) {
-            throw new TokenStorageException("Failed to verify token from Redis", e);
+        if (storedEmail == null) {
+            throw new TokenExpiredOrNotFoundException("Invalid or expired token.");
         }
+
+        if (!storedEmail.equals(email)) {
+            throw new EmailAndTokenMissMatchException("Email and token mismatch.");
+        }
+
+        // notify user_auth service
+        try {
+            var isMarkedAsVerified = userAuthClient.markUserAsVerified(email).getBody();
+            if (Boolean.FALSE.equals(isMarkedAsVerified)) {
+                throw new UserAuthMarkedAsVerifiedException("Error while verifying user emailed token.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Email is verified — clean up token
+        redisTemplate.delete(key);
+
+        return "success";
     }
 
-    public ResponseEntity<?> sendEmail(SendEmailRequest request) {
+    public String sendEmail(SendEmailRequest request) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -94,13 +91,13 @@ public class VerificationService {
 
             mailSender.send(message);
 
-            return ResponseEntity.ok("Email sent successfully.");
-        } catch (MessagingException e) {
+            return "success";
+        } catch (Exception e) {
             throw new EmailSendException("Failed to send email: " + e.getMessage(), e);
         }
     }
 
-    public ResponseEntity<?> verifySMSCode(VerifySMSCodeRequest request) {
+    public String verifySMSCode(VerifySMSCodeRequest request) {
         String redisKey = "sms_verification:" + request.getUserId();
         String savedCode;
 
@@ -117,7 +114,7 @@ public class VerificationService {
             // Optional: delete after success
             redisTemplate.delete(redisKey);
 
-            return ResponseEntity.ok("Phone number verified successfully.");
+            return "success";
 
         } catch (TokenExpiredOrNotFoundException | InvalidTokenException e) {
             throw e;
@@ -126,7 +123,18 @@ public class VerificationService {
         }
     }
 
-    public ResponseEntity<?> verifyEmailCode(VerifyEmailCodeRequest request) {
+    public String saveSMSVerificationCode(SendSMSCodeRequest request) {
+        // Store token in Redis with expiration
+        try {
+            redisTemplate.opsForValue().set("sms_verification:" + request.getUserId(), request.getCode(), SMS_EXPIRATION);
+        } catch (Exception e) {
+            throw new SmsCodeStorageException("Failed to store sms verification code in Redis", e);
+        }
+
+        return "success";
+    }
+
+    public String verifyEmailCode(VerifyEmailCodeRequest request) {
         String redisKey = "email_verification:" + request.getEmail();
         String savedCode;
 
@@ -143,7 +151,7 @@ public class VerificationService {
             // Optional: delete key after success
             redisTemplate.delete(redisKey);
 
-            return ResponseEntity.ok("Email verified successfully.");
+            return "success";
 
         } catch (TokenExpiredOrNotFoundException | InvalidTokenException e) {
             throw e;

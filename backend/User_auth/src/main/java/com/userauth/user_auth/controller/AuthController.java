@@ -122,4 +122,10 @@ public class AuthController {
             return new ResponseEntity<>(new UserInfoDTO(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Operation(summary = "Mark user associated with the provided email as verified ")
+    @PostMapping("/marked-as-verified")
+    public ResponseEntity<Boolean> markUserAsVerified(@RequestParam String email) {
+        return ResponseEntity.ok(authService.markedAsVerified(email));
+    }
 }

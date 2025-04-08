@@ -6,6 +6,7 @@ import com.userauth.user_auth.auth.AuthenticationResponse;
 import com.userauth.user_auth.auth.RegisterRequest;
 import com.userauth.user_auth.exception.AuthException;
 import com.userauth.user_auth.exception.TokenExpiredException;
+import com.userauth.user_auth.exception.UserNotFoundException;
 import com.userauth.user_auth.model.UserDTO;
 import com.userauth.user_auth.model.UserInfoDTO;
 import org.springframework.http.ResponseEntity;
@@ -81,12 +82,12 @@ public interface AuthService {
     ResponseEntity<Long> getLoggedInUserId(String token);
 
     /**
-     * Verifying the email from the client end via email verification
-     * @param email email to be verified
-     * @param token token to verify against
+     * Verifying the email from the client end via email verification(mark user associated with email as verified
+     * @param email email of the user to me marked as verified
      * @return true
+     * @throws UserNotFoundException if a user is not found associated with the provided email
      */
-    ResponseEntity<Boolean> verifyEmail(String email, String token);
+    Boolean markedAsVerified(String email) throws UserNotFoundException;
 
     /**
      * Check if an email is in the database

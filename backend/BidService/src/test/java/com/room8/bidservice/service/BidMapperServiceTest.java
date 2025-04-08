@@ -1,7 +1,7 @@
 package com.room8.bidservice.service;
 
 
-import com.room8.bidservice.feignInterface.UserAuthServiceInterface;
+import com.room8.bidservice.client.UserAuthServiceInterface;
 import com.room8.bidservice.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
