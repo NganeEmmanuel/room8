@@ -1,0 +1,6 @@
+---
+- name: Setup Docker on servers
+  hosts: bastion
+  become: yes
+  roles:
+    - docker

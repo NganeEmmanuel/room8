@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-}
+} # remove this before running. this is duplicate internet gateway. its properly configured in the networking.tf module
 
 resource "aws_subnet" "public" {
   count             = 2
