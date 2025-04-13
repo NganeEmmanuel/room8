@@ -1,0 +1,45 @@
+---
+- name: Install python3-venv
+  ansible.builtin.package:
+    name: python3-venv
+    state: present
+
+- name: Create a Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /opt/venv
+
+- name: Install Kubernetes client in virtual environment
+  ansible.builtin.pip:
+    name: kubernetes
+    virtualenv: /opt/venv
+
+- name: Ensure Kubernetes client is installed
+  ansible.builtin.command:
+    cmd: /opt/venv/bin/pip show kubernetes
+
+- name: Set ansible_python_interpreter
+  set_fact:
+    ansible_python_interpreter: /opt/venv/bin/python
+
+- name: Create argocd namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: argocd
+    state: present
+
+- name: Install ArgoCD using official manifests
+  ansible.builtin.shell: |
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  args:
+    warn: false
+
+- name: Wait for ArgoCD server deployment to be available
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    namespace: argocd
+    name: argocd-server
+  register: argocd_server
+  until: argocd_server.resources[0].status.availableReplicas | default(0) > 0
+  retries: 20
+  delay: 15

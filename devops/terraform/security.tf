@@ -11,12 +11,35 @@ resource "aws_security_group" "bastion_sg" {
     # cidr_blocks = ["129.0.205.99/32", "132.99.201.10/32", "141.22.55.77/32"] # <--- for multiple ip addresses
   }
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # todo change to [aws_vpc.main.cidr_block]
+  }
+
+  ingress {
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # todo change to [aws_vpc.main.cidr_block]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+
 
   tags = { Name = "bastion-sg" }
 }
@@ -29,6 +52,20 @@ resource "aws_security_group" "app_sg" {
   ingress {
     from_port   = 0
     to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  ingress {
+    from_port   = 30000
+    to_port     = 32767
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.main.cidr_block]
   }

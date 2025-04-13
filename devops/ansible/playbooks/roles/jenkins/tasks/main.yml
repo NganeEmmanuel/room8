@@ -1,0 +1,33 @@
+---
+# Install Java (Jenkins dependency)
+- name: Install Java
+  apt:
+    name: openjdk-17-jdk
+    state: present
+    update_cache: yes
+
+# Add Jenkins GPG key
+- name: Add Jenkins repository key
+  apt_key:
+    url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+    state: present
+
+# Add Jenkins repository
+- name: Add Jenkins repository
+  apt_repository:
+    repo: deb https://pkg.jenkins.io/debian binary/
+    state: present
+
+# Install Jenkins
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: present
+    update_cache: yes
+
+# Ensure Jenkins is started and enabled
+- name: Start and enable Jenkins service
+  systemd:
+    name: jenkins
+    enabled: yes
+    state: started
