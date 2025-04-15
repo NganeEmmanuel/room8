@@ -13,6 +13,32 @@ The application is designed using a **microservices architecture**, ensuring sca
 
 ---
 
+## 🗂️ GitHub Repository Structure
+
+```
+room8/
+├── backend/
+│   ├── ApiGateway/         # single access for applciation
+│   ├── ServiceRegistry/    # Eureka service register for service descovery
+│   ├── User_Auth/          # User authentication and authorization service
+│   ├── ListingService/     # Listing service handling room listings
+│   ├── BidService/         # Handles the biding logic on listings
+│   └── ContactService/     # Handles contacting users via email and phone number
+│   ├── FeedbackService/    # Handle feedback logic like rating and reviews
+│   ├── SearchService/      # Handles search related logic including filtering search
+├── frontend/
+│   ├── room8               # fronend application
+├── devops/
+│   ├── ci/                 # Jenkinsfiles, pipelines
+│   ├── terraform/          # Terraform scripts for infra
+│   ├── ansible/            # Playbooks and roles
+│   ├── docker/             # Dockerfiles and Docker Compose files
+│   ├── k8s/                # Kubernetes manifests
+│   └── scripts/            # Helper bash or Python scripts
+└── Documentation
+└── README.md
+```
+
 ## Overall Architectural Overview
 The project follows a **microservices-based architecture**, where different services handle distinct functionalities. The key components include:
 
@@ -53,21 +79,26 @@ The backend consists of several microservices, each handling a specific function
 ### **3. Authentication Service**
 - Handles user authentication and authorization.
 - Uses **JWT tokens** for secure communication.
+- Uses Redis for temporal token storage and management
 - Integrates with **Spring Security**.
 
 ### **4. User Service**
 - Manages user profiles and preferences.
-- Stores user data in **PostgreSQL**.
+- Stores user data in **MYSQL**.
 
 ### **5. Listing Service**
 - Manages property and roommate listings.
-- Uses **MongoDB** for flexible storage of listings.
+- Uses **MSQL** for storage of listings.
 
-### **6. Feedback Service**
+### **6. Bid Service**
+- Manages tennant bids on listings.
+- Uses **MYSQL** for storage of listings.
+
+### **7. Feedback Service**
 - Handles user reviews and ratings.
-- Uses **PostgreSQL** to store feedback data.
+- Uses **MYSQL** to store feedback data.
 
-### **7. Search Service**
+### **8. Search Service**
 - Provides search functionality for rooms and roommates.
 - Uses **Elasticsearch** for fast querying.
 

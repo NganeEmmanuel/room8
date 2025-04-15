@@ -43,5 +43,5 @@ The `RoomService` is responsible for managing room listings in the system. It in
 - `AuthClient` <--> `user_auth`
 - (Optional) `RoomService` <--> `BidService`
 
-![component diagram](diagram.png)
+![component diagram](../images/component-diagram.png)
 

@@ -1,0 +1,9 @@
+---
+- name: Install Docker on bastion and app nodes
+  hosts: bastion
+  become: true
+
+  roles:
+    - docker
+    - jenkins
+    - argocd
