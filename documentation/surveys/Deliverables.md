@@ -95,7 +95,7 @@ How likely are you to recommend an app like ours to friends or family?
 - **Somewhat Likely:** 10%
 - **Not Likely:** 0%
 
-![[Referral Likelihood Chart](../documentation/image/referal.png)]
+![Referral Likelihood Chart](../documentation/image/referal.png)
 
 ## Key Insights and Trends
 1. **High Demand for Affordability:** Many respondents highlighted the challenge of high rental prices, indicating a need for budget-friendly options in the app.
