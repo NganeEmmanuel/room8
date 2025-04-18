@@ -5,7 +5,7 @@ resource "aws_launch_template" "app_node" {
   key_name      = var.key_name
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
-  user_data = base64encode(file("scripts/k8s-bootstrap.sh"))  # Optional
+  user_data = base64encode(file("scripts/worker-bootstrap.sh"))  # Optional
 
 }
 

@@ -2,3 +2,7 @@ terraform.tfvars
 .terraform
 .terraform.lock.hcl
 scripts/sample.sh
+aws_login.pem
+errored.tfstate
+*.tfstate
+*.tfstate.backup
