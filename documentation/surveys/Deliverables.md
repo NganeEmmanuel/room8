@@ -24,7 +24,7 @@ This report summarizes the findings from the user survey conducted to understand
 - **Female:** 50% of the responders were females
 - **Prefer not to say:** 0%
 
-![Gender Distribution Chart](../documentation/image/basic_user_info.png)
+![Gender Distribution Chart](../documentation/images/basic_user_info.png)
 
 #### Age Range
 - **Under 18:** 0%
@@ -35,7 +35,7 @@ This report summarizes the findings from the user survey conducted to understand
 - **55-64:** 0%
 - **65 and above:** 0%
 
-![Age Range Distribution Chart](../documentation/image/age_range.png) 
+![Age Range Distribution Chart](../documentation/images/age_range.png) 
 
 #### Income Range
 - **Under 41,875 FCFA:** 40%
@@ -50,14 +50,14 @@ This report summarizes the findings from the user survey conducted to understand
 - **450,000 FCFA – 500,000 FCFA:** 10%
 - **500,000 FCFA and above:** 10%
 
-![Income Range Distribution Chart](../documentation/image/income_range.png)
+![Income Range Distribution Chart](../documentation/images/income_range.png)
 
 #### Geographical Location
 - **Urban area:** 50%
 - **Suburban area:** 50%
 - **Rural area:** 0%
 
-![Geographical Location Chart](../documentation/image/geographicallocation.png)
+![Geographical Location Chart](../documentation/images/geographical_location.png)
 
 ### Challenges Faced in Securing Housing
 What difficulties have you encountered when searching for rental properties? (Select all that apply)
@@ -68,7 +68,7 @@ What difficulties have you encountered when searching for rental properties? (Se
 - **Lack of Responsiveness from Landlords:** 30% mentioned poor communication as a barrier.
 - **Other Barriers:** 0% of respondents specified other difficulties.
 
-![Challenges Faced Chart](../documentation/image/difficulties.png)
+![Challenges Faced Chart](../documentation/images/difficulties.png)
 
 ### Feedback on Proposed Solution
 How valuable do you think an app designed to assist with your housing search would be?
@@ -76,7 +76,7 @@ How valuable do you think an app designed to assist with your housing search wou
 - **Somewhat Valuable:** 10%
 - **Not Valuable:** 0%
 
-![Value of the App Chart](../documentation/image/howvaluable.png)
+![Value of the App Chart](../documentation/images/how_valuable.png)
 
 ### Desired Features
 What additional features would you like to see in a housing solution app? (Select all that apply)
@@ -87,7 +87,7 @@ What additional features would you like to see in a housing solution app? (Selec
 - **User Reviews and Ratings for Landlords:** 90% indicated this would influence their decisions.
 - **Other Features:** No respondents suggested other features.
 
-![Desired Features Chart](../documentation/image/additionalfeatures)
+![Desired Features Chart](../documentation/image/additional_features)
 
 ### Referral Likelihood
 How likely are you to recommend an app like ours to friends or family?
