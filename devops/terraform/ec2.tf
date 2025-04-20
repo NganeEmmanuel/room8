@@ -5,6 +5,7 @@ resource "aws_instance" "bastion" {
   key_name                   = var.key_name  # Replace with your key pair
   associate_public_ip_address = true
   vpc_security_group_ids     = [aws_security_group.bastion_sg.id]
+  iam_instance_profile = aws_iam_instance_profile.master_profile.name #iam roles for master s3 put {in this case the bastion is our master node}
 
   # Add the file provisioner to copy the PEM file
   provisioner "file" {
