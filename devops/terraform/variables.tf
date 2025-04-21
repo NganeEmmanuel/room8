@@ -39,3 +39,9 @@ variable "ami" {
 variable "key_name" {
   description = "SSH key pair name"
 }
+
+
+variable "private_key_path" {
+  description = "SSH private key path"
+}
+
