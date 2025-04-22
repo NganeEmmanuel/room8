@@ -18,30 +18,44 @@ The `RoomService` is responsible for managing room listings in the system. It in
 ## Interfaces
 
 ### REST API `<interface>`
-- External clients use this to interact with RoomService.
-- Handles HTTP requests and maps them to internal logic via `ListingManager`.
+- Rest API serve as an Interface to allow components(micro services communicate with one another)
 
 ### AuthClient -> user_auth `<component>`
 - Used to validate users or fetch user information.
 
-### BidService `<component>`
+### BidService `<component>/<microservice>`
 - May be called to fetch or manage room biding.
 
+### FeddbackService `<component>/<microservice>`
+- May be called to manage feedback from clients.
+
+### ContactService `<component>/<microservice>`
+- May be called to manage communication between clients and landlord.
+
+### SearchService `<component>/<microservice>`
+- May be called to manage listings based on search filters
 ## Database
 
 ### MySQL `<database>`
 - Stores all room listing data.
 - Accessed via the `ListingRepository`.
 
+### Redis `<database>`
 
+- Redis stores frequently accessed data in memory, making it much faster to retrieve than from a database.
 
 ## Communication Flow 
 
 - REST API → RoomService (ListingManager)
 - ListingManager <--> ListingValidator, ListingRepository
-- `ListingRepository` <--> MySQL
+- `Room service` <--> `MySQL`
+- `Redis` <--> `MySql`
 - `AuthClient` <--> `user_auth`
 - (Optional) `RoomService` <--> `BidService`
+- (Optional) `RoomService` <--> `SearchService`
+- (Optional) `RoomService` <--> `feedbackService`
+- (Optional) `RoomService` <--> `ContactService`
 
-![component diagram](../images/component-diagram.png)
+
+![component diagram](../images/component_diagram.png)
 

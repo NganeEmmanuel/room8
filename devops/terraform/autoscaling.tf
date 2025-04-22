@@ -4,13 +4,11 @@ resource "aws_launch_template" "app_node" {
   instance_type = var.instance_type
   key_name      = var.key_name
   vpc_security_group_ids = [aws_security_group.app_sg.id]
-
   iam_instance_profile {
     name = aws_iam_instance_profile.worker_profile.name # iam role for worker
   }
 
   user_data = base64encode(file("scripts/worker-bootstrap.sh"))  # for bootstrap script
-
 }
 
 resource "aws_autoscaling_group" "app_nodes" {

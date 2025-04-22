@@ -1,5 +1,4 @@
 resource "aws_instance" "bastion" {
-
   ami                        = var.ami # Ubuntu 2025, update if needed
   instance_type              = "t3.large"
   subnet_id                  = aws_subnet.public[0].id

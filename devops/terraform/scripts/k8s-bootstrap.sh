@@ -1,7 +1,5 @@
 #!/bin/bash
-
 set -e  # Exit immediately on error
-
 
 echo "🔧 Starting Kubernetes bootstrap script..."
 
@@ -15,14 +13,11 @@ apt-get upgrade -y
 
 # Install required system dependencies
 echo "📚 Installing dependencies..."
-
 apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common git unzip
-
 
 # ----------------------------
 # 2. Kernel Parameters for Kubernetes
 # ----------------------------
-
 
 echo "🔧 Loading kernel modules..."
 modprobe overlay
@@ -37,16 +32,13 @@ net.ipv4.ip_forward = 1
 EOF
 sysctl --system
 
-
 # ----------------------------
 # 3. Disable Swap
 # ----------------------------
 
 echo "🚫 Disabling swap..."
-
 swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab
-
 
 # ----------------------------
 # 4. Install Docker
@@ -54,7 +46,6 @@ sed -i '/ swap / s/^/#/' /etc/fstab
 
 echo "🐳 Installing Docker..."
 apt-get install -y docker.io
-
 
 systemctl enable docker
 systemctl start docker
@@ -86,11 +77,9 @@ echo "📦 Installing Kubernetes tools..."
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list
 
-
 apt-get update -y
 apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
-
 
 echo "⚙️ Configuring Kubelet cgroup driver..."
 KUBELET_DEFAULT_FILE="/etc/default/kubelet"
@@ -111,7 +100,6 @@ echo "⚙️ Modifying Docker Daemon configuration..."
 mkdir -p /etc/docker
 
 tee /etc/docker/daemon.json > /dev/null << 'EOF'
-
 {
     "exec-opts": ["native.cgroupdriver=systemd"],
     "log-driver": "json-file",
@@ -121,7 +109,6 @@ tee /etc/docker/daemon.json > /dev/null << 'EOF'
     "storage-driver": "overlay2"
 }
 EOF
-
 
 systemctl daemon-reload
 systemctl restart docker
@@ -134,8 +121,6 @@ done
 echo "✅ Docker is active."
 
 # ----------------------------
-
-
 # 8. Install AWS CLI
 # ----------------------------
 
@@ -155,31 +140,25 @@ rm -rf aws awscliv2.zip
 # ----------------------------
 
 echo "🚀 Initializing Kubernetes cluster..."
-
 set +e
 kubeadm init --control-plane-endpoint="$HOST_IP" --pod-network-cidr=192.168.0.0/16 --upload-certs
 INIT_STATUS=$?
 set -e
 
-
 if [ $INIT_STATUS -ne 0 ]; then
     echo "🔁 Retrying kubeadm init..."
-
     sleep 10
     kubeadm reset -f
     systemctl restart kubelet
     kubeadm init --control-plane-endpoint="$HOST_IP" --pod-network-cidr=192.168.0.0/16 --upload-certs
-
 fi
 
 # ----------------------------
 # 10. Setup kubeconfig
-
 # ----------------------------
 
 echo "📁 Setting up kubeconfig for ubuntu user..."
 mkdir -p /home/ubuntu/.kube
-
 cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
 chown ubuntu:ubuntu /home/ubuntu/.kube/config
 
@@ -194,14 +173,12 @@ timeout=100
 elapsed=0
 interval=5
 
-
 while (( elapsed < timeout )); do
     if su - ubuntu -c "kubectl get nodes" &>/dev/null; then
         echo "✅ API server is ready."
         break
     fi
     echo "🔁 Waiting for API server..."
-
     sleep $interval
     elapsed=$((elapsed + interval))
 done
@@ -231,4 +208,3 @@ else
 fi
 
 echo "✅ Kubernetes cluster bootstrapped successfully!"
-
