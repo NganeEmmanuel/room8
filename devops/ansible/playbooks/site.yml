@@ -4,6 +4,6 @@
   become: true
 
   roles:
-    - docker
+#    - docker --> docker, containerd, and k8s are installed using the bootstrap on provisioning with terraform
     - jenkins
     - argocd

@@ -136,7 +136,21 @@ echo "✅ AWS CLI installed successfully."
 rm -rf aws awscliv2.zip
 
 # ----------------------------
-# 9. Kubernetes Initialization
+# 9. Set Hostname to 'master'
+# ----------------------------
+
+echo "🖥️ Setting hostname to 'master'..."
+hostnamectl set-hostname master
+
+# Update /etc/hosts to reflect the new hostname
+echo "📂 Updating /etc/hosts with new hostname..."
+sed -i "s/127.0.0.1.*localhost/127.0.0.1 master localhost/g" /etc/hosts
+
+echo "✅ Hostname set to 'master' and /etc/hosts updated."
+
+
+# ----------------------------
+# 10. Kubernetes Initialization
 # ----------------------------
 
 echo "🚀 Initializing Kubernetes cluster..."
@@ -154,7 +168,7 @@ if [ $INIT_STATUS -ne 0 ]; then
 fi
 
 # ----------------------------
-# 10. Setup kubeconfig
+# 11. Setup kubeconfig
 # ----------------------------
 
 echo "📁 Setting up kubeconfig for ubuntu user..."
@@ -163,7 +177,7 @@ cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
 chown ubuntu:ubuntu /home/ubuntu/.kube/config
 
 # ----------------------------
-# 11. Install CNI Plugin (Calico)
+# 12. Install CNI Plugin (Calico)
 # ----------------------------
 
 echo "🌐 Installing Calico CNI plugin..."
@@ -187,11 +201,31 @@ if (( elapsed >= timeout )); then
     echo "❌ Timeout reached waiting for API server."
 fi
 
+# Apply the Calico manifest
 su - ubuntu -c "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml"
 echo "✅ Calico CNI plugin installed."
 
 # ----------------------------
-# 12. Save Join Command
+# 12.1 Patch MTU in Calico ConfigMap
+# ----------------------------
+
+echo "🔧 Patching Calico MTU setting in ConfigMap…"
+su - ubuntu -c "kubectl -n kube-system patch cm calico-config \
+  --type merge \
+  --patch '{\"data\":{\"veth_mtu\":\"8941\"}}'"
+
+echo "🔄 Restarting Calico DaemonSet…"
+su - ubuntu -c "kubectl -n kube-system rollout restart daemonset/calico-node"
+
+# give the pods a moment to start terminating/restarting
+sleep 5
+
+# wait for all calico-node pods to be ready
+su - ubuntu -c "kubectl -n kube-system wait --for=condition=ready pod -l k8s-app=calico-node --timeout=120s"
+echo "✅ Calico MTU patched and DaemonSet ready."
+
+# ----------------------------
+# 13. Save Join Command
 # ----------------------------
 
 echo "📁 Generating join command..."

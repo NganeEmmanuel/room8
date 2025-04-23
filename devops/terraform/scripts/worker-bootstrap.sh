@@ -2,7 +2,7 @@
 set -e
 
 echo "🚀 Starting Kubernetes worker bootstrap script..."
-sleep 180  # Wait to ensure network stability before internet-based installs
+sleep 120  # Wait to ensure network stability before internet-based installs
 
 # ----------------------------
 # 0. Install AWS CLI
@@ -126,8 +126,25 @@ systemctl daemon-reload
 systemctl restart docker
 echo "✅ Docker daemon ready."
 
+
 # ----------------------------
-# 8. Download and Run Join Script
+# 8. Set Unique Hostname for Worker
+# ----------------------------
+
+echo "🖥️ Setting unique hostname for this worker node..."
+
+# Retrieve the EC2 Instance ID from metadata
+INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+
+# Set the hostname to the instance ID (you can modify this to suit your naming convention)
+hostnamectl set-hostname "worker-${INSTANCE_ID}"
+
+# Update /etc/hosts to reflect the new hostname
+sed -i "s/127.0.0.1.*localhost/127.0.0.1 ${INSTANCE_ID}/g" /etc/hosts
+
+
+# ----------------------------
+# 9. Download and Run Join Script
 # ----------------------------
 
 echo "⬇️ Downloading join.sh from S3..."
