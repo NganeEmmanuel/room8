@@ -27,7 +27,7 @@ room8/
 │   ├── FeedbackService/    # Handle feedback logic like rating and reviews
 │   ├── SearchService/      # Handles search related logic including filtering search
 ├── frontend/
-│   ├── room8               # fronend application
+│   ├── room8               # frontend application
 ├── devops/
 │   ├── ci/                 # Jenkinsfiles, pipelines
 │   ├── terraform/          # Terraform scripts for infra
