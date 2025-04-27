@@ -6,7 +6,6 @@ import lombok.*;
 @Data
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class UserDTO {
     private Long id;
@@ -21,5 +20,8 @@ public class UserDTO {
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+    }
+
+    public UserDTO() {
     }
 }

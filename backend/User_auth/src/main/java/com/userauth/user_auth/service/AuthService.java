@@ -10,6 +10,8 @@ import com.userauth.user_auth.exception.UserNotFoundException;
 import com.userauth.user_auth.model.UserDTO;
 import com.userauth.user_auth.model.UserInfoDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 
 public interface AuthService {
     /**
