@@ -12,7 +12,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,25 +28,17 @@ public class VerificationService {
     /**
      * Generates a verification token, stores it in Redis, and sends a formatted email to the user.
      */
-    public String sendVerificationEmail(VerificationRequest request) {
-        String token = UUID.randomUUID().toString();
+    public Boolean sendVerificationEmail(VerificationRequest request) {
         String email = request.getEmail();
 
-        // Store token in Redis with expiration
-        try {
-            redisTemplate.opsForValue().set("email_verification:" + token, email, TOKEN_EXPIRATION);
-        } catch (Exception e) {
-            throw new TokenStorageException("Failed to store token in Redis", e);
-        }
-
-        // Generate the verification URL
-        String verificationUrl = "https://yourdomain.com/verify-email?email=" + email + "&token=" + token; //todo edit domain link
+        // Generate the verification URL todo edit the link to reflect the service (authentication service is the one verifying)
+        String verificationUrl = "https://yourdomain.com/verify-email?email=" + email + "&token=" + request.getToken(); //todo edit domain link you can use environmental variable to set it since we are using ec2
         String emailHtml = EmailTemplateBuilder.buildVerificationEmail(email, verificationUrl);
 
         // Send the email
         emailService.sendHtmlEmail(email, "Verify Your Email Address", emailHtml);
 
-        return "success";
+        return Boolean.TRUE;
     }
 
 
