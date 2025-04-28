@@ -1,4 +1,4 @@
-package com.room8.contactservice.model;
+package com.room8.authservice.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
