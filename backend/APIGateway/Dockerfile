@@ -10,6 +10,9 @@ RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
 COPY backend/APIGateway .
+
+# Re-apply executable permission (IMPORTANT)
+RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 # --- Stage 2: Package the app ---

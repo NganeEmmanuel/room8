@@ -17,6 +17,9 @@ RUN ./mvnw dependency:go-offline
 # Copy the rest of the source code
 COPY backend/ServiceRegistry .
 
+# Re-apply executable permission (IMPORTANT)
+RUN chmod +x mvnw
+
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
