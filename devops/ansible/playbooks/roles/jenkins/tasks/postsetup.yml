@@ -1,0 +1,37 @@
+# Upload admin user Groovy init script
+- name: Create Jenkins admin user
+  template:
+    src: basic-security.groovy.j2
+    dest: /var/lib/jenkins/init.groovy.d/basic-security.groovy
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+
+# Upload list of plugins
+- name: Upload plugin list
+  copy:
+    src: plugins.txt
+    dest: /var/lib/jenkins/plugins.txt
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+
+# Install plugins via Jenkins CLI
+- name: Install Jenkins plugins (using CLI)
+  shell: |
+    JENKINS_CLI=/tmp/jenkins-cli.jar
+    wget -q http://localhost:8080/jnlpJars/jenkins-cli.jar -O $JENKINS_CLI
+    until curl -sL http://localhost:8080/login > /dev/null; do sleep 5; done
+    for plugin in $(cat /var/lib/jenkins/plugins.txt); do
+      java -jar $JENKINS_CLI -s http://localhost:8080 install-plugin $plugin -deploy
+    done
+    systemctl restart jenkins
+
+# Upload seed job groovy script
+- name: Create Jenkins seed job (sample pipeline)
+  copy:
+    src: seed_job.groovy
+    dest: /var/lib/jenkins/init.groovy.d/seed_job.groovy
+    owner: jenkins
+    group: jenkins
+    mode: '0644'

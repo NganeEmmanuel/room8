@@ -43,3 +43,8 @@
     port: 8080
     delay: 10
     timeout: 60
+
+# run the post setup file to set up admin user, install plugins, and run ci
+- name: Include Jenkins post-setup configuration
+  include_tasks: postsetup.yml
+

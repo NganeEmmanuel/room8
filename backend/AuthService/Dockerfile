@@ -8,10 +8,10 @@ LABEL maintainer="emmanuelngane06@gmail.com"
 WORKDIR /app
 
 # Copy the JAR file to the container
-COPY target/APIGateway-0.0.1-SNAPSHOT.jar /app/apiGateway.jar
+COPY target/AuthService-0.0.1-SNAPSHOT.jar /app/authService.jar
 
 # Expose the port that the service will run on
-EXPOSE 8765
+EXPOSE 8081
 
 # Command to run the application
-ENTRYPOINT ["java", "-jar", "/app/apiGateway.jar"]
+ENTRYPOINT ["java", "-jar", "/app/authService.jar"]
