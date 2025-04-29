@@ -6,6 +6,7 @@ WORKDIR /app
 COPY backend/ServiceRegistry/pom.xml .
 COPY backend/ServiceRegistry/.mvn .mvn
 COPY backend/ServiceRegistry/mvnw .
+RUN chmod +x mvnw
 RUN ./mvnw dependency:resolve
 
 COPY backend/ServiceRegistry .

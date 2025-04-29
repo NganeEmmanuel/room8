@@ -6,6 +6,7 @@ WORKDIR /app
 COPY backend/APIGateway/pom.xml .
 COPY backend/APIGateway/.mvn .mvn
 COPY backend/APIGateway/mvnw .
+RUN chmod +x mvnw
 RUN ./mvnw dependency:resolve
 
 COPY backend/APIGateway .

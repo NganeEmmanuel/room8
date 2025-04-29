@@ -43,3 +43,16 @@
     owner: jenkins
     group: jenkins
     mode: '0644'
+
+# Add Jenkins user to Docker group
+- name: Add Jenkins user to Docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+
+# Restart Jenkins to apply group membership
+- name: Restart Jenkins to apply Docker group changes
+  service:
+    name: jenkins
+    state: restarted
