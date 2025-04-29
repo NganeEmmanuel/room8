@@ -1,3 +1,11 @@
+- name: Ensure Jenkins init.groovy.d directory exists
+  file:
+    path: /var/lib/jenkins/init.groovy.d
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+
 # Upload admin user Groovy init script
 - name: Create Jenkins admin user
   template:

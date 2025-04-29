@@ -25,7 +25,7 @@ variable "private_subnet_cidrs" {
 
 variable "instance_type" {
   description = "AWS instance type"
-  default = "t3.xlarge"  # ⚠️ For heavy apps, can go higher (e.g., t3.xlarge)
+  default = "t3.large"  # ⚠️ For heavy apps, can go higher (e.g., t3.xlarge)
 }
 
 variable "team_ip_address" {

@@ -16,33 +16,28 @@ pipeline {
             steps {
                 script {
                     def services = [
-//                         "AuthService",
-//                         "UserService",
                         "ServiceRegistry",
                         "ApiGateway"
-//                         "BidService",
-//                         "ListingService",
-//                         "ContactService",
-//                         "FeedbackService",
-//                         "NotificationService",
-//                         "SearchService"
                     ]
 
                     services.each { service ->
                         def image = "${DOCKERHUB_NAMESPACE.toLowerCase()}-${service.toLowerCase()}:latest"
                         def dockerfilePath = "backend/${service}/Dockerfile"
-                        def contextPath = "backend/${service}"
+                        def contextPath = "." // build context is the root so Dockerfile paths work for COPY
 
-                        echo "📦 Building image for ${service}..."
+                        echo "📦 Building image for ${service} using multi-stage Dockerfile..."
                         sh """
-                          docker build -t ${image} -f ${dockerfilePath} ${contextPath}
+                            docker build -t ${image} \
+                                -f ${dockerfilePath} \
+                                --build-arg SERVICE_NAME=${service} \
+                                ${contextPath}
                         """
 
-                        echo "🚀 Pushing image ${image}..."
+                        echo "🚀 Pushing image ${image} to DockerHub..."
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                             sh """
-                              echo $PASS | docker login -u $USER --password-stdin
-                              docker push ${image}
+                                echo \$PASS | docker login -u \$USER --password-stdin
+                                docker push ${image}
                             """
                         }
                     }
@@ -53,8 +48,7 @@ pipeline {
         stage('Trigger ArgoCD Sync') {
             steps {
                 echo "📡 Triggering ArgoCD sync (placeholder)..."
-                // todo implement webhook or CLI sync here.
-                sh 'curl -X POST http://argocd-api/refresh-path' // Replace with actual ArgoCD sync logic
+                sh 'curl -X POST http://argocd-api/refresh-path' // Replace with your actual webhook or argocd CLI sync
             }
         }
     }
