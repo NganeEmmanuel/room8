@@ -26,7 +26,6 @@ EXPOSE 8765
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/apiGateway.jar"]
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests && rm -rf ~/.m2/repository
+RUN rm -rf ~/.m2/repository
 
 

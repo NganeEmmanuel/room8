@@ -51,5 +51,16 @@ pipeline {
                 sh 'curl -X POST http://argocd-api/refresh-path' // Replace with your actual webhook or argocd CLI sync
             }
         }
+
+        stage('Cleanup') {
+            steps {
+                echo 'Cleaning up Maven and Docker resources...'
+                sh '''
+                    rm -rf ~/.m2/repository
+                    docker container prune -f
+                    docker image prune -af
+                '''
+            }
+        }
     }
 }
