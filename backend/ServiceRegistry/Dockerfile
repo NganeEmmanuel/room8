@@ -36,5 +36,6 @@ EXPOSE 8761
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/serviceRegistry.jar"]
 
-RUN rm -rf ~/.m2/repository
+RUN ./mvnw clean package -DskipTests && rm -rf ~/.m2/repository
+
 
