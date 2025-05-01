@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_NAMESPACE = "nganeemmanuel/room8"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/NganeEmmanuel/room8.git'
+            }
+        }
+
+        stage('Build and Push Each Microservice') {
+            steps {
+                script {
+                    def services = [
+                        "ServiceRegistry",
+                        "APIGateway"
+                    ]
+
+                    services.each { service ->
+                        def image = "${DOCKERHUB_NAMESPACE.toLowerCase()}-${service.toLowerCase()}:latest"
+                        def dockerfilePath = "backend/${service}/Dockerfile"
+                        def contextPath = "." // build context is the root so Dockerfile paths work for COPY
+
+                        echo "📦 Building image for ${service} using multi-stage Dockerfile..."
+                        sh """
+                            docker build -t ${image} \
+                                -f ${dockerfilePath} \
+                                --build-arg SERVICE_NAME=${service} \
+                                ${contextPath}
+                        """
+
+                        echo "🚀 Pushing image ${image} to DockerHub..."
+                        withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                            sh """
+                                echo \$PASS | docker login -u \$USER --password-stdin
+                                docker push ${image}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger ArgoCD Sync') {
+            steps {
+                echo "📡 Triggering ArgoCD sync (placeholder)..."
+                sh 'curl -X POST http://argocd-api/refresh-path' // Replace with your actual webhook or argocd CLI sync
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                echo 'Cleaning up Maven and Docker resources...'
+                sh '''
+                    rm -rf ~/.m2/repository
+                    docker container prune -f
+                    docker image prune -af
+                '''
+            }
+        }
+    }
+}

@@ -49,12 +49,26 @@ ansible/
 ├── inventory/
 │   └── hosts.ini         # IPs of servers
 ├── playbooks/
-│   └── site.yml          # Main playbook
-├── roles/
-│   └── docker/
-│       ├── tasks/
-│       │   └── main.yml  # Steps to install Docker
-│       └── templates/    # Dynamic config files
+│   └── roles/
+│     ├── argocd/
+│     │  ├── tasks/
+│     │     └── main.yml  # Steps to install argocd
+│     ├── docker/
+│     │  ├── tasks/
+│     │     └── main.yml  # Steps to install Docker(we did this in the bootstrap during provisioning)
+│     ├── jenkins/
+│     │  ├── tasks/
+│     │  │   ├── main.yml
+│     │  │   └── postsetup.yml  # Post-install configuration
+│     │  ├── files/
+│     │  │   ├── plugins.txt     # List of Jenkins plugins
+│     │  │   └── seed_job.groovy # Groovy script to create job
+│     │  └── templates/
+│     │      └── basic-security.groovy.j2  # Admin user creation
+│     ├── k8s/
+│     │  ├── tasks/
+│     │     └── main.yml
+└── site.yml          # Main playbook 
 └── ansible.cfg           # Config options (optional)
 ```
 
