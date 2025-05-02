@@ -1,9 +1,11 @@
 ---
-- name: Install Docker on bastion and app nodes
+- name: Provision jenkins, argocd and configure Kubernetes cluster
   hosts: bastion
   become: true
 
   roles:
-#    - docker --> docker, containerd, and k8s are installed using the bootstrap on provisioning with terraform
-    - jenkins
-    - argocd
+    - helm             # Helm first so it's available for all Helm-based installs
+    - ingress_nginx    # Needs Helm, and runs before ArgoCD to expose it
+    - nginx-forwarder
+    - argocd           # Exposed via ingress
+    - jenkins          # If Jenkins will also be exposed (optional)

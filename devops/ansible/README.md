@@ -47,7 +47,9 @@ Ansible is **agentless**. That means no software needs to be installed on the ta
 ```
 ansible/
 ├── inventory/
-│   └── hosts.ini         # IPs of servers
+│   ├── hosts.ini         # IPs of servers
+│   └── group_vars/
+│       └── all.yml     # Variables for all hosts
 ├── playbooks/
 │   └── roles/
 │     ├── argocd/
@@ -66,8 +68,13 @@ ansible/
 │     │  └── templates/
 │     │      └── basic-security.groovy.j2  # Admin user creation
 │     ├── k8s/
-│     │  ├── tasks/
-│     │     └── main.yml
+│     │  ├── api-gateway/
+│     │  │  ├──ingress.yaml
+│     │  │  └── configmap.yaml
+│     │  ├── argocd/
+│     │  │  ├──ingress.yaml
+│     │  ├── frontend/
+│     │  │  ├──ingress.yaml
 └── site.yml          # Main playbook 
 └── ansible.cfg           # Config options (optional)
 ```

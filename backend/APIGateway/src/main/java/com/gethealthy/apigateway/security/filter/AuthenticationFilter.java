@@ -75,7 +75,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             // Make an API call to authenticate the user using Eureka's service discovery (load-balanced)
             return webClientBuilder.build()
                     .post()
-                    .uri("http://localhost:8765/authentication-service/api/v1/auth/authenticate-user") // Using Eureka service discovery
+                    .uri("http://localhost:8765/authentication-service/api/v1/auth/authenticate-user") // todo change tot springboot style lb://Using Eureka service discovery
                     .header(HttpHeaders.AUTHORIZATION, authHeader)
                     .retrieve()
                     .bodyToMono(Boolean.class)

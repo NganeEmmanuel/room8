@@ -20,42 +20,62 @@
     kubectl wait --for=condition=available --timeout=600s deployment/argocd-server -n argocd
   args:
     executable: /bin/bash
-  register: argocd_ready
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
-- name: Patch ArgoCD server to use NodePort for testing
+- name: Patch ArgoCD server to add --insecure to args
   shell: |
-    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+    kubectl patch deployment argocd-server -n argocd --type=json \
+    -p='[
+      {
+        "op": "add",
+        "path": "/spec/template/spec/containers/0/args/1",
+        "value": "--insecure"
+      }
+    ]'
   args:
     executable: /bin/bash
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
-- name: Retrieve ArgoCD admin password
+- name: Restart ArgoCD server after patching command
   shell: |
-    kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
+    kubectl rollout restart deployment argocd-server -n argocd
   args:
     executable: /bin/bash
-  register: argocd_password
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Copy ArgoCD ingress.yaml to remote
+  copy:
+    src: roles/k8s/argocd/ingress.yaml
+    dest: /tmp/argocd-ingress.yaml
+
+- name: Apply ArgoCD ingress
+  shell: |
+    kubectl apply -f /tmp/argocd-ingress.yaml
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Remove temporary ingress file
+  file:
+    path: /tmp/argocd-ingress.yaml
+    state: absent
+
+- name: Get ArgoCD admin password
+  shell: |
+    kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+  register: argocd_admin_password
   changed_when: false
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
-- name: Show ArgoCD admin password
+- name: Show ArgoCD access info
   debug:
-    msg: "🔐 ArgoCD admin password: {{ argocd_password.stdout }}"
-
-- name: Get ArgoCD server NodePort
-  shell: |
-    kubectl get svc argocd-server -n argocd -o=jsonpath="{.spec.ports[0].nodePort}"
-  args:
-    executable: /bin/bash
-  register: argocd_port
-  changed_when: false
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-
-- name: Show ArgoCD Web UI URL
-  debug:
-    msg: "🌐 Access ArgoCD at http://<BASTION_PUBLIC_IP>:{{ argocd_port.stdout }} (Username: admin)"
+    msg: |
+      🎯 ArgoCD has been successfully deployed!
+      🌐 URL: http://{{ ingress_elastic_ip }}/
+      👤 Username: admin
+      🔑 Password: {{ argocd_admin_password.stdout }}
