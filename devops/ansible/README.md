@@ -1,6 +1,3 @@
-Awesome, let’s do an Ansible crash course tailored just for your DevOps workflow. Since you’re already deep into the Terraform and CI/CD side, this will all tie in smoothly.
-
----
 
 ## 🔧 **What is Ansible?**
 Ansible is an **open-source configuration management, provisioning, and automation tool**.
