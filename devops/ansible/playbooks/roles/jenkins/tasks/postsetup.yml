@@ -1,3 +1,10 @@
+# Install Git on Jenkins host  --------> this is new
+- name: Ensure Git is installed
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+
 - name: Ensure Jenkins init.groovy.d directory exists
   file:
     path: /var/lib/jenkins/init.groovy.d
