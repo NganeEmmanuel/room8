@@ -1,0 +1,65 @@
+- name: Add Prometheus Helm repo
+  shell: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  args:
+    creates: ~/.cache/helm/repository/prometheus-community-index.yaml
+
+- name: Update Helm repos
+  shell: helm repo update
+
+- name: Create monitoring namespace (kubectl fallback)
+  shell: kubectl get namespace monitoring || kubectl create namespace monitoring
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+
+- name: Install kube-prometheus-stack with path-based ingress
+  community.kubernetes.helm:
+    name: monitoring-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    release_namespace: monitoring
+    create_namespace: false
+    values:
+      grafana:
+        adminPassword: "admin123"
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/rewrite-target: /
+          paths:
+            - /grafana
+        service:
+          type: ClusterIP
+
+      prometheus:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            nginx.ingress.kubernetes.io/rewrite-target: /
+          paths:
+            - /prometheus
+        service:
+          type: ClusterIP
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+
+- name: Show Grafana credentials
+  debug:
+    msg: |
+      Grafana Login:
+      ➤ URL: http://<E-IP>/grafana
+      ➤ Username: admin
+      ➤ Password: admin123
+
+
+- name: Deploy ServiceMonitor for service-registry
+  shell: kubectl apply -f roles/monitoring/files/servicemonitor-service-registry.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Deploy ServiceMonitor for api-gateway
+  shell: kubectl apply -f roles/monitoring/files/servicemonitor-api-gateway.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

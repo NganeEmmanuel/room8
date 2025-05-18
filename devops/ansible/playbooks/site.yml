@@ -9,3 +9,4 @@
     - nginx-forwarder
     - argocd           # Exposed via ingress
     - jenkins          # If Jenkins will also be exposed (optional)
+    - monitoring
