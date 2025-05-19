@@ -1,0 +1,1 @@
+ingress_elastic_ip: "<NLB-IP>"  # Replace with your actual pre-allocated EIP OR nlb
