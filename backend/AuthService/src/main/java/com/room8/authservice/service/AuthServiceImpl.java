@@ -17,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -33,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRedisService userRedisService;
     private final EmailVerificationRedisService emailVerificationRedisService;
     private final OTPRedisService otpRedisService;
+    private final UserRoleRedisService userRoleRedisService;
 
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
@@ -43,14 +46,18 @@ public class AuthServiceImpl implements AuthService {
 
         // check for duplicate user(if user already exits)
         if (!isEmailNotExist(request.getEmail())){
-            throw new DuplicateEmailException("Email: "+ request.getEmail() + " already exists");
+            throw new DuplicateEmailException("Email: "+ request.getEmail() + " already in use");
         }
 
         // generate role and add authority
-        var roles = new ArrayList<UserRole>();
-        roles.add(UserRole.builder()
-                .userAuthority(UserAuthority.TENANT)
-                .build());
+        var role = userRoleRedisService.getUserRole(UserAuthority.TENANT.toString());
+        if (role != null){
+            role = userServiceClient.getRole(UserAuthority.TENANT).getBody();
+            userRoleRedisService.storeUserRole(UserAuthority.TENANT.toString(), role, 60 * 24);
+        }
+
+        assert role != null;
+        var roles = List.of(role);
 
         // build user, add roles, encrypt password
         var user = Tenant.builder()
@@ -70,9 +77,12 @@ public class AuthServiceImpl implements AuthService {
         // save user information in cache for future reference with expiration time of 5hrs
         userRedisService.storeUserInformation(user.getEmail(), user,  60 * 5);  // 5hrs
 
+        //get string form of roles
+        var roleStringList = getRoleList(user.getRole());
+
         // Generate JWT tokens (normal token and refresh token) using the username
-        var jwtToken =  jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 5); //5 minutes
-        var refreshToken = jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 60 * 24); // 24hrs
+        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 5); //5 minutes
+        var refreshToken = jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 60 * 24); // 24hrs
 
         // Store new jwtToken and refresh token
         refreshTokenRedisService.storeRefreshToken(user.getEmail(), refreshToken, 60 * 24); // 1 day expiration
@@ -114,10 +124,15 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // generate role and add authority
-        var roles = new ArrayList<UserRole>();
-        roles.add(UserRole.builder()
-                .userAuthority(UserAuthority.LANDLORD)
-                .build());
+        var role = userRoleRedisService.getUserRole(UserAuthority.LANDLORD.toString());
+        if (role == null){
+            role = userServiceClient.getRole(UserAuthority.LANDLORD).getBody();
+            //add roles to cache for 24 hours
+            userRoleRedisService.storeUserRole(UserAuthority.LANDLORD.toString(), role, 60 * 24);
+        }
+
+        assert role != null;
+        var roles = List.of(role);
 
         // build user, add roles, encrypt password
         var user = Tenant.builder()
@@ -137,9 +152,12 @@ public class AuthServiceImpl implements AuthService {
         // save user information in cache for future reference with expiration time of 5hrs
         userRedisService.storeUserInformation(user.getEmail(), user,  60 * 5);  // 5hrs
 
+        //get string form of roles
+        var roleStringList = getRoleList(user.getRole());
+
         // Generate JWT tokens (normal token and refresh token) using the username
-        var jwtToken =  jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 5); //5 minutes
-        var refreshToken = jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 60 * 24); // 24hrs
+        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 5); //5 minutes
+        var refreshToken = jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 60 * 24); // 24hrs
 
         // Store new jwtToken and refresh token
         refreshTokenRedisService.storeRefreshToken(user.getEmail(), refreshToken, 60 * 24); // 1 day expiration
@@ -176,8 +194,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Boolean isEmailNotExist(String email) {
-        var statusCode = userServiceClient.getUserFromEmail(email).getStatusCode();
-        return statusCode == HttpStatus.NOT_FOUND || statusCode == HttpStatus.CONFLICT;
+        try {
+            userServiceClient.getUserFromEmail(email); // No need to check status code now
+            return Boolean.FALSE; // Email exists
+        } catch (UserNotFoundException e) {
+            return Boolean.TRUE; // Email does not exist
+        }
     }
 
     @Override
@@ -208,9 +230,12 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid Credentials");
         }
 
+        // get roles
+        List<String> roles = getRoleList(user.getRole());
+
         // Generate JWT token using the email
-        var jwtToken =  jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 5);
-        var refreshToken = jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 60 * 24);
+        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roles, 1000 * 60 * 5);
+        var refreshToken = jwtService.generateTokenWithRoles(user.getEmail(), roles, 1000 * 60 * 60 * 24);
 
         // Store new jwtToken and refresh token
         refreshTokenRedisService.storeRefreshToken(user.getEmail(), refreshToken, 60 * 24); // 1 day expiration
@@ -241,9 +266,16 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid refresh token");
         }
 
+        var user = userRedisService.getUserInformation(userEmail).orElseGet(
+                () -> userServiceClient.getUserFromEmail(userEmail).getBody()
+        );
+
+        assert user != null;
+        var roles = getRoleList(user.getRole());
+
         // Generate new tokens
-        String newJwtToken = jwtService.generateJwtToken(userEmail, 1000 * 60 * 5);
-        String newRefreshToken = jwtService.generateJwtToken(userEmail, 1000 * 60 * 60 * 24);
+        String newJwtToken = jwtService.generateTokenWithRoles(userEmail, roles, 1000 * 60 * 5);
+        String newRefreshToken = jwtService.generateTokenWithRoles(userEmail, roles,1000 * 60 * 60 * 24);
 
         // Invalidate old refresh token
         refreshTokenRedisService.invalidateRefreshToken(userEmail);
@@ -358,6 +390,16 @@ public class AuthServiceImpl implements AuthService {
         userRedisService.updateUserInformation(user.getEmail(), user, 60 * 5);
 
         return user.getIsEmailVerified();
+    }
+
+    private List<String> getRoleList(List<UserRole> roles) {
+        var roleList = new ArrayList<String>();
+        roles.forEach(
+                role -> {
+                    roleList.add(role.getUserAuthority().toString());
+                }
+        );
+        return roleList;
     }
 
 

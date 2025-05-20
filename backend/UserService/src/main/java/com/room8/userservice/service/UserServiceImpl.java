@@ -9,8 +9,10 @@ import com.room8.userservice.exception.UserNotFoundException;
 import com.room8.userservice.model.User;
 import com.room8.userservice.model.UserDTO;
 import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.model.UserRole;
 import com.room8.userservice.repository.UserInfoRepository;
 import com.room8.userservice.repository.UserRepository;
+import com.room8.userservice.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationServiceClient authenticationServiceClient;
     private final UserInfoMapperService userInfoMapperService;
     private final UserInfoRepository userInfoRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     public User addUser(User user) {
@@ -41,11 +44,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserByEmail(String email) throws UserNotFoundException {
-        var user = userRepository.findByEmail(email).orElseThrow(
+    public User getUserByEmail(String email) throws UserNotFoundException {
+        return userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException(email)
         );
-        return userMapperService.toDTO(user);
     }
 
     @Override
@@ -155,6 +157,15 @@ public class UserServiceImpl implements UserService {
 
         // save the changes to the database
         return userRepository.save(user);
+    }
+
+    @Override
+    public UserRole getRole(UserAuthority role) {
+        return userRoleRepository.findByUserAuthority(role).orElseGet(
+                () -> userRoleRepository.save(UserRole.builder()
+                        .userAuthority(role)
+                        .build())
+                );
     }
 
 }

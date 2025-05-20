@@ -1,5 +1,6 @@
-package com.room8.authservice.exception;
+package com.room8.authservice.exception.handler;
 
+import com.room8.authservice.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -83,7 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<String> handleDuplicateEmailException(Exception ex, WebRequest request) {
         logger.error("Email already exit in the database: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.IM_USED);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     /**
@@ -96,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException(Exception ex, WebRequest request) {
         logger.error("Bad credentials: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -146,11 +147,11 @@ public class GlobalExceptionHandler {
      * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
      * @return A ResponseEntity containing a generic error message and HTTP status.
      */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobalException(Exception ex, WebRequest request) {
-        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<String> handleGlobalException(Exception ex, WebRequest request) {
+//        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+//        return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
 
 }

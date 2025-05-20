@@ -20,9 +20,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    @PostMapping("/signup/tenant")
+    public ResponseEntity<AuthenticationResponse> registerTenant(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.tenantSignup(request));
+    }
+
+    @PostMapping("/signup/landlord")
+    public ResponseEntity<AuthenticationResponse> registerLandlord(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.landlordSignup(request));
     }
 
     @PostMapping("/login")
