@@ -36,5 +36,5 @@ EXPOSE 8761
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/serviceRegistry.jar"]
 
-RUN rm -rf ~/.m2/repository
+
 

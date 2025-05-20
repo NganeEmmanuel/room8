@@ -1,8 +1,10 @@
 package com.room8.userservice.controller;
 
+import com.room8.userservice.enums.UserAuthority;
 import com.room8.userservice.model.User;
 import com.room8.userservice.model.UserDTO;
 import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.model.UserRole;
 import com.room8.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/get-user/email")
-    public ResponseEntity<UserDTO> getUserFromEmail(@RequestParam String email) {
+    public ResponseEntity<User> getUserFromEmail(@RequestParam String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
@@ -68,5 +70,10 @@ public class UserController {
     @PutMapping("/mark-as-verified/phone")
     public ResponseEntity<User> markUserAsPhoneVerified(@RequestBody String phoneNumber) {
         return ResponseEntity.ok(userService.markUserAsPhoneVerified(phoneNumber));
+    }
+
+    @GetMapping("/getRole")
+    public ResponseEntity<UserRole> getRole(@RequestParam UserAuthority role) {
+        return ResponseEntity.ok(userService.getRole(role));
     }
 }

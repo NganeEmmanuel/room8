@@ -19,9 +19,6 @@ public class UserRole {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private User user;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserAuthority userAuthority;
@@ -39,6 +36,5 @@ public class UserRole {
         this.id = other.id;
         this.userAuthority = other.userAuthority;
         this.created = other.created != null ? new Date(other.created.getTime()) : null;
-        this.user = null; // ❗ Important: not copying user link to avoid circular reference
     }
 }

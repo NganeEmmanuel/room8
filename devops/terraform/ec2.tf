@@ -7,6 +7,13 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids     = [aws_security_group.bastion_sg.id]
   iam_instance_profile = aws_iam_instance_profile.master_profile.name #iam roles for master s3 put {in this case the bastion is our master node}
 
+  # Add 15 GB EBS volume (root volume)
+  root_block_device {
+    volume_size = 15         # Change this to desired size in GB
+    volume_type = "gp3"      # gp3 is cost-effective and fast; or use gp2
+    delete_on_termination = true
+  }
+
   # Add the file provisioner to copy the PEM file
   provisioner "file" {
     source      = "aws_login.pem"  # Relative path within your Terraform directory
