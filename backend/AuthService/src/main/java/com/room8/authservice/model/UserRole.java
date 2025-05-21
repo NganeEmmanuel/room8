@@ -15,12 +15,10 @@ import java.util.Date;
 @Builder
 public class UserRole {
     private Integer id;
-    private User user;
     private UserAuthority userAuthority;
     private Date created;
 
-    public UserRole(User user, UserAuthority userAuthority) {
-        this.user = user;
+    public UserRole(UserAuthority userAuthority) {
         this.userAuthority = userAuthority;
         this.created = new Date();
     }

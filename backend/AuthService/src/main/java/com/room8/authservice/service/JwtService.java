@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +46,19 @@ public class JwtService {
      */
     public String generateJwtToken(String userEmail, long expirationTimeMillis) {
         return generateJwtToken(new HashMap<>(), userEmail, expirationTimeMillis);
+    }
+
+    /**
+     *
+     * @param userEmail the user email
+     * @param roles the roles for that user
+     * @param expirationTimeMillis the time in millisecond for the token to last
+     * @return the jwt token
+     */
+    public String generateTokenWithRoles(String userEmail, List<String> roles, long expirationTimeMillis) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", roles); // or "role" if it's a single role
+        return generateJwtToken(claims, userEmail, expirationTimeMillis);
     }
 
     public String generateJwtToken(Map<String, Object> extraClaims, String userEmail, long expirationTimeMillis) {
@@ -102,6 +114,25 @@ public class JwtService {
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }
+
+    /**
+     *
+     * @param jwtToken the token from which the roles will be extracted
+     * @return the list of roles
+     */
+    public List<String> extractUserRoles(String jwtToken) {
+        return extractClaim(jwtToken, claims -> {
+            Object rolesClaim = claims.get("roles");
+            if (rolesClaim instanceof List<?>) {
+                return ((List<?>) rolesClaim)
+                        .stream()
+                        .map(Object::toString)
+                        .collect(Collectors.toList());
+            }
+            return new ArrayList<>();
+        });
+    }
+
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
