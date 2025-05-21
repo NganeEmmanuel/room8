@@ -3,8 +3,8 @@
   args:
     creates: ~/.cache/helm/repository/prometheus-community-index.yaml
 
-#- name: Update Helm repos
-#  shell: helm repo update
+- name: Update Helm repos
+  shell: helm repo update
 
 - name: Create monitoring namespace (kubectl fallback)
   shell: kubectl get namespace monitoring || kubectl create namespace monitoring

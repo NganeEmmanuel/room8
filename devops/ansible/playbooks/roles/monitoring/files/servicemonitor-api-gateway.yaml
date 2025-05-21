@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: api-gateway
   labels:
-    release: prometheus-stack
+    release: monitoring-stack
 spec:
   selector:
     matchLabels:
