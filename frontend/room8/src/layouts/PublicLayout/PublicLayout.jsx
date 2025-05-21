@@ -1,13 +1,14 @@
 // layouts/PublicLayout.jsx
 import Navbar from "../../components/NavBar/NavBar";
 import Footer from "../../components/Footer/Footer";
+import { Outlet } from "react-router-dom"
 
-const PublicLayout = ({ children, isAuthenticated }) => {
+const PublicLayout = ({  isAuthenticated }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar isAuthenticated={isAuthenticated} />
       <main className="flex-grow px-4 py-6">
-        {children}
+        <Outlet />
       </main>
       <Footer />
     </div>
