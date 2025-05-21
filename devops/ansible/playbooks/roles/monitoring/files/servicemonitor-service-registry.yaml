@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: service-registry
   endpoints:
-    - port: http
+    - port: metrics
       path: /actuator/prometheus
       interval: 15s
   namespaceSelector:
