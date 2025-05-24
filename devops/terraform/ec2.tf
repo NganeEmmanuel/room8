@@ -1,6 +1,6 @@
 resource "aws_instance" "bastion" {
   ami                        = var.ami # Ubuntu 2025, update if needed
-  instance_type              = "t3.large"
+  instance_type              = "t3.xlarge"
   subnet_id                  = aws_subnet.public[0].id
   key_name                   = var.key_name  # Replace with your key pair
   associate_public_ip_address = true
@@ -9,7 +9,7 @@ resource "aws_instance" "bastion" {
 
   # Add 15 GB EBS volume (root volume)
   root_block_device {
-    volume_size = 15         # Change this to desired size in GB
+    volume_size = 10         # Change this to desired size in GB
     volume_type = "gp3"      # gp3 is cost-effective and fast; or use gp2
     delete_on_termination = true
   }
