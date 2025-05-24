@@ -7,7 +7,7 @@ const PublicLayout = ({  isAuthenticated }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar isAuthenticated={isAuthenticated} />
-      <main className="flex-grow px-4 py-6">
+      <main className="flex-grow px-1 py-2">
         <Outlet />
       </main>
       <Footer />

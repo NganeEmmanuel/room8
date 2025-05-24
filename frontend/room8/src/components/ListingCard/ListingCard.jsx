@@ -37,9 +37,9 @@ function ListingCard({
           }}
         >
           {isWishlisted ? (
-            <AiFillHeart className="text-red-500 text-xl" />
+            <AiFillHeart className="text-blue-500 text-xl" />
           ) : (
-            <AiOutlineHeart className="text-red-500 text-xl" />
+            <AiOutlineHeart className="text-blue-500 text-xl" />
           )}
         </div>
       </div>
@@ -50,12 +50,12 @@ function ListingCard({
           <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate max-w-[75%]">
             {title}
           </h3>
-          <span className="text-xs sm:text-sm bg-red-100 text-red-600 px-2 py-0.5 rounded whitespace-nowrap">
+          <span className="text-xs sm:text-sm bg-blue-100 text-blue-600 px-2 py-0.5 rounded whitespace-nowrap">
             {roomType}
           </span>
         </div>
         <p className="text-xs sm:text-sm text-gray-500 mb-1 truncate">{location}</p>
-        <p className="text-red-600 font-bold mb-2 text-sm sm:text-base">{price}</p>
+        <p className="text-blue-600 font-bold mb-2 text-sm sm:text-base">{price}</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
           <span className="truncate">🛏️ {rooms} rooms</span>
           <span className="truncate">🚿 {toilets} toilets</span>

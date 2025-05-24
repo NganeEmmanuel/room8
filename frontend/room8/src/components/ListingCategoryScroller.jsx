@@ -49,7 +49,8 @@ const ListingsCategoryScroller = ({ title, listings = [], filterType, onSeeMore 
 
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scrollbar-none scroll-smooth px-8 py-2"
+            className="flex gap-4 overflow-x-scroll scrollbar-none scroll-smooth px-8 py-2"
+            style={{scrollbarWidth: "none"}}
           >
             {listings.map((listing, index) => (
               <div key={index} className="min-w-[250px] flex-shrink-0">
