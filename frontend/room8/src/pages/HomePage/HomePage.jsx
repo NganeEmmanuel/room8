@@ -1,12 +1,25 @@
-import React from 'react'
+import { useEffect, useState } from "react"
+import ListingsCategoryScroller from "../../components/ListingCategoryScroller.jsx"
+import mockListings from "../../mock/mock.js"
 
-function HomePage() {
+const HomePage = () => {
+  const [listings, setListings] = useState([])
+
+  useEffect(() => {
+    mockListings({}).then((data) => {
+      setListings(data)
+    })
+  }, [])
+
   return (
-   <div className="flex items-center justify-center h-screen">
-      <h1 className="text-3xl text-center">
-          HomePage works
-      </h1>
-  </div>
+    <div className="px-4">
+      <ListingsCategoryScroller
+        title="Similar Listings"
+        listings={listings}
+        filterType="price"
+        onSeeMore={() => console.log("Clicked see more")}
+      />
+    </div>
   )
 }
 
