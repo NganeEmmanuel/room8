@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 
@@ -13,28 +12,28 @@ const ImageBanner = ({ images }) => {
     setCurrentImageIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1))
   }
 
-  // Fallback image if no images are provided
   const fallbackImage = "https://via.placeholder.com/800x400?text=No+Image+Available"
 
-  // If no images, show fallback
   if (!images || images.length === 0) {
     return (
       <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
-        <img src={fallbackImage || "/placeholder.svg"} alt="Property" className="w-full h-full object-cover" />
+        <img
+          src={fallbackImage}
+          alt="Property"
+          className="w-full h-full object-cover"
+        />
       </div>
     )
   }
 
   return (
     <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
-      {/* Main Image */}
       <img
         src={images[currentImageIndex] || fallbackImage}
         alt={`Property view ${currentImageIndex + 1}`}
         className="w-full h-full object-cover transition-opacity duration-300"
       />
 
-      {/* Navigation Arrows (only if multiple images) */}
       {images.length > 1 && (
         <>
           <button
