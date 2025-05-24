@@ -11,7 +11,7 @@ const mockListings = async (filters) => {
     setTimeout(() => {
       const mockListings = Array(60).fill(0).map((_, i) => ({
         id: i,
-        title: `Listing ${i + 1}`,
+        title: `Listing extended title area to see what it shows${i + 1}`,
         location: ["Abuja", "Lagos", "Enugu"][i % 3],
         price: 30000 + i * 1000,
         image: images[i % images.length],
