@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: unified-ingress
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /grafana(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: monitoring-stack-grafana
+                port:
+                  number: 80
+          - path: /prometheus(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: monitoring-stack-kube-prom-prometheus
+                port:
+                  number: 9090

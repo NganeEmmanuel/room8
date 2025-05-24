@@ -1,5 +1,5 @@
 resource "aws_eip" "argocd_eip" {
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "ingress-nginx-lb-eip"
   }
