@@ -2,7 +2,7 @@
 set -e
 
 echo "🚀 Starting Kubernetes worker bootstrap script..."
-sleep 120  # Wait to ensure network stability before internet-based installs
+sleep 60  # Wait to ensure network stability before internet-based installs
 
 # ----------------------------
 # 0. Install AWS CLI

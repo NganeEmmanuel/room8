@@ -3,8 +3,8 @@
   args:
     creates: ~/.cache/helm/repository/prometheus-community-index.yaml
 
-- name: Update Helm repos
-  shell: helm repo update
+#- name: Update Helm repos
+#  shell: helm repo update
 
 - name: Create monitoring namespace (kubectl fallback)
   shell: kubectl get namespace monitoring || kubectl create namespace monitoring
@@ -41,8 +41,16 @@
             - /prometheus
         service:
           type: ClusterIP
+        prometheusSpec:
+          retention: 10d
+          serviceMonitorSelector: {}
+          podMonitorSelector: {}
+          ruleSelector: {}
+          maximumStartupDurationSeconds: 300  # ✅ fix the error
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
+
+
 
 
 - name: Show Grafana credentials
@@ -53,13 +61,22 @@
       ➤ Username: admin
       ➤ Password: admin123
 
+- name: Copy ServiceMonitor for service-registry to remote
+  copy:
+    src: roles/monitoring/files/servicemonitor-service-registry.yaml
+    dest: /tmp/servicemonitor-service-registry.yaml
 
 - name: Deploy ServiceMonitor for service-registry
-  shell: kubectl apply -f roles/monitoring/files/servicemonitor-service-registry.yaml
+  shell: kubectl apply -f /tmp/servicemonitor-service-registry.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
+- name: Copy ServiceMonitor for api-gateway to remote
+  copy:
+    src: roles/monitoring/files/servicemonitor-api-gateway.yaml
+    dest: /tmp/servicemonitor-api-gateway.yaml
+
 - name: Deploy ServiceMonitor for api-gateway
-  shell: kubectl apply -f roles/monitoring/files/servicemonitor-api-gateway.yaml
+  shell: kubectl apply -f /tmp/servicemonitor-api-gateway.yaml
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf

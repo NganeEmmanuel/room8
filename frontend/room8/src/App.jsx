@@ -11,6 +11,8 @@ import Dashboard from './pages/admin/Dashboard/Dashboard';
 import ManageListings from './pages/admin/ManageListings/ManageListingsPage';
 import ManageBids from './pages/admin/ManageBids/ManageBidsPage';
 import ProfilePage from './pages/admin/ProfilePage/ProfilePage';
+import ListingsSearchResultsPage from './pages/ListingsSearchResultsPage';
+
 
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
@@ -27,6 +29,8 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/listings" element={<ListingsPage />} />
           <Route path="/listingDetails" element={<ListingDetailsPage />} />
+          <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+
         </Route>
 
         {/* Auth Routes (no layout) */}
