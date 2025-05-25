@@ -30,7 +30,7 @@ function App() {
           <Route path="/listings" element={<ListingsPage />} />
           <Route path="/listingDetails" element={<ListingDetailsPage />} />
           <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
-
+          <Route path="/search" element={<ListingsSearchResultsPage/>} />
         </Route>
 
         {/* Auth Routes (no layout) */}

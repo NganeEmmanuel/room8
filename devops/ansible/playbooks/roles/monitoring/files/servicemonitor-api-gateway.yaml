@@ -9,8 +9,8 @@ spec:
     matchLabels:
       app: api-gateway
   endpoints:
-    - port: metrics
-      path: /actuator/prometheus
+    - port: tcp
+      path: /api/actuator/prometheus
       interval: 15s
   namespaceSelector:
     matchNames:

@@ -33,6 +33,7 @@
         service:
           type: ClusterIP
         prometheusSpec:
+          externalUrl: "http://<E-IP>/prometheus"
           retention: 10d
           serviceMonitorSelector: {}
           podMonitorSelector: {}

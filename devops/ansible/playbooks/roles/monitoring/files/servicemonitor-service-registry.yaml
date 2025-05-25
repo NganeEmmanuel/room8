@@ -9,8 +9,8 @@ spec:
     matchLabels:
       app: service-registry
   endpoints:
-    - port: metrics
-      path: /actuator/prometheus
+    - port: tcp
+      path: /eureka/actuator/prometheus   # ← FIXED
       interval: 15s
   namespaceSelector:
     matchNames:
