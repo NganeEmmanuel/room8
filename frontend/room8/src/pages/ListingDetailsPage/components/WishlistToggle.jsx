@@ -23,7 +23,7 @@ const WishlistToggle = ({ listingId, isWishlisted, onToggleWishlist, isAuthentic
       aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
     >
       {isWishlisted ? (
-        <HeartSolid className="h-6 w-6 text-red-500" />
+        <HeartSolid className="h-6 w-6 text-blue-400-500" />
       ) : (
         <HeartOutline className="h-6 w-6 text-gray-500" />
       )}
