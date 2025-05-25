@@ -1,4 +1,4 @@
-import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined } from 'react-icons/fa';
+import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined, FaLocationArrow } from 'react-icons/fa';
 import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
 import  {Link} from 'react-router-dom'
 function ListingCard({
@@ -53,24 +53,27 @@ function ListingCard({
       </span>
     </div>
 
-    <p className="text-xs text-gray-500 truncate">📍 {location}</p>
-    <p className="text-blue-600 font-bold text-sm">{price}</p>
+  
+    <p className="text-blue-600 font-bold text-sm "> {price}</p>
 
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 text-[11px] sm:text-xs text-gray-500">
       <span className="flex items-center gap-1 truncate">
-        <FaBed /> {rooms} rooms
+        <FaLocationArrow color='grey' /> {location}
       </span>
       <span className="flex items-center gap-1 truncate">
-        <FaBath /> {toilets} toilets
+        <FaBed color='grey'/> {rooms} rooms
       </span>
       <span className="flex items-center gap-1 truncate">
-        <FaUsers /> {roommates} roommates
+        <FaBath color='grey' /> {toilets} toilets
       </span>
       <span className="flex items-center gap-1 truncate">
-        <FaUtensils /> {kitchen} kitchen
+        <FaUsers color='grey' /> {roommates} roommates
+      </span>
+      <span className="flex items-center gap-1 truncate">
+        <FaUtensils color='grey' /> {kitchen} kitchen
       </span>
       <span className="flex items-center gap-1 truncate col-span-2 sm:col-span-1">
-        <FaRulerCombined /> {size}
+        <FaRulerCombined color='grey' /> {size} square metres
       </span>
     </div>
   </div>
