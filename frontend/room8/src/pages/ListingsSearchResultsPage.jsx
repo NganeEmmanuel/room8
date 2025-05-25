@@ -58,6 +58,12 @@ const ListingsSearchResultsPage = () => {
     setSearchParams(params)
     setIsFilterOpen(false)
   }
+  const onClear = () => {
+  setPriceMin("")
+  setPriceMax("")
+  setSelectedRoomTypes([])
+  setSort("")
+}
 
   const toggleRoomType = (type) => {
     setSelectedRoomTypes((prev) =>
@@ -103,6 +109,7 @@ const ListingsSearchResultsPage = () => {
           sort={sort}
           setSort={setSort}
           onApply={applyFilters}
+          onClear={onClear}
         />
       </aside>
 

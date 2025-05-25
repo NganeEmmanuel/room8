@@ -13,6 +13,7 @@ const FilterSidebar = ({
   sort,
   setSort,
   onApply,
+    onClear,
   onClose,
 }) => {
   return (
@@ -83,9 +84,17 @@ const FilterSidebar = ({
     ))}
   </div>
 
+       {/* Clear Filters Button */}
+      <button
+        onClick={onClear}
+        className="w-full px-6 py-3 text-lg font-semibold bg-blue-600 text-white rounded hover:bg-blue-600 transition mb-4"
+      >
+        Clear Filters
+      </button>
+
  <button
   onClick={onApply}
-  className="w-full px-6 py-3 text-lg font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 transition mb-4"
+  className="w-full px-6 py-3 text-lg font-semibold bg-blue-600 text-white rounded hover:bg-blue-600 transition mb-4"
 >
   Apply Filters
 </button>
