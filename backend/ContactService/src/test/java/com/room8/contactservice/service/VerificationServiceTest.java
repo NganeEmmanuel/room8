@@ -59,9 +59,9 @@ class VerificationServiceTest {
 
         doNothing().when(emailService).sendHtmlEmail(anyString(), anyString(), anyString());
 
-        String result = verificationService.sendVerificationEmail(request);
+        Boolean result = verificationService.sendVerificationEmail(request);
 
-        assertEquals("success", result);
+        assertEquals(Boolean.TRUE, result);
         verify(emailService).sendHtmlEmail(eq("test@example.com"), any(), contains("https://yourdomain.com"));
     }
 

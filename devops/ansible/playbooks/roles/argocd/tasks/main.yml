@@ -1,45 +1,111 @@
 ---
-- name: Install python3-venv
-  ansible.builtin.package:
-    name: python3-venv
-    state: present
+- name: Create ArgoCD namespace
+  shell: |
+    kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
 
-- name: Create a Python virtual environment
-  ansible.builtin.command:
-    cmd: python3 -m venv /opt/venv
-
-- name: Install Kubernetes client in virtual environment
-  ansible.builtin.pip:
-    name: kubernetes
-    virtualenv: /opt/venv
-
-- name: Ensure Kubernetes client is installed
-  ansible.builtin.command:
-    cmd: /opt/venv/bin/pip show kubernetes
-
-- name: Set ansible_python_interpreter
-  set_fact:
-    ansible_python_interpreter: /opt/venv/bin/python
-
-- name: Create argocd namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    name: argocd
-    state: present
-
-- name: Install ArgoCD using official manifests
-  ansible.builtin.shell: |
+- name: Apply ArgoCD core manifests
+  shell: |
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
   args:
-    warn: false
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
 
-- name: Wait for ArgoCD server deployment to be available
-  kubernetes.core.k8s_info:
-    kind: Deployment
-    namespace: argocd
-    name: argocd-server
-  register: argocd_server
-  until: argocd_server.resources[0].status.availableReplicas | default(0) > 0
-  retries: 20
-  delay: 15
+- name: Wait for ArgoCD pods to be ready
+  shell: |
+    kubectl wait --for=condition=available --timeout=600s deployment/argocd-server -n argocd
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Patch ArgoCD server to add --insecure to args
+  shell: |
+    kubectl patch deployment argocd-server -n argocd --type=json \
+    -p='[
+      {
+        "op": "add",
+        "path": "/spec/template/spec/containers/0/args/1",
+        "value": "--insecure"
+      }
+    ]'
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+
+- name: Patch argocd-cm ConfigMap to set rootpath to /argocd
+  shell: |
+    kubectl patch configmap argocd-cm -n argocd --type merge -p '{"data":{"server.rootpath":"/argocd","server.insecure":"true"}}'
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Safely append ARGOCD_SERVER_ROOTPATH env var to ArgoCD server
+  shell: |
+    kubectl -n argocd patch deployment argocd-server \
+    --type='json' \
+    -p='[
+      {
+        "op": "add",
+        "path": "/spec/template/spec/containers/0/env/-",
+        "value": {
+          "name": "ARGOCD_SERVER_ROOTPATH",
+          "value": "/argocd"
+        }
+      }
+    ]'
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+
+
+- name: Restart ArgoCD server after patching command
+  shell: |
+    kubectl rollout restart deployment argocd-server -n argocd
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Copy ArgoCD ingress.yaml to remote
+  copy:
+    src: roles/k8s/argocd/ingress.yaml
+    dest: /tmp/argocd-ingress.yaml
+
+- name: Apply ArgoCD ingress
+  shell: |
+    kubectl apply -f /tmp/argocd-ingress.yaml
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Remove temporary ingress file
+  file:
+    path: /tmp/argocd-ingress.yaml
+    state: absent
+
+- name: Get ArgoCD admin password
+  shell: |
+    kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+  register: argocd_admin_password
+  changed_when: false
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Show ArgoCD access info
+  debug:
+    msg: |
+      🎯 ArgoCD has been successfully deployed!
+      🌐 URL: http://{{ ingress_elastic_ip }}/
+      👤 Username: admin
+      🔑 Password: {{ argocd_admin_password.stdout }}

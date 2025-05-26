@@ -17,4 +17,5 @@ public class VerificationRequest {
     @NotBlank(message = "Email must not be blank")
     @Email(message = "Email should be valid")
     private String email;
+    private String token;
 }

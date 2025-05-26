@@ -1,0 +1,65 @@
+# Install Git on Jenkins host  --------> this is new
+- name: Ensure Git is installed
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+
+- name: Ensure Jenkins init.groovy.d directory exists
+  file:
+    path: /var/lib/jenkins/init.groovy.d
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+
+# Upload admin user Groovy init script
+- name: Create Jenkins admin user
+  template:
+    src: basic-security.groovy.j2
+    dest: /var/lib/jenkins/init.groovy.d/basic-security.groovy
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+
+# Upload list of plugins
+- name: Upload plugin list
+  copy:
+    src: plugins.txt
+    dest: /var/lib/jenkins/plugins.txt
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+
+# Install plugins via Jenkins CLI
+- name: Install Jenkins plugins (using CLI)
+  shell: |
+    JENKINS_CLI=/tmp/jenkins-cli.jar
+    wget -q http://localhost:8080/jnlpJars/jenkins-cli.jar -O $JENKINS_CLI
+    until curl -sL http://localhost:8080/login > /dev/null; do sleep 5; done
+    for plugin in $(cat /var/lib/jenkins/plugins.txt); do
+      java -jar $JENKINS_CLI -s http://localhost:8080 install-plugin $plugin -deploy
+    done
+    systemctl restart jenkins
+
+# Upload seed job groovy script
+- name: Create Jenkins seed job (sample pipeline)
+  copy:
+    src: seed_job.groovy
+    dest: /var/lib/jenkins/init.groovy.d/seed_job.groovy
+    owner: jenkins
+    group: jenkins
+    mode: '0644'
+
+# Add Jenkins user to Docker group
+- name: Add Jenkins user to Docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+
+# Restart Jenkins to apply group membership
+- name: Restart Jenkins to apply Docker group changes
+  service:
+    name: jenkins
+    state: restarted
