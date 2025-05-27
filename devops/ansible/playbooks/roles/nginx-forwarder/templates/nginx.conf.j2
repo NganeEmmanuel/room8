@@ -1,0 +1,33 @@
+events {}
+
+http {
+upstream ingress_http {
+server 127.0.0.1:30080;
+}
+
+upstream ingress_https {
+server 127.0.0.1:30443;
+}
+
+server {
+listen 80;
+location / {
+proxy_pass http://ingress_http;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+}
+}
+
+server {
+{#listen 443 ssl;#}
+{#ssl_certificate     /etc/nginx/nginx-selfsigned.crt;#}
+{#ssl_certificate_key /etc/nginx/nginx-selfsigned.key;#}
+listen 80;
+
+location / {
+proxy_pass https://ingress_https;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+}
+}
+}

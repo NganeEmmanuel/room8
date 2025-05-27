@@ -25,9 +25,26 @@
     state: present
     update_cache: yes
 
+# Reload systemd to recognize Jenkins service
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
 # Ensure Jenkins is started and enabled
 - name: Start and enable Jenkins service
   systemd:
     name: jenkins
     enabled: yes
     state: started
+
+# Optional: Wait for Jenkins to fully boot
+- name: Wait for Jenkins to respond on port 8080
+  wait_for:
+    port: 8080
+    delay: 10
+    timeout: 60
+
+# run the post setup file to set up admin user, install plugins, and run ci
+- name: Include Jenkins post-setup configuration
+  include_tasks: postsetup.yml
+

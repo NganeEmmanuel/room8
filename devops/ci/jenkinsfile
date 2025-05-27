@@ -1,0 +1,101 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_NAMESPACE = "nganeemmanuel/room8"
+        DEPLOYMENTS_REPO = "https://github.com/NganeEmmanuel/room8-deployments.git"
+        DEPLOYMENTS_BRANCH = "master"
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    env.IMAGE_TAG = new Date().format("yyyyMMddHHmmss")
+                    echo "📌 Image Tag: ${env.IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Checkout Source') {
+            steps {
+                git 'https://github.com/NganeEmmanuel/room8.git'
+            }
+        }
+
+        stage('Build and Push Docker Images') {
+            steps {
+                script {
+                    def services = ["ServiceRegistry", "APIGateway"]
+
+                    services.each { service ->
+                        def serviceSlug = service.toLowerCase()
+                        def image = "${DOCKERHUB_NAMESPACE}-${serviceSlug}:${IMAGE_TAG}"
+                        def dockerfilePath = "backend/${service}/Dockerfile"
+                        def contextPath = "."
+
+                        echo "📦 Building Docker image for ${service}..."
+                        sh """
+                            docker build -t ${image} \
+                                         -f ${dockerfilePath} \
+                                         --build-arg SERVICE_NAME=${service} \
+                                         ${contextPath}
+                        """
+
+                        echo "🚀 Pushing ${image} to Docker Hub..."
+                        withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                            sh """
+                                echo \$PASS | docker login -u \$USER --password-stdin
+                                docker push ${image}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Clone Deployments Repo and Update YAMLs') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-cred', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    script {
+                        def services = [
+                            "apigateway"      : "api-gateway",
+                            "serviceregistry" : "service-registry"
+                        ]
+
+                        echo "🔁 Cloning room8-deployments repo..."
+                        sh "rm -rf room8-deployments"
+                        sh "git clone https://${GIT_USER}:${GIT_PASS}@github.com/NganeEmmanuel/room8-deployments.git"
+
+                        services.each { imageName, folderName ->
+                            echo "🔧 Updating deployment manifest for ${folderName}..."
+                            sh """
+                                sed -i "s|image: nganeemmanuel/room8-${imageName}:.*|image: nganeemmanuel/room8-${imageName}:${IMAGE_TAG}|" room8-deployments/base/${folderName}/deployment.yaml
+                            """
+                        }
+
+                        dir("room8-deployments") {
+                            sh '''
+                                git config user.name "jenkins-bot"
+                                git config user.email "jenkins@room8.local"
+                                git add .
+                                git commit -m "🚀 Update image tags to ${IMAGE_TAG}" || echo "No changes to commit"
+                                git push origin ${DEPLOYMENTS_BRANCH}
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh '''
+                    docker image prune -af
+                    docker container prune -f
+                    rm -rf ~/.m2/repository
+                '''
+            }
+        }
+    }
+}
