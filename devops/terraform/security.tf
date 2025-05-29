@@ -182,3 +182,53 @@ resource "aws_security_group" "lb_sg" {
     Name = "lb-sg"
   }
 }
+
+# -----------------------------------------------------------------------------
+# 3) RDS SG
+# -----------------------------------------------------------------------------
+resource "aws_security_group" "db_sg" {
+  name        = "room8-db-sg"
+  description = "Allow MySQL traffic from app nodes"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "db-sg" }
+}
+
+# -----------------------------------------------------------------------------
+# 3) Redis SG
+# -----------------------------------------------------------------------------
+resource "aws_security_group" "redis_sg" {
+  name        = "room8-redis-sg"
+  description = "Allow Redis access from app nodes"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "redis-sg" }
+}

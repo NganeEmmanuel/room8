@@ -43,3 +43,11 @@ variable "key_name" {
 variable "private_key_path" {
   description = "SSH private key path"
 }
+
+variable "db_username" {
+  description = "Database username"
+}
+
+variable "db_password" {
+  description = "Database password"
+}

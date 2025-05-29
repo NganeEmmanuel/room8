@@ -55,10 +55,10 @@ const HomePage = () => {
           style={{ backgroundImage: `url(${heroImage})`, height: "80vh" }}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-blue-600">
               Easily Find Rooms, Apartments and Roommates
             </h1>
-            <p className="text-lg sm:text-2xl font-bold mb-6">
+            <p className="text-md sm:text-2xl font-medium mb-6 text-gray-500">
               Simple, Fast, Trusted by Renters & Landlords<br />
               Your Next Home is Waiting for You.
             </p>
@@ -69,8 +69,8 @@ const HomePage = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Enter city or room type..."
-                className="w-full sm:w-2/3 px-10 py-2 rounded-lg border-3 bg-gray-200 border-blue-600 focus:outline-none focus:border-blue-600"
+                placeholder="Enter city to search rooms ..."
+                className="w-full sm:w-2/3 px-10 py-2 rounded-lg border-3 bg-gray-100 border-blue-300 border-width-1 focus:outline-none focus:border-blue-600"
               />
               <button
                 onClick={handleSearch}

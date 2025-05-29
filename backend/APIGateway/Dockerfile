@@ -20,6 +20,9 @@ FROM openjdk:21-jdk
 
 WORKDIR /app
 
+# Inject profile and env secrets at runtime (not baked into image)
+ENV SPRING_PROFILES_ACTIVE=prod
+
 COPY --from=builder /app/target/APIGateway-0.0.1-SNAPSHOT.jar /app/apiGateway.jar
 
 EXPOSE 8765

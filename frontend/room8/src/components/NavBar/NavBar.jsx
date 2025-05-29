@@ -39,7 +39,7 @@ const Navbar = ({ isAuthenticated }) => {
           </Link>
         </li>
 
-        {isAuthenticated ? (
+        {!isAuthenticated ? ( //todo remove the not there. this is for developement purpose only
           <>
             <li>
               <Link to="/admin/dashboard" className={navItemClass("/admin/dashboard")}>
