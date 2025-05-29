@@ -18,6 +18,7 @@ const MemberModal = ({ member, isOpen, onClose }) => {
       document.body.style.overflow = "unset"
     }
 
+    
     return () => {
       document.removeEventListener("keydown", handleEscape)
       document.body.style.overflow = "unset"
