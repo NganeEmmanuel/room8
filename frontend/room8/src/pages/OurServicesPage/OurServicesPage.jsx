@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+
 const services = [
   {
     title: "Room/Roomate search",
@@ -37,7 +37,7 @@ const OurServicesPage = () => {
             }`}
           >
             <h2 className="text-xl font-bold sm:col-span-1">{service.title}</h2>
-            <p className="text-gray-800 font-semibold sm:col-span-2 whitespace-pre-line">
+            <p className="text-gray-900 font-semibold sm:col-span-2 whitespace-pre-line">
               {service.description}
             </p>
           </div>

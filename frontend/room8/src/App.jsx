@@ -13,8 +13,6 @@ import ManageBids from './pages/admin/ManageBids/ManageBidsPage';
 import ProfilePage from './pages/admin/ProfilePage/ProfilePage';
 import ListingsSearchResultsPage from './pages/ListingsSearchResultsPage';
 import OurServicesPage from './pages/OurServicesPage/OurServicesPage';
-
-
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 
@@ -32,7 +30,6 @@ function App() {
           <Route path="/listingDetails" element={<ListingDetailsPage />} />
           <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
           <Route path="/ourservices" element={<OurServicesPage />} />
-
         </Route>
 
         {/* Auth Routes (no layout) */}
