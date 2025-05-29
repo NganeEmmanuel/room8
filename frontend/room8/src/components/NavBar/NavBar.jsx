@@ -29,9 +29,10 @@ const Navbar = ({ isAuthenticated }) => {
           </Link>
         </li>
         <li>
-          <Link to="/listings" className={navItemClass("/services")}>
+          <Link to="/OurServices" className={navItemClass("/ourServices")}>
             Our Services
           </Link>
+
         </li>
         <li>
           <Link to="/listings" className={navItemClass("/about")}>
