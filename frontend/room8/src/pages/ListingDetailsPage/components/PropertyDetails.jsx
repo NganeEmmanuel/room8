@@ -1,4 +1,6 @@
 import React from 'react';
+import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined } from 'react-icons/fa';
+
 
 const PropertyDetails = ({ listing }) => {
   const {
@@ -32,13 +34,23 @@ const PropertyDetails = ({ listing }) => {
       </div>
 
       {/* Property Features (Emoji style) */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700 mb-6">
-        <p>🛏️ <strong>{rooms}</strong> rooms</p>
-        <p>🚿 <strong>{toilet}</strong> toilets</p>
-        <p>🍳 <strong>{kitchen}</strong> kitchen</p>
-        <p>👫 <strong>{roommates}</strong> roommates</p>
-        <p>📏 <strong>{squareFt}</strong></p>
-      </div>
+         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2 text-xs sm:text-sm text-gray-400">
+            <span className="flex items-center gap-1 truncate">
+              <FaBed /> {rooms} rooms
+            </span>
+            <span className="flex items-center gap-1 truncate">
+              <FaBath /> {toilet} toilets
+            </span>
+            <span className="flex items-center gap-1 truncate">
+              <FaUsers /> {roommates} roommates
+            </span>
+            <span className="flex items-center gap-1 truncate">
+              <FaUtensils /> {kitchen} kitchen
+            </span>
+            <span className="flex items-center gap-1 truncate col-span-2 sm:col-span-1">
+              <FaRulerCombined /> {squareFt}
+            </span>
+          </div>
 
       {/* Price and Actions */}
       <div className="flex flex-wrap items-center justify-between mt-4 pb-4 border-b border-gray-200">

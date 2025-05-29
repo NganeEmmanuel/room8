@@ -8,6 +8,7 @@ import BidsSection from "./components/BidsSection"
 import WishlistToggle from "./components/WishlistToggle"
 import PropertyDetails from "./components/PropertyDetails"
 import istockphoto from "../../assets/images/istockphoto.jpg"
+import Spinner from "./components/Spinner.jsx";
 
 const ListingDetailsPage = () => {
   const [searchParams] = useSearchParams()
@@ -28,7 +29,7 @@ const ListingDetailsPage = () => {
             id: listingId || "123",
             title: "Studio modern",
             price: 50000,
-            currency: "cfa",
+            currency: "FCFA",
             location: "Dispensaire Messasi - Yaounde",
             description:
               "This beautiful studio apartment is located in the heart of downtown...",
@@ -44,8 +45,8 @@ const ListingDetailsPage = () => {
             petFriendly: true,
             furnished: true,
             bids: [
-              { id: 1, user: { name: "Sandra", avatar: istockphoto }, amount: 30000, currency: "cfa" },
-              { id: 2, user: { name: "Sandra", avatar: istockphoto }, amount: 28000, currency: "cfa" },
+              { id: 1, user: { name: "Sandra", avatar: istockphoto }, amount: 30000, currency: "FCFA" },
+              { id: 2, user: { name: "Sandra", avatar: istockphoto }, amount: 28000, currency: "FCFA" },
             ],
             similarListings: [
               {
@@ -53,7 +54,7 @@ const ListingDetailsPage = () => {
                 title: "Studio",
                 location: "Dispensaire Messasi - Yaounde",
                 price: 50000,
-                currency: "cfa",
+                currency: "FCFA",
                 image: istockphoto,
                 rooms: 3,
                 toilet: 1,
@@ -83,7 +84,7 @@ const ListingDetailsPage = () => {
   }
 
   const handleBackToSearch = () => {
-    navigate("/listings")
+    navigate("/search")
   }
 
   const handleAcceptBid = (bidId) => {
@@ -99,12 +100,8 @@ const ListingDetailsPage = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
-  }
+  return <Spinner />
+}
 
   if (!listing) {
     return (
@@ -122,7 +119,7 @@ const ListingDetailsPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="max-w-7xl mx-auto p-1">
       <div className="mb-4">
         <button onClick={handleBackToSearch} className="flex items-center text-blue-500 hover:text-blue-700">
           <ArrowLeftIcon className="h-4 w-4 mr-1" />

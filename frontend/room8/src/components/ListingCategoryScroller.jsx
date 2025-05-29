@@ -2,9 +2,9 @@
 import { useRef } from "react"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 import ListingCard from "./ListingCard/ListingCard"
+import Spinner from "../pages/ListingDetailsPage/components/Spinner.jsx";
 
-
-const ListingsCategoryScroller = ({ title, listings = [], filterType, onSeeMore }) => {
+const ListingsCategoryScroller = ({ title, listings = [], onSeeMore }) => {
   const scrollRef = useRef(null)
 
   const scrollLeft = () => {
@@ -29,11 +29,11 @@ const ListingsCategoryScroller = ({ title, listings = [], filterType, onSeeMore 
       </div>
 
       {/* Loader */}
-      {isLoading && <div className="text-center text-gray-400 py-10">Loading listings...</div>}
+      {isLoading && <div className="text-center text-gray-400 py-10"><Spinner /></div>}
 
       {/* Empty State */}
       {!isLoading && !hasListings && (
-        <div className="text-center text-gray-500 py-10">No listings available.</div>
+       <Spinner />
       )}
 
       {/* Scrollable Listings */}
