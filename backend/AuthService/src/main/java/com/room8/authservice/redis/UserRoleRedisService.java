@@ -54,7 +54,7 @@ public class UserRoleRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String role) {
-        return "user_role_:" + role;
+        return "auth:user_role_:" + role;
     }
 }
 

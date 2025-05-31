@@ -54,6 +54,6 @@ public class UserRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String email) {
-        return "user_email_:" + email;
+        return "auth:user_email_:" + email;
     }
 }

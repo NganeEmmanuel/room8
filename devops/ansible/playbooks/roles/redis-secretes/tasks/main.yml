@@ -1,0 +1,7 @@
+- name: Create redis secret
+  template:
+    src: redis-secret.yaml.j2
+    dest: /tmp/redis-secret.yaml
+
+- name: Apply redis secret to Kubernetes
+  shell: kubectl apply -f /tmp/redis-secret.yaml

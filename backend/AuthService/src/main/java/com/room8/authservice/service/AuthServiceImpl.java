@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
 
         // generate role and add authority
         var role = userRoleRedisService.getUserRole(UserAuthority.TENANT.toString());
-        if (role != null){
+        if (role == null){
             role = userServiceClient.getRole(UserAuthority.TENANT).getBody();
             userRoleRedisService.storeUserRole(UserAuthority.TENANT.toString(), role, 60 * 24);
         }
@@ -101,12 +101,12 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         //send verification email
-        var isEmailSent = contactServiceClient.sendVerificationEmail(verificationRequest).getBody();
-
-        // check if email was sent
-        if(Boolean.FALSE.equals(isEmailSent)){
-            throw new EmailSendingException("Failed to send verification email");
-        }
+//        var isEmailSent = contactServiceClient.sendVerificationEmail(verificationRequest).getBody();
+//
+//        // check if email was sent
+//        if(Boolean.FALSE.equals(isEmailSent)){
+//            throw new EmailSendingException("Failed to send verification email");
+//        }
 
         // Build refresh token
         return AuthenticationResponse.builder()

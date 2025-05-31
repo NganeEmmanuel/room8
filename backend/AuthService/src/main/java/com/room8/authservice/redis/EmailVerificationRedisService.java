@@ -29,6 +29,6 @@ public class EmailVerificationRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String email) {
-        return "emailToken_:" + email;
+        return "auth:emailToken_:" + email;
     }
 }

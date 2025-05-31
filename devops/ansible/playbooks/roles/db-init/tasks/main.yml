@@ -1,0 +1,32 @@
+- name: Create DB and user in RDS
+  mysql_db:
+    login_host: "{{ rds_host }}"
+    login_user: "{{ rds_root_user }}"
+    login_password: "{{ rds_root_pass }}"
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ microservice_databases }}"
+
+- name: Create DB user with access
+  mysql_user:
+    login_host: "{{ rds_host }}"
+    login_user: "{{ rds_root_user }}"
+    login_password: "{{ rds_root_pass }}"
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.name }}.*:ALL"
+    host: "%"
+    state: present
+  loop: "{{ microservice_databases }}"
+
+- name: Template secret file for microservice
+  template:
+    src: service-secret.yaml.j2
+    dest: "/tmp/{{ item.secret_name }}.yaml"
+  loop: "{{ microservice_databases }}"
+
+- name: Apply secret via kubectl
+  shell: kubectl apply -f /tmp/{{ item.secret_name }}.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  loop: "{{ microservice_databases }}"

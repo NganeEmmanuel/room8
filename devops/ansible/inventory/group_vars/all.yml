@@ -1,1 +1,17 @@
-ingress_elastic_ip: "<NLB-IP>"  # Replace with your actual pre-allocated EIP OR nlb
+# RDS Endpoint
+rds_host: <db-host>
+rds_root_user: <root-Username>
+rds_root_pass: <your-root-password>
+
+# Databases to create (can loop over)
+microservice_databases:
+  - name: <db_name>
+    user: <db_user>
+    password: <db_pass>
+    secret_name: <your-service-secret-name>
+    service_name: <your-service-name>
+    port: <port>
+# - you can add more microservices
+
+redis_host: <redis-host>
+redis_port: <redis-port>

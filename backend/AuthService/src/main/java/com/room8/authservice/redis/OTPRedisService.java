@@ -29,6 +29,6 @@ public class OTPRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String phoneNumber) {
-        return "phoneNumber:" + phoneNumber;
+        return "auth:phoneNumber:" + phoneNumber;
     }
 }

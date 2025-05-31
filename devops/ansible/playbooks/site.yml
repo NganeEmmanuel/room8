@@ -1,5 +1,5 @@
 ---
-- name: Provision jenkins, argocd and configure Kubernetes cluster
+- name: Provision jenkins, argocd and configure Kubernetes cluster, ingress controllers, monitoring and secretes
   hosts: bastion
   become: true
 
@@ -9,4 +9,6 @@
     - nginx-forwarder
     - argocd           # Exposed via ingress
     - jenkins          # If Jenkins will also be exposed (optional)
-    - monitoring
+    - monitoring       # configure service monitors for microservices
+    - db-init          # Create databases and db user and password for microservices
+    - redis-secretes   # set up redis secretes for elasticache
