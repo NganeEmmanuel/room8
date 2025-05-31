@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
-
 import ImageBanner from "./components/ImageBanner"
 import SimilarListings from "./components/SimilarListings"
 import BidsSection from "./components/BidsSection"
