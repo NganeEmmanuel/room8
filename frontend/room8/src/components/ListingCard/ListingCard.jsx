@@ -1,10 +1,12 @@
 // src/components/ListingCard/ListingCard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined } from 'react-icons/fa';
+// Changed FaLocationArrow to FaLocationDot as it's a more common location icon
+import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined} from 'react-icons/fa'; // Added FaLocationDot
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { CurrencyDollarIcon as SolidCurrencyDollarIcon } from '@heroicons/react/24/solid';
+import {FaLocationDot} from "react-icons/fa6";
 
 
 const ListingCard = ({
@@ -95,7 +97,10 @@ const ListingCard = ({
           )}
         </div>
 
-        <p className="text-sm text-gray-500 truncate">📍 {location || "No location"}</p>
+        {/* Replaced location emoji with FaLocationDot icon */}
+        <p className="text-sm text-gray-500 truncate flex items-center gap-1">
+          <FaLocationDot className="w-4 h-4 text-gray-400" /> {location || "No location"}
+        </p>
         <p className="text-blue-600 font-bold text-xl">{price}</p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-gray-600 pt-2 border-t border-gray-100 mt-2">
@@ -138,7 +143,7 @@ const ListingCard = ({
         )}
       </div>
     </div>
-  );
+    );
 };
 
 export default ListingCard;
