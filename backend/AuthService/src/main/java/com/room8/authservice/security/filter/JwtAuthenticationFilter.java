@@ -35,7 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String email;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            // Return 401 Unauthorized if the Authorization header is missing or invalid
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: No Bearer token provided");
+//            filterChain.doFilter(request, response);
             return;
         }
 

@@ -15,7 +15,12 @@ public class JwtBlacklistRedisService {
     // Blacklist a token in Redis with its expiration time
     public void blacklistToken(String token, Date expirationDate) {
         long expirationTime = expirationDate.getTime() - System.currentTimeMillis();
-        redisTemplate.opsForValue().set("auth:blacklist:" + token, "true", expirationTime, TimeUnit.MILLISECONDS);
+
+        // Check if the expiration time is valid
+        if (expirationTime > 0) {
+            redisTemplate.opsForValue().set("auth:blacklist:" + token, "true", expirationTime, TimeUnit.MILLISECONDS);
+        }
+        // If expirationTime is <= 0, do not call set, thus avoiding errors in tests
     }
 
     // Check if a token is blacklisted

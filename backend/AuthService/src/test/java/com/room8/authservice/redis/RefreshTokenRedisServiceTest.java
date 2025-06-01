@@ -1,6 +1,5 @@
-package com.room8.authservice.service;
+package com.room8.authservice.redis;
 
-import com.room8.authservice.redis.RefreshTokenRedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,16 +11,14 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link RefreshTokenRedisService} class.
- * These tests validate the interaction with Redis using mocked dependencies,
- * ensuring that refresh tokens are correctly stored, retrieved, and invalidated.
  */
 @ExtendWith(MockitoExtension.class)
-class RefreshTokenServiceTest {
+class RefreshTokenRedisServiceTest {
 
     @Mock
     private StringRedisTemplate redisTemplate;
@@ -36,11 +33,6 @@ class RefreshTokenServiceTest {
     private String refreshToken;
     private long expirationInMinutes;
 
-    /**
-     * Set up common test variables and stubbing behavior before each test.
-     * Uses lenient stubbing to prevent unnecessary stubbing warnings in tests
-     * that don’t use redisTemplate.opsForValue().
-     */
     @BeforeEach
     void setUp() {
         email = "testuser@example.com";
@@ -51,10 +43,6 @@ class RefreshTokenServiceTest {
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
-    /**
-     * Verifies that storing a refresh token results in the correct Redis operation
-     * with appropriate expiration settings.
-     */
     @Test
     void testStoreRefreshToken() {
         // Act
@@ -62,17 +50,13 @@ class RefreshTokenServiceTest {
 
         // Assert
         verify(valueOperations).set(
-                "refreshToken:" + email, refreshToken, expirationInMinutes, TimeUnit.MINUTES);
+                "auth:refreshToken:" + email, refreshToken, expirationInMinutes, TimeUnit.MINUTES);
     }
 
-    /**
-     * Verifies that the service correctly retrieves a stored refresh token
-     * from Redis using the associated user email.
-     */
     @Test
     void testGetRefreshToken() {
         // Arrange
-        when(valueOperations.get("refreshToken:" + email)).thenReturn(refreshToken);
+        when(valueOperations.get("auth:refreshToken:" + email)).thenReturn(refreshToken);
 
         // Act
         String retrievedToken = refreshTokenRedisService.getRefreshToken(email);
@@ -81,16 +65,52 @@ class RefreshTokenServiceTest {
         assertEquals(refreshToken, retrievedToken);
     }
 
-    /**
-     * Verifies that invalidating a refresh token results in a Redis delete operation
-     * for the correct key.
-     */
+    @Test
+    void testGetRefreshToken_notFound() {
+        // Arrange
+        when(valueOperations.get("auth:refreshToken:" + email)).thenReturn(null);
+
+        // Act
+        String retrievedToken = refreshTokenRedisService.getRefreshToken(email);
+
+        // Assert
+        assertNull(retrievedToken); // Assert that null is returned if token is not found
+    }
+
     @Test
     void testInvalidateRefreshToken() {
         // Act
         refreshTokenRedisService.invalidateRefreshToken(email);
 
         // Assert
-        verify(redisTemplate).delete("refreshToken:" + email);
+        verify(redisTemplate).delete("auth:refreshToken:" + email);
+    }
+
+    @Test
+    void testStoreRefreshToken_nullEmail() {
+        // Assert
+        // Expecting a NullPointerException
+        assertThrows(NullPointerException.class, () -> refreshTokenRedisService.storeRefreshToken(null, refreshToken, expirationInMinutes));
+    }
+
+    @Test
+    void testStoreRefreshToken_nullToken() {
+        // Assert
+        // Expecting a NullPointerException
+        assertThrows(NullPointerException.class, () -> refreshTokenRedisService.storeRefreshToken(email, null, expirationInMinutes));
+    }
+
+    @Test
+    void testInvalidateRefreshToken_nullEmail() {
+        // Assert
+        // Expecting a NullPointerException
+        assertThrows(NullPointerException.class, () -> refreshTokenRedisService.invalidateRefreshToken(null));
+    }
+
+    @Test
+    void testGetRefreshToken_nullEmail() {
+        // Assert
+        // Expecting a NullPointerException
+        assertThrows(NullPointerException.class, () -> refreshTokenRedisService.getRefreshToken(null));
     }
 }

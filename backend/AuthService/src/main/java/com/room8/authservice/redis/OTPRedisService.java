@@ -13,6 +13,13 @@ public class OTPRedisService {
 
     // Store OTP in Redis with expiration
     public void storeOTP(String phoneNumber, String otp, long expirationInMinutes) {
+        if (otp == null) {
+            throw new NullPointerException("OTP must not be null");
+        }
+        if (expirationInMinutes <= 0) {
+            throw new IllegalArgumentException("Expiration time must be greater than zero");
+        }
+
         redisTemplate.opsForValue().set(
                 getRedisKey(phoneNumber), otp, expirationInMinutes, TimeUnit.MINUTES);
     }
@@ -29,6 +36,9 @@ public class OTPRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String phoneNumber) {
+        if (phoneNumber == null) {
+            throw new NullPointerException("Phone number must not be null");
+        }
         return "auth:phoneNumber:" + phoneNumber;
     }
 }

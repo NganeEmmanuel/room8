@@ -1,6 +1,5 @@
-package com.room8.authservice.service;
+package com.room8.authservice.redis;
 
-import com.room8.authservice.redis.JwtBlacklistRedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
  * and checking whether a token is blacklisted.
  */
 @ExtendWith(MockitoExtension.class)
-class JwtBlacklistServiceTest {
+class JwtBlacklistRedisServiceTest {
 
     @Mock
     private StringRedisTemplate redisTemplate;
@@ -58,10 +58,11 @@ class JwtBlacklistServiceTest {
         jwtBlacklistRedisService.blacklistToken(jwtToken, futureExpirationDate);
 
         // Assert
+        long expectedExpirationTime = futureExpirationDate.getTime() - System.currentTimeMillis();
         verify(valueOperations).set(
-                eq("blacklist:" + jwtToken),
+                eq("auth:blacklist:" + jwtToken),
                 eq("true"),
-                anyLong(),
+                eq(expectedExpirationTime),
                 eq(TimeUnit.MILLISECONDS)
         );
     }
@@ -72,7 +73,7 @@ class JwtBlacklistServiceTest {
     @Test
     void testIsTokenBlacklisted_whenTokenIsBlacklisted_returnsTrue() {
         // Arrange
-        when(redisTemplate.hasKey("blacklist:" + jwtToken)).thenReturn(true);
+        when(redisTemplate.hasKey("auth:blacklist:" + jwtToken)).thenReturn(true);
 
         // Act & Assert
         assertTrue(jwtBlacklistRedisService.isTokenBlacklisted(jwtToken));
@@ -84,9 +85,48 @@ class JwtBlacklistServiceTest {
     @Test
     void testIsTokenBlacklisted_whenTokenIsNotBlacklisted_returnsFalse() {
         // Arrange
-        when(redisTemplate.hasKey("blacklist:" + jwtToken)).thenReturn(false);
+        when(redisTemplate.hasKey("auth:blacklist:" + jwtToken)).thenReturn(false);
 
         // Act & Assert
         assertFalse(jwtBlacklistRedisService.isTokenBlacklisted(jwtToken));
+    }
+
+    /**
+     * Test that blacklisting a token with a past expiration date does not store the token.
+     */
+    @Test
+    void testBlacklistToken_withPastExpirationDate_doesNotStoreToken() {
+        // Arrange
+        Date pastExpirationDate = new Date(System.currentTimeMillis() - 60000); // 1 minute in past
+
+        // Act
+        jwtBlacklistRedisService.blacklistToken(jwtToken, pastExpirationDate);
+
+        // Assert
+        verify(valueOperations, never()).set(anyString(), anyString(), anyLong(), any());
+    }
+
+    /**
+     * Test that blacklisting a token with a zero expiration time triggers an immediate expiration.
+     */
+    @Test
+    void testBlacklistToken_withZeroExpiration_doesNotStoreToken() {
+        // Arrange
+        Date zeroExpirationDate = new Date(System.currentTimeMillis()); // Current time
+
+        // Act
+        jwtBlacklistRedisService.blacklistToken(jwtToken, zeroExpirationDate);
+
+        // Assert
+        verify(valueOperations, never()).set(anyString(), anyString(), anyLong(), any());
+    }
+
+    /**
+     * Test that checking for a null token returns false.
+     */
+    @Test
+    void testIsTokenBlacklisted_whenTokenIsNull_returnsFalse() {
+        // Act & Assert
+        assertFalse(jwtBlacklistRedisService.isTokenBlacklisted(null));
     }
 }
