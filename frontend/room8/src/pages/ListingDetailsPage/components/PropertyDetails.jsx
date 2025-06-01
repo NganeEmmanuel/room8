@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined } from 'react-icons/fa';
+import {FaLocationDot} from "react-icons/fa6";
 
 
 const PropertyDetails = ({ listing }) => {
@@ -30,7 +31,9 @@ const PropertyDetails = ({ listing }) => {
             </span>
           </div>
         </div>
-        <p className="text-gray-600 mt-1">📍 {location}</p>
+          <span className="flex items-center gap-1 truncate">
+        <FaLocationDot /> {location}
+               </span>
       </div>
 
       {/* Property Features (Emoji style) */}
