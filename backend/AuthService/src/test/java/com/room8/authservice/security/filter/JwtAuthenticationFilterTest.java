@@ -2,9 +2,9 @@ package com.room8.authservice.security.filter;
 
 import com.room8.authservice.client.UserServiceClient;
 import com.room8.authservice.model.User;
-import com.room8.authservice.service.AuthService;
 import com.room8.authservice.service.JwtService;
 import com.room8.authservice.redis.UserRedisService;
+import com.room8.authservice.utils.EmailUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +27,7 @@ class JwtAuthenticationFilterTest {
     private JwtService jwtService;
 
     @Mock
-    private AuthService authService;
+    private EmailUtils emailUtils;
 
     @Mock
     private UserServiceClient userServiceClient;
@@ -79,7 +79,7 @@ class JwtAuthenticationFilterTest {
 
         when(jwtService.isJwtTokenValid(token)).thenReturn(true);
         when(jwtService.extractUserEmail(token)).thenReturn("invalid-email");
-        when(authService.isCorrectEmailFormat("invalid-email")).thenReturn(false);
+        when(emailUtils.isCorrectEmailFormat("invalid-email")).thenReturn(false);
 
         // Mock the userServiceClient to return a valid ResponseEntity
         when(userServiceClient.getUserFromEmail("invalid-email")).thenReturn(ResponseEntity.ok(null));
@@ -99,7 +99,7 @@ class JwtAuthenticationFilterTest {
 
         when(jwtService.isJwtTokenValid(token)).thenReturn(true);
         when(jwtService.extractUserEmail(token)).thenReturn("user@example.com");
-        when(authService.isCorrectEmailFormat("user@example.com")).thenReturn(true);
+        when(emailUtils.isCorrectEmailFormat("user@example.com")).thenReturn(true);
         when(userRedisService.getUserInformation("user@example.com")).thenReturn(Optional.empty());
         when(userServiceClient.getUserFromEmail("user@example.com"))
                 .thenReturn(ResponseEntity.notFound().build());
@@ -120,7 +120,7 @@ class JwtAuthenticationFilterTest {
         User mockUser = new User();
         when(jwtService.isJwtTokenValid(token)).thenReturn(true);
         when(jwtService.extractUserEmail(token)).thenReturn("user@example.com");
-        when(authService.isCorrectEmailFormat("user@example.com")).thenReturn(true);
+        when(emailUtils.isCorrectEmailFormat("user@example.com")).thenReturn(true);
         when(userRedisService.getUserInformation("user@example.com")).thenReturn(Optional.of(mockUser));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -139,7 +139,7 @@ class JwtAuthenticationFilterTest {
         User mockUser = new User();
         when(jwtService.isJwtTokenValid(token)).thenReturn(true);
         when(jwtService.extractUserEmail(token)).thenReturn("user@example.com");
-        when(authService.isCorrectEmailFormat("user@example.com")).thenReturn(true);
+        when(emailUtils.isCorrectEmailFormat("user@example.com")).thenReturn(true);
         when(userRedisService.getUserInformation("user@example.com")).thenReturn(Optional.empty());
         when(userServiceClient.getUserFromEmail("user@example.com"))
                 .thenReturn(ResponseEntity.ok(mockUser)); // Return a successful response with the mock user
@@ -188,7 +188,7 @@ class JwtAuthenticationFilterTest {
 
         when(jwtService.isJwtTokenValid(token)).thenReturn(true);
         when(jwtService.extractUserEmail(token)).thenReturn("user@example.com");
-        when(authService.isCorrectEmailFormat("user@example.com")).thenReturn(true);
+        when(emailUtils.isCorrectEmailFormat("user@example.com")).thenReturn(true);
         when(userRedisService.getUserInformation("user@example.com")).thenReturn(Optional.empty());
         when(userServiceClient.getUserFromEmail("user@example.com"))
                 .thenReturn(ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST).build());

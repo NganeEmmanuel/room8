@@ -1,17 +1,15 @@
-package com.room8.authservice.auth;
+package com.room8.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.jackson.JsonComponent;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@JsonComponent
-public class AuthenticationResponse {
+public class EmailVerification {
+    private String email;
     private String token;
-    private String refreshToken;
 }

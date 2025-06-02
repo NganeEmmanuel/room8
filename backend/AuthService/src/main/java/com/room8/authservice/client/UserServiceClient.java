@@ -2,7 +2,7 @@ package com.room8.authservice.client;
 
 import com.room8.authservice.enums.UserAuthority;
 import com.room8.authservice.model.User;
-import com.room8.authservice.model.UserDTO;
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.model.UserRole;
 import com.room8.authservice.security.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;

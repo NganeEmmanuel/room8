@@ -3,6 +3,7 @@ package com.room8.authservice.redis;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,14 +59,23 @@ class JwtBlacklistRedisServiceTest {
         jwtBlacklistRedisService.blacklistToken(jwtToken, futureExpirationDate);
 
         // Assert
-        long expectedExpirationTime = futureExpirationDate.getTime() - System.currentTimeMillis();
+        ArgumentCaptor<Long> expirationCaptor = ArgumentCaptor.forClass(Long.class);
+
         verify(valueOperations).set(
                 eq("auth:blacklist:" + jwtToken),
                 eq("true"),
-                eq(expectedExpirationTime),
+                expirationCaptor.capture(),
                 eq(TimeUnit.MILLISECONDS)
         );
+
+        long actualExpiration = expirationCaptor.getValue();
+        long expectedExpiration = futureExpirationDate.getTime() - System.currentTimeMillis();
+
+        // Allow slight drift of ±10ms
+        assertTrue(Math.abs(actualExpiration - expectedExpiration) < 10,
+                "Expiration time drifted by more than 10ms");
     }
+
 
     /**
      * Test that checking for a blacklisted token returns true if key exists in Redis.

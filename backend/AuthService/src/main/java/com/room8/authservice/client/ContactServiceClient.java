@@ -1,6 +1,6 @@
 package com.room8.authservice.client;
 
-import com.room8.authservice.model.VerificationRequest;
+import com.room8.authservice.dto.VerificationRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

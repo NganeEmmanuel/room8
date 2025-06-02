@@ -1,9 +1,9 @@
 package com.room8.authservice.security.filter;
 
 import com.room8.authservice.client.UserServiceClient;
-import com.room8.authservice.service.AuthService;
 import com.room8.authservice.service.JwtService;
 import com.room8.authservice.redis.UserRedisService;
+import com.room8.authservice.utils.EmailUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +19,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final AuthService authService;
     private final UserRedisService userRedisService;
     private final UserServiceClient userServiceClient;
+    private final EmailUtils emailUtils;
 
     @Override
     protected void doFilterInternal(
@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
 
         // check if token contains email, it's a valid email format, and Authenticate User
-        if (email != null && authService.isCorrectEmailFormat(email) && user != null) {
+        if (email != null && emailUtils.isCorrectEmailFormat(email) && user != null) {
             request.setAttribute("email", email);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
