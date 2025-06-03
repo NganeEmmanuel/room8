@@ -2,7 +2,7 @@ package com.room8.userservice.service;
 
 
 import com.room8.userservice.model.User;
-import com.room8.userservice.model.UserDTO;
+import com.room8.userservice.dto.UserDTO;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 

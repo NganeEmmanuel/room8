@@ -5,8 +5,8 @@ import com.room8.userservice.enums.UserAuthority;
 import com.room8.userservice.exception.UserInfoNotFoundException;
 import com.room8.userservice.exception.UserNotFoundException;
 import com.room8.userservice.model.User;
-import com.room8.userservice.model.UserDTO;
-import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.dto.UserDTO;
+import com.room8.userservice.dto.UserInfoDTO;
 import com.room8.userservice.model.UserRole;
 
 public interface UserService {

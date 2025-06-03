@@ -1,6 +1,8 @@
 package com.room8.userservice.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,24 +25,31 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String firstName;
 
+    @NotBlank
     @Column(nullable = false)
     private String lastName;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    @NotBlank
     @Column(nullable = false)
     private String password;
 
+    @NotNull
     @Column(nullable = false)
     private Boolean isEmailVerified;
 
+    @NotNull
     @Column(nullable = false)
     private Boolean isPhoneVerified;
 
@@ -80,6 +89,7 @@ public class User {
         this.phoneNumber = other.phoneNumber;
         this.password = other.password;
         this.isEmailVerified = other.isEmailVerified;
+        this.isPhoneVerified = other.isPhoneVerified;
         this.joinDate = other.joinDate != null ? new Date(other.joinDate.getTime()) : null;
         this.lastUpdated = other.lastUpdated != null ? new Date(other.lastUpdated.getTime()) : null;
 

@@ -1,5 +1,6 @@
-package com.room8.userservice.model;
+package com.room8.userservice.dto;
 
+import com.room8.userservice.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

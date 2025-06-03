@@ -1,4 +1,4 @@
-package com.room8.userservice.model;
+package com.room8.userservice.dto;
 
 import com.room8.userservice.enums.*;
 import lombok.AllArgsConstructor;
