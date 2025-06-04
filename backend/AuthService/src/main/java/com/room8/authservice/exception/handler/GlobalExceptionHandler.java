@@ -146,6 +146,19 @@ public class GlobalExceptionHandler {
 
 
     /**
+     * Handles exceptions errors occurring in external services
+     *
+     * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
+     * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
+     * @return A ResponseEntity containing a generic error message and HTTP status.
+     */
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<String> handleExternalServiceException(ExternalServiceException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.EXPECTATION_FAILED);
+    }
+
+
+    /**
      * Handles all other exceptions and returns a generic error response.
      *
      * @param ex The Exception. This parameter allows access to the exception's message and stack trace.

@@ -1,6 +1,7 @@
 package com.room8.authservice.utils;
 
 import com.room8.authservice.client.UserServiceClient;
+import com.room8.authservice.exception.DuplicateEmailException;
 import com.room8.authservice.exception.UserNotFoundException;
 import com.room8.authservice.service.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,25 @@ public class EmailUtils {
             return Boolean.FALSE; // Email exists
         } catch (UserNotFoundException e) {
             return Boolean.TRUE; // Email does not exist
+        }
+    }
+
+    public Boolean isPhoneNumberNotExist(String phoneNumber) {
+        try {
+            userServiceClient.getUserFromPhoneNumber(phoneNumber); // No need to check status code now
+            return Boolean.FALSE; // phone exists
+        } catch (UserNotFoundException e) {
+            return Boolean.TRUE; // phone does not exist
+        }
+    }
+
+    public void checkUserConflict(String email, String phoneNumber) {
+        if(!isEmailNotExist(email)) {
+            throw new DuplicateEmailException("Email: " + email + " already in use");
+        }
+
+        if(!isPhoneNumberNotExist(phoneNumber)) {
+            throw new DuplicateEmailException("PhoneNumber: " + phoneNumber + " already in use");
         }
     }
 

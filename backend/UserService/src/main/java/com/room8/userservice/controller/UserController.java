@@ -77,4 +77,9 @@ public class UserController {
     public ResponseEntity<UserRole> getRole(@RequestParam UserAuthority role) {
         return ResponseEntity.ok(userService.getRole(role));
     }
+
+    @GetMapping("/check-conflict")
+    public ResponseEntity<Boolean> checkConflict(@RequestParam String email, @RequestParam String phoneNumber) {
+        return ResponseEntity.ok(userService.checkConflict(email, phoneNumber));
+    }
 }

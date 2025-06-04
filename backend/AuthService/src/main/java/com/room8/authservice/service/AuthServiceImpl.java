@@ -1,9 +1,9 @@
 package com.room8.authservice.service;
 
+import com.room8.authservice.client.UserServiceClient;
 import com.room8.authservice.dto.*;
 import com.room8.authservice.enums.UserAuthority;
 import com.room8.authservice.exception.*;
-import com.room8.authservice.client.UserServiceClient;
 import com.room8.authservice.model.*;
 import com.room8.authservice.redis.*;
 import com.room8.authservice.utils.RoleUtil;

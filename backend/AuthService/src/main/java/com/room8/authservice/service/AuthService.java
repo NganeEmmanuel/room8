@@ -3,8 +3,8 @@ package com.room8.authservice.service;
 import com.room8.authservice.dto.AuthenticationRequest;
 import com.room8.authservice.dto.AuthenticationResponse;
 import com.room8.authservice.dto.RegisterRequest;
-import com.room8.authservice.exception.*;
 import com.room8.authservice.dto.UserDTO;
+import com.room8.authservice.exception.*;
 
 public interface AuthService {
     /**

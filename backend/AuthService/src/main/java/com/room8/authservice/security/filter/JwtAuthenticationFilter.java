@@ -1,8 +1,9 @@
 package com.room8.authservice.security.filter;
 
 import com.room8.authservice.client.UserServiceClient;
-import com.room8.authservice.service.JwtService;
 import com.room8.authservice.redis.UserRedisService;
+import com.room8.authservice.service.JwtService;
+import com.room8.authservice.utils.CheckEndpoints;
 import com.room8.authservice.utils.EmailUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRedisService userRedisService;
     private final UserServiceClient userServiceClient;
     private final EmailUtils emailUtils;
+    private final CheckEndpoints checkEndpoints;
 
     @Override
     protected void doFilterInternal(
@@ -30,6 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        final String path = request.getServletPath();
+
+        // Bypass authentication for public endpoints
+        if (CheckEndpoints.isPublicEndpoint(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String email;

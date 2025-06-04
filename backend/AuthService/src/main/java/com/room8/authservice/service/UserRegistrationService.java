@@ -1,15 +1,18 @@
 package com.room8.authservice.service;
 
-import com.room8.authservice.dto.AuthenticationResponse;
-import com.room8.authservice.dto.RegisterRequest;
 import com.room8.authservice.client.ContactServiceClient;
 import com.room8.authservice.client.UserServiceClient;
+import com.room8.authservice.dto.AuthenticationResponse;
+import com.room8.authservice.dto.RegisterRequest;
+import com.room8.authservice.dto.VerificationRequest;
 import com.room8.authservice.enums.UserAuthority;
 import com.room8.authservice.exception.DuplicateEmailException;
 import com.room8.authservice.exception.EmailSendingException;
 import com.room8.authservice.model.Tenant;
-import com.room8.authservice.dto.VerificationRequest;
-import com.room8.authservice.redis.*;
+import com.room8.authservice.redis.EmailVerificationRedisService;
+import com.room8.authservice.redis.OTPRedisService;
+import com.room8.authservice.redis.RefreshTokenRedisService;
+import com.room8.authservice.redis.UserRedisService;
 import com.room8.authservice.utils.EmailUtils;
 import com.room8.authservice.utils.RoleUtil;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +48,7 @@ public class UserRegistrationService {
     public AuthenticationResponse registerUser(RegisterRequest request, UserAuthority userAuthority) {
 
         // check for duplicate user(if user already exits)
-        if (!emailUtils.isEmailNotExist(request.getEmail())){
-            throw new DuplicateEmailException("Email: "+ request.getEmail() + " already in use");
-        }
+        emailUtils.checkUserConflict(request.getEmail(), request.getPhoneNumber());
 
         // build user, add roles, encrypt password
         var user = Tenant.builder()
@@ -56,6 +57,8 @@ public class UserRegistrationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phoneNumber(request.getPhoneNumber())
+                .isEmailVerified(false)
+                .isPhoneVerified(false)
                 .role(roleUtil.generateRole(userAuthority))
                 .build();
 
@@ -89,14 +92,14 @@ public class UserRegistrationService {
                 .email(user.getEmail())
                 .token(emailToken)
                 .build();
-
-        //send verification email
-        var isEmailSent = contactServiceClient.sendVerificationEmail(verificationRequest).getBody();
-
-        // check if email was sent
-        if(Boolean.FALSE.equals(isEmailSent)){
-            throw new EmailSendingException("Failed to send verification email");
-        }
+//
+//        //send verification email
+//        var isEmailSent = contactServiceClient.sendVerificationEmail(verificationRequest).getBody();
+//
+//        // check if email was sent
+//        if(Boolean.FALSE.equals(isEmailSent)){
+//            throw new EmailSendingException("Failed to send verification email");
+//        }
 
         // Build refresh token
         return AuthenticationResponse.builder()

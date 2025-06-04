@@ -125,6 +125,11 @@ public class UserServiceImpl implements UserService {
                         .build()));
     }
 
+    @Override
+    public Boolean checkConflict(String email, String phoneNumber) {
+        return  userRepository.findByEmailOrPhoneNumber(email, phoneNumber).isPresent();
+    }
+
     // ------------------- Private Helpers -----------------------
 
     private User findUserByEmail(String email) {

@@ -91,4 +91,12 @@ public interface UserService {
      * @return the role objects
      */
     UserRole getRole(UserAuthority role);
+
+    /**
+     *
+     * @param email new user email
+     * @param phoneNumber new user phone number
+     * @return false if no entry can be found in the database associated with email or phone number
+     */
+    Boolean checkConflict(String email, String phoneNumber);
 }

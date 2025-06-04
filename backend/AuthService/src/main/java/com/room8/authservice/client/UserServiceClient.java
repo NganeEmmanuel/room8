@@ -1,8 +1,8 @@
 package com.room8.authservice.client;
 
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.enums.UserAuthority;
 import com.room8.authservice.model.User;
-import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.model.UserRole;
 import com.room8.authservice.security.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -33,4 +33,7 @@ public interface UserServiceClient {
 
     @GetMapping("/api/v1/user/getRole")
     ResponseEntity<UserRole> getRole(@RequestParam UserAuthority role);
+
+    @GetMapping("/api/v1/user/check-conflict")
+    ResponseEntity<Boolean> checkConflict(@RequestParam String email, @RequestParam String phoneNumber);
 }
