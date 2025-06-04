@@ -16,15 +16,15 @@ spring:
           lower-case-service-id: true
       default-filters:
         - AuthenticationFilter
-      routes:
-        - id: auth-service-route
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth-service/**
-        - id: user-service-route
-          uri: lb://user-service
-          predicates:
-            - Path=/api/user-service/**
+#      routes:
+#        - id: auth-service-route
+#          uri: lb://auth-service
+#          predicates:
+#            - Path=/api/auth-service/**
+#        - id: user-service-route
+#          uri: lb://user-service
+#          predicates:
+#            - Path=/api/user-service/**
 
 eureka:
   instance:
