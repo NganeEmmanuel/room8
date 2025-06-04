@@ -1,3 +1,15 @@
+- name: Install pip3
+  become: yes
+  apt:
+    name: python3-pip
+    state: present
+
+- name: Ensure PyMySQL is installed
+  become: yes
+  pip:
+    name: PyMySQL
+    executable: pip3
+
 - name: Create DB and user in RDS
   mysql_db:
     login_host: "{{ rds_host }}"

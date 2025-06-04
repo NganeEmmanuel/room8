@@ -5,3 +5,6 @@
 
 - name: Apply redis secret to Kubernetes
   shell: kubectl apply -f /tmp/redis-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+

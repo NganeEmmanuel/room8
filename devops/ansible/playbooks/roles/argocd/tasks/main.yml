@@ -106,6 +106,6 @@
   debug:
     msg: |
       🎯 ArgoCD has been successfully deployed!
-      🌐 URL: http://{{ ingress_elastic_ip }}/
+      🌐 URL: http://<E-IP>/
       👤 Username: admin
       🔑 Password: {{ argocd_admin_password.stdout }}

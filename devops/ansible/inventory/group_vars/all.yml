@@ -15,3 +15,6 @@ microservice_databases:
 
 redis_host: <redis-host>
 redis_port: <redis-port>
+
+#master node
+master_node: <EIP>

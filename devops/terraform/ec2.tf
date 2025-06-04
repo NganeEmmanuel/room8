@@ -9,7 +9,7 @@ resource "aws_instance" "bastion" {
 
   # Add 15 GB EBS volume (root volume)
   root_block_device {
-    volume_size = 10         # Change this to desired size in GB
+    volume_size = 15         # Change this to desired size in GB
     volume_type = "gp3"      # gp3 is cost-effective and fast; or use gp2
     delete_on_termination = true
   }
