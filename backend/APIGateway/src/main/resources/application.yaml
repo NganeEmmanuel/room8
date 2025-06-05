@@ -33,8 +33,8 @@ eureka:
   instance:
     hostname: api-gateway
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
 
 server:
   port: 8765
