@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 @Component
-@FeignClient(name = "USER-SERVICE", configuration = FeignConfig.class)
+@FeignClient(name = "user-service", configuration = FeignConfig.class)
 public interface UserServiceClient {
     @GetMapping("/api/v1/user/get-user/email")
     ResponseEntity<User> getUserFromEmail(@RequestParam String email);
