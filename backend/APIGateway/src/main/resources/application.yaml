@@ -20,13 +20,13 @@ spring:
         - id: user-service
           uri: http://user-service.default.svc.cluster.local
           predicates:
-            - Path=/api/user-service/**
+            - Path=/user-service/**
           filters:
             - StripPrefix=1
         - id: auth-service
           uri: http://auth-service.default.svc.cluster.local
           predicates:
-            - Path=/api/auth-service/**
+            - Path=/auth-service/**
           filters:
             - StripPrefix=1
 eureka:
