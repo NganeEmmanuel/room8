@@ -12,26 +12,29 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false
           lower-case-service-id: true
       default-filters:
         - AuthenticationFilter
-#      routes:
-#        - id: auth-service-route
-#          uri: lb://auth-service
-#          predicates:
-#            - Path=/api/auth-service/**
-#        - id: user-service-route
-#          uri: lb://user-service
-#          predicates:
-#            - Path=/api/user-service/**
-
+      routes:
+        - id: user-service
+          uri: http://user-service.default.svc.cluster.local
+          predicates:
+            - Path=/api/user-service/**
+          filters:
+            - StripPrefix=1
+        - id: auth-service
+          uri: http://auth-service.default.svc.cluster.local
+          predicates:
+            - Path=/api/auth-service/**
+          filters:
+            - StripPrefix=1
 eureka:
   instance:
     hostname: api-gateway
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: false
+    fetch-registry: false
 
 server:
   port: 8765
@@ -44,12 +47,15 @@ management:
         include: "*"
       base-path: /actuator
   endpoint:
+    gateway:
+      enabled: true          # <-- 🔥 REQUIRED to access /actuator/gateway/routes
     prometheus:
       enabled: true
   prometheus:
     metrics:
       export:
         enabled: true
+
 
 logging:
   level:
