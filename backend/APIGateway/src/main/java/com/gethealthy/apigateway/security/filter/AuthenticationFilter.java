@@ -3,18 +3,14 @@ package com.gethealthy.apigateway.security.filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
@@ -31,16 +27,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         return (exchange, chain) -> {
             String requestPath = exchange.getRequest().getURI().getPath();
 
-            // Extract serviceId from path prefix
-            String[] parts = requestPath.split("/", 3); // ["", "auth-service", "api/v1/auth/login"]
-            if (parts.length < 3) {
-                return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid path format"));
-            }
-
-            String serviceId = parts[1]; // "auth-service"
-            String newPath = "/" + parts[2]; // "/api/v1/auth/login"
-            String targetUri = "lb://" + serviceId + newPath;
-
             // Skip auth filter for these paths
             if (requestPath.equals("/auth-service/api/v1/auth/login")
                     || requestPath.equals("/auth-service/api/v1/auth/signup/tenant")
@@ -48,24 +34,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 //                    || requestPath.equals("/api/v1/auth/authenticate-user")
 //                    || requestPath.equals("/auth-service/api/v1/auth/authenticate-user")
             ) {
-                return exchange.getRequest().getBody()
-                        .next()
-                        .flatMap(dataBuffer -> loadBalancedWebClient
-                                .method(exchange.getRequest().getMethod()) // Support POST/GET/etc.
-                                .uri(targetUri)
-                                .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
-                                .bodyValue(dataBuffer.asByteBuffer())
-                                .retrieve()
-                                .toEntity(String.class)
-                                .flatMap(response -> {
-                                    ServerHttpResponse clientResponse = exchange.getResponse();
-                                    clientResponse.setStatusCode(response.getStatusCode());
-                                    clientResponse.getHeaders().putAll(response.getHeaders());
-                                    DataBuffer buffer = clientResponse.bufferFactory().wrap(response.getBody().getBytes(StandardCharsets.UTF_8));
-                                    return clientResponse.writeWith(Mono.just(buffer));
-                                })
-                        );
-
+                return chain.filter(exchange);
             }
 
             // Check Authorization header presence
