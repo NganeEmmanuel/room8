@@ -1,9 +1,13 @@
 spring:
   data:
     elasticsearch:
-      uris: https://<your-prod-es-endpoint>.es.amazonaws.com
-      username: ${ELASTIC_USERNAME}
-      password: ${ELASTIC_PASSWORD}
+      repositories:
+        enabled: true
+
+  elasticsearch:
+    uris: https://<your-prod-es-endpoint>.es.amazonaws.com
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
 
 # Logging
 logging:
