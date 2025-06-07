@@ -19,3 +19,7 @@ redis_port: <redis-port>
 #master node
 master_node: <EIP>
 
+
+#elastic search variables
+elastic_uri: <Elastic search uri/host>
+
