@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -21,6 +22,11 @@ public class Listing {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    @Column(nullable = false)
+    private String title;
+    @ElementCollection
+    @Column(nullable = false)
+    private List<String> imageUrls;
     @Column(nullable = false)
     private Integer numberOfRooms;
     @Column(nullable = false)

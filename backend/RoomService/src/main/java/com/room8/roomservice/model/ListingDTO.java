@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +17,8 @@ import java.util.Date;
 @Builder
 public class ListingDTO {
     private Long id;
+    private String title;
+    private List<String> imagesUrls;
     private Integer numberOfRooms;
     private Double roomArea; //in square meters
     private Long numberOfBathrooms;
