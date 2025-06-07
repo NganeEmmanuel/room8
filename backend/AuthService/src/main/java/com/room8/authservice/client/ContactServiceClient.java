@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
-@FeignClient("CONTACT-SERVICE")
+@FeignClient("contact-service")
 public interface ContactServiceClient {
 
     @PostMapping("api/v1/contact/send-verification-email")

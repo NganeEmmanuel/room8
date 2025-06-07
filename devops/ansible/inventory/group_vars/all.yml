@@ -18,3 +18,4 @@ redis_port: <redis-port>
 
 #master node
 master_node: <EIP>
+

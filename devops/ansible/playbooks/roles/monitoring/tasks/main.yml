@@ -77,6 +77,6 @@
   debug:
     msg: |
       Grafana Login:
-      ➤ URL: http://<E-IP>/grafana
+      ➤ URL: http://{{ master_node }}/grafana
       ➤ Username: admin
       ➤ Password: admin123

@@ -1,0 +1,20 @@
+spring:
+  data:
+    elasticsearch:
+      uris: https://<your-prod-es-endpoint>.es.amazonaws.com
+      username: ${ELASTIC_USERNAME}
+      password: ${ELASTIC_PASSWORD}
+
+# Logging
+logging:
+  level:
+    org.elasticsearch: INFO
+
+# For deployment
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
