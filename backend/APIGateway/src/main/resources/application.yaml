@@ -29,6 +29,18 @@ spring:
             - Path=/auth-service/**
           filters:
             - StripPrefix=1
+        - id: bid-service
+          uri: http://bid-service.default.svc.cluster.local
+          predicates:
+            - Path=/bid-service/**
+          filters:
+            - StripPrefix=1
+        - id: search-service
+          uri: http://search-service.default.svc.cluster.local
+          predicates:
+            - Path=/search-service/**
+          filters:
+            - StripPrefix=1
 eureka:
   instance:
     hostname: api-gateway
