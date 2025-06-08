@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from "react"
-
+import heroImage from "../../assets/images/heroimage.png"
 const services = [
   {
     title: "Room/Roomate search",
@@ -28,15 +28,21 @@ const OurServicesPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="bg-gray-50 py-15 text-center mb-5">
-        <h1 className="text-4xl md:text-3xl font-extrabold text-black-900">Our Services</h1>
-        <p className="mt-5 text-xl font-bold text-black-700 max-w-2xl mx-auto">
-          Explore the features that make Room8 your trusted platform for finding rooms and roommates.
-        </p>
-        <div className="pt-8">  
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg shadow-md transition duration-300">
-           Contact Us
-          </button>
+      <div
+        className="relative bg-cover bg-center py-24 bg-gray-900 text-white text-center mb-5"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      >
+
+        <div className="relative z-10 px-4">
+          <h1 className="text-4xl md:text-3xl font-extrabold">Our Services</h1>
+          <p className="mt-5 text-xl font-bold max-w-2xl mx-auto">
+            Explore the features that make Room8 your trusted platform for finding rooms and roommates.
+          </p>
+          <div className="pt-8">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg shadow-md transition duration-300">
+              Contact Us
+            </button>
+          </div>
         </div>
       </div>
 
