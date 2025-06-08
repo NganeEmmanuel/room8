@@ -26,13 +26,26 @@ const services = [
 
 const OurServicesPage = () => {
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-10 py-12">
-      <h1 className="text-center text-3xl font-bold mb-12">Our Services</h1>
-      <div className="space-y-10">
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="bg-gray-50 py-15 text-center mb-5">
+        <h1 className="text-4xl md:text-3xl font-extrabold text-black-900">Our Services</h1>
+        <p className="mt-5 text-xl font-bold text-black-700 max-w-2xl mx-auto">
+          Explore the features that make Room8 your trusted platform for finding rooms and roommates.
+        </p>
+        <div className="pt-8">  
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg shadow-md transition duration-300">
+           Contact Us
+          </button>
+        </div>
+      </div>
+
+      {/* Services List */}
+      <div className="space-y-5 px-4 sm:px-10 pb-12">
         {services.map((service, index) => (
           <div
             key={index}
-            className={`grid sm:grid-cols-3 gap-6 px-4 py-8 ${
+            className={`grid sm:grid-cols-3 gap-6 px-4 py-20 ${
               index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
             }`}
           >
