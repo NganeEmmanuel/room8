@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @CrossOrigin(allowedHeaders = "*")
@@ -24,7 +23,7 @@ public class RoomController {
 
     @GetMapping("/get/listing")
     @ResponseStatus(HttpStatus.OK)
-    public ListingDTO getRoom(@RequestParam ListingRequest listingRequest) {
+    public ListingDTO getRoom(@RequestBody ListingRequest listingRequest) {
         return roomService.getRoom(listingRequest);
     }
 
@@ -36,7 +35,7 @@ public class RoomController {
 
     @DeleteMapping("/delete/listing")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String deleteRoom(@RequestParam ListingRequest listingRequest) {
+    public String deleteRoom(@RequestBody ListingRequest listingRequest) {
         roomService.deleteRoom(listingRequest);
         return "Deleted";
     }
