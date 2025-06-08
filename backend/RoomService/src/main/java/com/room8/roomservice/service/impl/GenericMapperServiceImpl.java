@@ -1,12 +1,11 @@
-package com.room8.roomservice.service;
+package com.room8.roomservice.service.impl;
 
-import org.jvnet.hk2.annotations.Service;
+import com.room8.roomservice.service.MapperService;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-@Service
 public class GenericMapperServiceImpl<T, U> implements MapperService<T, U> {
 
     private final Class<T> dtoClass;

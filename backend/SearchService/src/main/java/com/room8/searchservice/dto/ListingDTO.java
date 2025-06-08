@@ -15,12 +15,16 @@ import java.util.List;
 @Data
 @Builder
 public class ListingDTO {
+
+    //common and single studio and apartment
     private Long id;
+    private Long landlordId;
     private String title;
+    private String listingType;
     private List<String> imagesUrls;
     private Integer numberOfRooms;
     private Double roomArea; //in square meters
-    private Long numberOfBathrooms;
+    private Integer numberOfBathrooms;
     private Boolean isSharedBathroom;
     private Double bathroomArea; //in square meters
     private Integer numberOfKitchens;
@@ -37,4 +41,13 @@ public class ListingDTO {
     private Integer numberOfHouseMates;
     private Date listedDate;
     private Date lastUpdated;
+
+    //common in studio and apartment only
+    private Boolean hasLivingRoom;
+    private Integer numberOfLivingRooms;
+    private Double livingRoomArea; //in square meters
+
+    // common in apartment only
+    private Boolean hasOutDoorLivingArea;
+    private Double outDoorArea; //in square meters
 }

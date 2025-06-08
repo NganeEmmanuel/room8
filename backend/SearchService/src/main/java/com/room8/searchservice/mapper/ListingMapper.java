@@ -56,6 +56,7 @@ public final class ListingMapper {
     private static ListingDocument.ListingDocumentBuilder baseBuilder(ListingDTO listing) {
         return ListingDocument.builder()
                 .id(listing.getId() != null ? listing.getId().toString() : null)
+                .landlordId(listing.getLandlordId() != null ? listing.getLandlordId() : null)
                 .title(listing.getTitle())
                 .imageUrls(listing.getImagesUrls() != null ? listing.getImagesUrls() : null)
                 .numberOfRooms(listing.getNumberOfRooms())
@@ -76,6 +77,7 @@ public final class ListingMapper {
                 .listingStyle(listing.getListingStyle() != null ? listing.getListingStyle().name() : null)
                 .numberOfHouseMates(listing.getNumberOfHouseMates())
                 .listedDate(listing.getListedDate())
-                .lastUpdated(listing.getLastUpdated());
+                .lastUpdated(listing.getLastUpdated())
+                .listingType(listing.getListingType());
     }
 }

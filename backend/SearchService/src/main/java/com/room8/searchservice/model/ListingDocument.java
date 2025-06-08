@@ -23,6 +23,9 @@ public class ListingDocument {
     @Id
     private String id;  // ES document id
 
+    @Field(type = FieldType.Long)
+    private Long landlordId; //todo properly define this
+
     @Field(type = FieldType.Text)
     private String title;
 
@@ -35,8 +38,8 @@ public class ListingDocument {
     @Field(type = FieldType.Double)
     private Double roomArea;
 
-    @Field(type = FieldType.Long)
-    private Long numberOfBathrooms;
+    @Field(type = FieldType.Integer)
+    private Integer numberOfBathrooms;
 
     @Field(type = FieldType.Boolean)
     private Boolean isSharedBathroom;

@@ -4,4 +4,5 @@ import com.room8.roomservice.model.Studio;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudioRepository extends JpaRepository<Studio, Long> {
+    void deleteByLandlordId(Long landlordId);
 }
