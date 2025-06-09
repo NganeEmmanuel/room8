@@ -1,128 +1,96 @@
-// src/pages/admin/SettingsPage/SettingsPage.jsx
-import React, { useState } from 'react';
-import DashboardHeader from '../../../components/shared/DashboardHeader';
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    PersonalInformationSection,
+    SecuritySettingsSection,
+    AccountManagementSection,
+    DisplayAccessibilitySection,
+    PrivacySettingsSection
+} from './SettingSections.jsx';
+import { User, Shield, Palette, Eye, Settings2 } from 'lucide-react';
+
 
 const SettingsPage = () => {
-  const [profileName, setProfileName] = useState('Alex');
-  const [email, setEmail] = useState('alex@example.com');
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const [userData, setUserData] = useState({}); // State is kept for form inputs
+    const [activeSection, setActiveSection] = useState('personal-info');
+    useNavigate();
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    alert('Settings saved!');
-    console.log({ profileName, email, notificationsEnabled });
-    // Here you would typically make an API call to update user settings
-  };
+    // In a real app, you would fetch the user's settings data here
+    useEffect(() => {
+        // const fetchedData = await api.getUserSettings();
+        // setUserData(fetchedData);
+    }, []);
 
-  return (
-    <div className="space-y-6">
-      <DashboardHeader title="Settings" subtitle="Manage your account preferences" />
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">User Profile Settings</h3>
-        <form onSubmit={handleSave} className="space-y-6">
-          <div>
-            <label htmlFor="profileName" className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="profileName"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={profileName}
-              onChange={(e) => setProfileName(e.target.value)}
-              required
-            />
-          </div>
+    useEffect(() => {
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        document.documentElement.classList.remove('dark');
+    }, []);
 
-          <div className="flex items-center">
-            <input
-              id="notifications"
-              name="notifications"
-              type="checkbox"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              checked={notificationsEnabled}
-              onChange={(e) => setNotificationsEnabled(e.target.checked)}
-            />
-            <label htmlFor="notifications" className="ml-2 block text-sm font-medium text-gray-900">
-              Enable Email Notifications
-            </label>
-          </div>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Save Settings
-            </button>
-          </div>
-        </form>
-      </div>
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setUserData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
 
-      {/* Password Reset Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Change Password</h3>
-        <form className="space-y-6">
-          <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-              Current Password
-            </label>
-            <input
-              type="password"
-              id="currentPassword"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-              New Password
-            </label>
-            <input
-              type="password"
-              id="newPassword"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Change Password
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+    const handleSaveSettings = () => {
+        // await api.saveUserSettings(userData);
+        alert("Settings Saved!");
+    };
+
+    const navigationItems = [
+        { id: 'personal-info', label: 'Personal Information', icon: User },
+        { id: 'security', label: 'Security', icon: Shield },
+        { id: 'privacy', label: 'Privacy Settings', icon: Eye },
+        { id: 'display', label: 'Display', icon: Palette },
+        { id: 'account', label: 'Account Management', icon: Settings2 },
+    ];
+
+    const renderContent = () => {
+        switch (activeSection) {
+            case 'personal-info': return <PersonalInformationSection userData={userData} handleChange={handleInputChange} />;
+            case 'security': return <SecuritySettingsSection />;
+            case 'privacy': return <PrivacySettingsSection userData={userData} handleChange={handleInputChange} />;
+            case 'display': return <DisplayAccessibilitySection userData={userData} handleChange={handleInputChange} />;
+            case 'account': return <AccountManagementSection />;
+            default: return null;
+        }
+    };
+
+      return (
+        <div className="bg-gray-100 min-h-screen">
+            <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+                <header className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
+                    <p className="mt-1 text-sm text-gray-600">Manage your account, privacy, and display preferences.</p>
+                </header>
+                <div className="flex flex-col md:flex-row gap-8">
+                    <nav className="md:w-1/4 lg:w-1/5">
+                        <ul className="space-y-1">
+                            {navigationItems.map(item => (
+                                <li key={item.id}>
+                                    <button
+                                        onClick={() => setActiveSection(item.id)}
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-left ${activeSection === item.id ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-200'}`}
+                                    >
+                                        <item.icon className="mr-3 h-5 w-5" />
+                                        {item.label}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                    <main className="md:w-3/4 lg:w-4/5">
+                        {renderContent()}
+                        <div className="mt-6 flex justify-end">
+                             <button onClick={handleSaveSettings} className="px-6 py-2.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">Save All Changes</button>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default SettingsPage;

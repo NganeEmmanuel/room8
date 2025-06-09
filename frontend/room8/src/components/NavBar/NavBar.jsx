@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bars3Icon, UserCircleIcon, PowerIcon, BellIcon } from "@heroicons/react/24/outline"; // Added BellIcon
+import { Bars3Icon, UserCircleIcon, PowerIcon } from "@heroicons/react/24/outline"; // Added BellIcon
 import React, { useEffect, useState } from "react";
+import NotificationBell from "./NotificationBell.jsx";
 
 const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
   const location = useLocation();
@@ -9,8 +10,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
 
   // State to hold the user's name
   const [userName, setUserName] = useState('');
-  // State for notification count (optional, but good for an icon)
-  const [notificationCount] = useState(3); // Example count
+  // State for notification count (optional, but good for an icon)// Example count
 
   useEffect(() => {
     const storedUserName = localStorage.getItem('userName');
@@ -20,6 +20,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
       setUserName(userRole.charAt(0).toUpperCase() + userRole.slice(1).replace('-', ' & '));
     } else {
       setUserName('Guest');
+      navigate('/login')
     }
 
     // In a real app, you would fetch actual notification count here
@@ -84,16 +85,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
           isAuthenticated && (
             <>
               {/* Notification Icon */}
-              <li className="relative">
-                <button className="p-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
-                  <BellIcon className="w-6 h-6" />
-                  {notificationCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                      {notificationCount}
-                    </span>
-                  )}
-                </button>
-              </li>
+              <NotificationBell/>
 
               {/* Profile Icon and Name */}
               <li>
