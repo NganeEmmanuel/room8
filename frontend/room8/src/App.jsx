@@ -7,6 +7,8 @@ import HomePage from './pages/HomePage/HomePage';
 import ListingsPage from './pages/ListingsPage/ListingPage'; // Public listings page
 import ListingDetailsPage from './pages/ListingDetailsPage/ListingDetailsPage'; // Public listing details
 import ListingsSearchResultsPage from './pages/ListingsSearchResultsPage';
+import OurServicesPage from './pages/OurServicesPage/OurServicesPage';
+import OurTeam from './pages/OurTeam/OurTeam.jsx'
 
 // Auth Pages
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -19,15 +21,23 @@ import ManageBidsPage from './pages/admin/ManageBids/ManageBidsPage'; // Full pa
 import ProfilePage from './pages/admin/ProfilePage/ProfilePage';
 import CreateListingPage from './pages/admin/ManageListings/CreateListingPage'; // Page for creating new listing
 import EditListingPage from './pages/admin/ManageListings/EditListingPage'; // Page for editing a listing
+import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx"; // This layout wraps all authenticated admin routes
+import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
+import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
 
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
+<<<<<<< HEAD
 import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
 import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
 import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx";
 
 // This layout wraps all authenticated admin routes
+=======
+
+
+>>>>>>> 4d9cf711b1c7aac63cfd8923b78273e205c59d42
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
@@ -50,6 +60,9 @@ function App() {
           */}
           <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
           <Route path="/search" element={<ListingsSearchResultsPage />} />
+          <Route path="/ourservices" element={<OurServicesPage />} />
+          <Route path="/team" element={<OurTeam />} />
+
           {/* Add other public pages like /about, /services if needed */}
         </Route>
 

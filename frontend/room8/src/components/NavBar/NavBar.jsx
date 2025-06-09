@@ -112,12 +112,12 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
               </Link>
             </li>
             <li>
-              <Link to="/services" className={navItemClass("/services")}>
+              <Link to="/ourservices" className={navItemClass("/ourservices")}>
                 Our Services
               </Link>
             </li>
             <li>
-              <Link to="/about" className={navItemClass("/about")}>
+              <Link to="/team" className={navItemClass("/team")}>
                 Our Team
               </Link>
             </li>
