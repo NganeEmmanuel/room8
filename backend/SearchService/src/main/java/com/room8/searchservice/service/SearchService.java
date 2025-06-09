@@ -8,7 +8,7 @@ import java.util.List;
 public interface SearchService {
 
     // Index or update a listing document in Elasticsearch
-    ListingDocument indexListing(ListingDTO listingDTO);
+    void indexListing(ListingDTO listingDTO);
 
     // Search listings by keyword, location, filters etc. - simple example
     List<ListingDocument> searchListings(String query, String city, int page, int size);

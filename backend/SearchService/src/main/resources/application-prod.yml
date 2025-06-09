@@ -4,6 +4,16 @@ spring:
       repositories:
         enabled: true
 
+  # Kafka (consumer only config)
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: search-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      missing-topics-fatal: false
+
   elasticsearch:
     uris: ${ELASTIC_URI}
     username: ${ELASTIC_USERNAME}

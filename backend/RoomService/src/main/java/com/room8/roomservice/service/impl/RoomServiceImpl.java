@@ -11,6 +11,10 @@ import com.room8.roomservice.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
 
 @Service
 @RequiredArgsConstructor
@@ -83,9 +87,19 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void deleteAllRoomsByUserID(Long userId) throws NotFoundException {
-        singleRoomRepository.deleteByLandlordId(userId);
-        studioRepository.deleteByLandlordId(userId);
-        apartmentRepository.deleteByLandlordId(userId);
+        List<Long> singleRoomIds = singleRoomRepository.findIdsByLandlordId(userId);
+        List<Long> studioIds = studioRepository.findIdsByLandlordId(userId);
+        List<Long> apartmentIds = apartmentRepository.findIdsByLandlordId(userId);
+
+        List<Long> allIds = Stream.of(singleRoomIds, studioIds, apartmentIds)
+                .flatMap(Collection::stream)
+                .toList();
+
+        singleRoomRepository.deleteAllByLandlordId(userId);
+        studioRepository.deleteAllByLandlordId(userId);
+        apartmentRepository.deleteAllByLandlordId(userId);
+
+        listingEventPublisher.publishBulkDeleteEvent(allIds);
     }
 
     private void findListingById(Long listingId, String listinType) throws NotFoundException {

@@ -4,6 +4,14 @@ spring:
       repositories:
         enabled: true
 
+  # Kafka (consumer only config)
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: room-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
   elasticsearch:
     uris: http://localhost:9200
 

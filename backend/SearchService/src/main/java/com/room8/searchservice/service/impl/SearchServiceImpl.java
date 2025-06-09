@@ -20,12 +20,12 @@ public class SearchServiceImpl implements SearchService {
     private final ListingRepository listingRepository;
 
     @Override
-    public ListingDocument indexListing(ListingDTO listingDTO) {
+    public void indexListing(ListingDTO listingDTO) {
         if (listingDTO == null) {
             throw new IllegalArgumentException("ListingDTO cannot be null");
         }
         ListingDocument doc = ListingMapper.toDocument(listingDTO);
-        return listingRepository.save(doc);
+        listingRepository.save(doc);
     }
 
     @Override

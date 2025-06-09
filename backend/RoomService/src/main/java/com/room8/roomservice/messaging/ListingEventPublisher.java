@@ -9,10 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ListingEventPublisher {
+    //Todo add event versioning for future implementation
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
@@ -29,4 +32,18 @@ public class ListingEventPublisher {
             log.error("Failed to publish listing event", e);
         }
     }
+
+    public void publishBulkDeleteEvent(List<Long> listingIds) {
+        try {
+            ListingEvent event = new ListingEvent();
+            event.setEventType("BULK_DELETE");
+            event.setListingIds(listingIds);
+            String json = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send(TOPIC, json);
+            log.info("Published bulk delete event for {} listings", listingIds.size());
+        } catch (JsonProcessingException e) {
+            log.error("Failed to publish bulk delete event", e);
+        }
+    }
+
 }
