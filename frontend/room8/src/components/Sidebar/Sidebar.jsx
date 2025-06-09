@@ -6,7 +6,6 @@ import {
   UserIcon,
   Cog6ToothIcon,
   PowerIcon,
-  ChartBarIcon,
   HeartIcon,
   EyeIcon,
 } from "@heroicons/react/24/outline";
@@ -71,11 +70,7 @@ const Sidebar = ({ role }) => {
       to: "/admin/landlord/bids",
       icon: <BookmarkIcon className="w-5 h-5" />,
     },
-    // {
-    //   name: "Analytics",
-    //   to: "/admin/landlord/analytics",
-    //   icon: <ChartBarIcon className="w-5 h-5" />,
-    // },
+
   ];
 
   // Profile and settings links

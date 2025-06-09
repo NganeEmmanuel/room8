@@ -25,11 +25,13 @@ import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
 import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
-import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx"; // This layout wraps all authenticated admin routes
+import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx";
+
+// This layout wraps all authenticated admin routes
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
-  //const isAuthenticated = !!localStorage.getItem('accessToken');
+ // const isAuthenticated = !!localStorage.getItem('accessToken');
     const isAuthenticated = true; // Override for now to test admin section
 
 

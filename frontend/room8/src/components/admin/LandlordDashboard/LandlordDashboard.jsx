@@ -24,7 +24,7 @@ const LandlordDashboard = ({ userName = "Landlord" }) => { // Accept userName pr
 
   const [stats] = useState({
     totalListings: 2, // Reflecting current topListings array length
-    activeListings: 2, // Assuming all are active for now
+   // activeListings: 2, // Assuming all are active for now
     pendingBids: 8,    // Bids needing review from BidService
     acceptedBids: 12,  // Accepted bids from BidService
     totalViews: 234    // Aggregate views from ListingService
@@ -87,7 +87,7 @@ const LandlordDashboard = ({ userName = "Landlord" }) => { // Accept userName pr
     <div className="space-y-6">
       <DashboardHeader userName={userName} userRole="Landlord" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Listings"
           value={topListings.length} // Dynamic count
