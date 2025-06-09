@@ -20,6 +20,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
       setUserName(userRole.charAt(0).toUpperCase() + userRole.slice(1).replace('-', ' & '));
     } else {
       setUserName('Guest');
+      navigate('/login')
     }
 
     // In a real app, you would fetch actual notification count here

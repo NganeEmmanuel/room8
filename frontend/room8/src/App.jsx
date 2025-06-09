@@ -28,16 +28,11 @@ import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/Ten
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
-<<<<<<< HEAD
-import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
-import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
-import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx";
 
 // This layout wraps all authenticated admin routes
-=======
 
 
->>>>>>> 4d9cf711b1c7aac63cfd8923b78273e205c59d42
+
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
