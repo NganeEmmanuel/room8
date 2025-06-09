@@ -21,7 +21,7 @@ public class ListingDTO {
     private Long landlordId;
     private String title;
     private String listingType;
-    private List<String> imagesUrls;
+    private List<String> imageUrls;
     private Integer numberOfRooms;
     private Double roomArea; //in square meters
     private Integer numberOfBathrooms;

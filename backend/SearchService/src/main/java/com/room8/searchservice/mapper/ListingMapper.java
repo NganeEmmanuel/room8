@@ -2,7 +2,6 @@ package com.room8.searchservice.mapper;
 
 import com.room8.searchservice.dto.ApartmentDTO;
 import com.room8.searchservice.dto.ListingDTO;
-import com.room8.searchservice.dto.SingleRoomDTO;
 import com.room8.searchservice.dto.StudioDTO;
 import com.room8.searchservice.exception.IllegalArgumentException;
 import com.room8.searchservice.model.ListingDocument;
@@ -31,23 +30,31 @@ public final class ListingMapper {
 
         ListingDocument.ListingDocumentBuilder builder = baseBuilder(listing);
 
-        // Determine subclass type for discriminator and additional fields
-        switch (listing) {
-            case StudioDTO studio -> builder.listingType("Studio")
-                    .hasLivingRoom(studio.getHasLivingRoom())
-                    .numberOfLivingRooms(studio.getNumberOfLivingRooms())
-                    .livingRoomArea(studio.getLivingRoomArea());
+        String type = listing.getListingType();
+        switch (type) {
+            case "Studio" -> {
+                if (listing instanceof StudioDTO studio) {
+                    builder.hasLivingRoom(studio.getHasLivingRoom())
+                            .numberOfLivingRooms(studio.getNumberOfLivingRooms())
+                            .livingRoomArea(studio.getLivingRoomArea());
+                }
+                builder.listingType("Studio");
+            }
 
-            case ApartmentDTO apartment -> builder.listingType("Apartment")
-                    .hasLivingRoom(apartment.getHasLivingRoom())
-                    .numberOfLivingRooms(apartment.getNumberOfLivingRooms())
-                    .livingRoomArea(apartment.getLivingRoomArea())
-                    .hasOutDoorLivingArea(apartment.getHasOutDoorLivingArea())
-                    .outDoorArea(apartment.getOutDoorArea());
+            case "Apartment" -> {
+                if (listing instanceof ApartmentDTO apartment) {
+                    builder.hasLivingRoom(apartment.getHasLivingRoom())
+                            .numberOfLivingRooms(apartment.getNumberOfLivingRooms())
+                            .livingRoomArea(apartment.getLivingRoomArea())
+                            .hasOutDoorLivingArea(apartment.getHasOutDoorLivingArea())
+                            .outDoorArea(apartment.getOutDoorArea());
+                }
+                builder.listingType("Apartment");
+            }
 
-            case SingleRoomDTO singleRoomDTO -> builder.listingType("SingleRoom");
+            case "SingleRoom" -> builder.listingType("SingleRoom");
 
-            default -> builder.listingType("Listing"); // fallback base type
+            default -> builder.listingType("Listing");
         }
 
         return builder.build();
@@ -58,7 +65,7 @@ public final class ListingMapper {
                 .id(listing.getId() != null ? listing.getId().toString() : null)
                 .landlordId(listing.getLandlordId() != null ? listing.getLandlordId() : null)
                 .title(listing.getTitle())
-                .imageUrls(listing.getImagesUrls() != null ? listing.getImagesUrls() : null)
+                .imageUrls(listing.getImageUrls() != null ? listing.getImageUrls() : null)
                 .numberOfRooms(listing.getNumberOfRooms())
                 .roomArea(listing.getRoomArea())
                 .numberOfBathrooms(listing.getNumberOfBathrooms())

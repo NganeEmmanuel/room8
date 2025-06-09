@@ -6,6 +6,7 @@ import lombok.*;
 @ToString(callSuper=true)
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
 public class ApartmentDTO extends ListingDTO{
     private Boolean hasLivingRoom;
     private Integer numberOfLivingRooms;

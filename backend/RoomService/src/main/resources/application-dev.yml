@@ -5,10 +5,14 @@ spring:
     username: root
     password: Test123$
   kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:9092
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      admin:
+        properties:
+          default.replication.factor: 1
+          num.partitions: 1
 
 eureka:
   client:

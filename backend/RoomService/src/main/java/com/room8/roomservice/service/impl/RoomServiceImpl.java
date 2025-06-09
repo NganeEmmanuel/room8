@@ -1,5 +1,6 @@
 package com.room8.roomservice.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.room8.roomservice.dto.*;
 import com.room8.roomservice.exception.InvalidRoomTypeException;
 import com.room8.roomservice.exception.NotFoundException;
@@ -117,18 +118,33 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-    private ListingDTO saveRoom(ListingDTO listingDTO){
-        return switch (listingDTO.getListingType()){
+    private ListingDTO saveRoom(ListingDTO listingDTO) throws NotFoundException {
+        var room = convertTo(ApartmentDTO.class, listingDTO);
+        var entity = apartmentMapper.toEntity(room);
+        return switch (listingDTO.getListingType()) {
             case "SingleRoom" -> singleRoomMapper.toDTO(
-                        singleRoomRepository.save(singleRoomMapper.toEntity((SingleRoomDTO) listingDTO))
-                );
+                    singleRoomRepository.save(singleRoomMapper.toEntity(
+                            convertTo(SingleRoomDTO.class, listingDTO)
+                    ))
+            );
             case "Studio" -> studioMapper.toDTO(
-                    studioRepository.save(studioMapper.toEntity((StudioDTO) listingDTO))
+                    studioRepository.save(studioMapper.toEntity(
+                            convertTo(StudioDTO.class, listingDTO)
+                    ))
             );
             case "Apartment" -> apartmentMapper.toDTO(
-                    apartmentRepository.save(apartmentMapper.toEntity((ApartmentDTO) listingDTO))
+                    apartmentRepository.save(apartmentMapper.toEntity(
+                            convertTo(ApartmentDTO.class, listingDTO)
+                    ))
             );
-            default -> throw new InvalidRoomTypeException("Invalid room type. Select one of the available room types: SingleRoom, Studio, Apartment");
+            default -> throw new InvalidRoomTypeException("Unsupported listing type: " + listingDTO.getListingType());
         };
     }
+
+
+    private <T> T convertTo(Class<T> targetClass, ListingDTO source) {
+        ObjectMapper mapper = new ObjectMapper();  // or inject a singleton
+        return mapper.convertValue(source, targetClass);
+    }
+
 }
