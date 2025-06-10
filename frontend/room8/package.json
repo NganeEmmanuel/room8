@@ -16,6 +16,7 @@
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "framer-motion": "^12.16.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.511.0",
     "react": "^19.0.0",

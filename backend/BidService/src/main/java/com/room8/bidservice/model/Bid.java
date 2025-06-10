@@ -27,6 +27,7 @@ public class Bid {
     @OneToOne(mappedBy = "bid", cascade = CascadeType.REMOVE, orphanRemoval = true) // Deletes UserInfo when User is deleted
     private UserInfo bidderInfo;
 
+
     @Column(nullable = false, length = 8000)
     private String proposal;
 
