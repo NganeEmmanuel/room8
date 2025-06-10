@@ -13,3 +13,4 @@
     - db-init               # Create databases and db user and password for microservices
     - redis-secretes        # set up redis secretes for elasticache
     - elasticsearch-secret  # setup elastic search secretes
+    - kafka-secretes        # Setup apache kafka secretes
