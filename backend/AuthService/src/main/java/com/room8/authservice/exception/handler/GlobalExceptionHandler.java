@@ -5,19 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 @SuppressWarnings("unused")
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
-        logger.error("user not found: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -30,7 +29,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoMatchingUserFoundException.class)
     public ResponseEntity<String> handleNoMatchingUserFoundException(NoMatchingUserFoundException ex, WebRequest request) {
-        logger.error("No matching user found while looking through search keyword: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -44,7 +42,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<String> handleTokenExpiredException(TokenExpiredException ex, WebRequest request) {
-        logger.error("The provided token is expired: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -57,7 +54,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UserNotVerifiedException.class)
     public ResponseEntity<String> handleUserNotVerifiedException(UserNotVerifiedException ex, WebRequest request) {
-        logger.error("User email is not verified: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.PRECONDITION_REQUIRED);
     }
 
@@ -70,7 +66,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidEmailFormatException.class)
     public ResponseEntity<String> handleInvalidEmailFormatException(Exception ex, WebRequest request) {
-        logger.error("Invalid email format for registering user: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -83,7 +78,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<String> handleDuplicateEmailException(Exception ex, WebRequest request) {
-        logger.error("Email already exit in the database: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
@@ -96,7 +90,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException(Exception ex, WebRequest request) {
-        logger.error("Bad credentials: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -109,7 +102,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidEmailVerificationTokenException.class)
     public ResponseEntity<String> handleInvalidEmailVerificationTokenException(Exception ex, WebRequest request) {
-        logger.error("Invalid token: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -122,9 +114,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidPhoneVerificationTokenException.class)
     public ResponseEntity<String> handleInvalidPhoneVerificationTokenException(Exception ex, WebRequest request) {
-        logger.error("Invalid otp: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
+
+    /**
+     * Handles exceptions for bad InvalidPhoneVerificationToken
+     *
+     * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
+     * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
+     * @return A ResponseEntity containing a generic error message and HTTP status.
+     */
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+
 
     /**
      * Handles exceptions for bad EmailSending
@@ -141,17 +146,30 @@ public class GlobalExceptionHandler {
 
 
     /**
+     * Handles exceptions errors occurring in external services
+     *
+     * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
+     * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
+     * @return A ResponseEntity containing a generic error message and HTTP status.
+     */
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<String> handleExternalServiceException(ExternalServiceException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.EXPECTATION_FAILED);
+    }
+
+
+    /**
      * Handles all other exceptions and returns a generic error response.
      *
      * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
      * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
      * @return A ResponseEntity containing a generic error message and HTTP status.
      */
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<String> handleGlobalException(Exception ex, WebRequest request) {
-//        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-//        return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGlobalException(Exception ex, WebRequest request) {
+        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 
 }

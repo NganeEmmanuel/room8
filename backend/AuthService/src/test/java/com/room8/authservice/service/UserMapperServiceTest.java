@@ -1,7 +1,7 @@
 package com.room8.authservice.service;
 
 import com.room8.authservice.model.User;
-import com.room8.authservice.model.UserDTO;
+import com.room8.authservice.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

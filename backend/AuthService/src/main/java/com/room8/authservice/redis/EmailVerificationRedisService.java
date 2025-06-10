@@ -13,6 +13,9 @@ public class EmailVerificationRedisService {
 
     // Store email token in Redis with expiration
     public void storeEmailToken(String email, String emailToken, long expirationInMinutes) {
+        if (emailToken == null) {
+            throw new NullPointerException("Email token must not be null");
+        }
         redisTemplate.opsForValue().set(
                 getRedisKey(email), emailToken, expirationInMinutes, TimeUnit.MINUTES);
     }
@@ -29,6 +32,9 @@ public class EmailVerificationRedisService {
 
     // 🧹 Private helper method to generate Redis key
     private String getRedisKey(String email) {
-        return "emailToken_:" + email;
+        if (email == null) {
+            throw new NullPointerException("Email must not be null");
+        }
+        return "auth:emailToken_:" + email;
     }
 }

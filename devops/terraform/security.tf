@@ -184,7 +184,7 @@ resource "aws_security_group" "lb_sg" {
 }
 
 # -----------------------------------------------------------------------------
-# 3) RDS SG
+# 4) RDS SG
 # -----------------------------------------------------------------------------
 resource "aws_security_group" "db_sg" {
   name        = "room8-db-sg"
@@ -195,7 +195,7 @@ resource "aws_security_group" "db_sg" {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.app_sg.id]
+    security_groups = [aws_security_group.app_sg.id, aws_security_group.bastion_sg.id]
   }
 
   egress {
@@ -209,7 +209,7 @@ resource "aws_security_group" "db_sg" {
 }
 
 # -----------------------------------------------------------------------------
-# 3) Redis SG
+# 5) Redis SG
 # -----------------------------------------------------------------------------
 resource "aws_security_group" "redis_sg" {
   name        = "room8-redis-sg"
@@ -220,7 +220,7 @@ resource "aws_security_group" "redis_sg" {
     from_port       = 6379
     to_port         = 6379
     protocol        = "tcp"
-    security_groups = [aws_security_group.app_sg.id]
+    security_groups = [aws_security_group.app_sg.id, aws_security_group.bastion_sg.id]
   }
 
   egress {
@@ -231,4 +231,30 @@ resource "aws_security_group" "redis_sg" {
   }
 
   tags = { Name = "redis-sg" }
+}
+
+
+# -----------------------------------------------------------------------------
+# 6) Elastic Search
+# -----------------------------------------------------------------------------
+resource "aws_security_group" "elasticsearch_sg" {
+  name        = "room8-elasticsearch-sg"
+  description = "Allow Elasticsearch traffic from app nodes"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id, aws_security_group.bastion_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "room8-elasticsearch-sg" }
 }

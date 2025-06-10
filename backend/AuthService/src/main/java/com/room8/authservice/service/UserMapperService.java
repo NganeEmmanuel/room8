@@ -1,8 +1,8 @@
 package com.room8.authservice.service;
 
 
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.model.User;
-import com.room8.authservice.model.UserDTO;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 

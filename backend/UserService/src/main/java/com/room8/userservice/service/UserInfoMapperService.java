@@ -1,7 +1,7 @@
 package com.room8.userservice.service;
 
 import com.room8.userservice.model.UserInfo;
-import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.dto.UserInfoDTO;
 import org.springframework.stereotype.Service;
 
 @Service

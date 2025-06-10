@@ -1,0 +1,9 @@
+server:
+  port:
+
+spring:
+  application:
+    name: search-service
+
+  profiles:
+    active: dev

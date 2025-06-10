@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -22,11 +23,20 @@ public class Listing {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column(nullable = false)
+    private Long landlordId;
+    @Column(nullable = false)
+    private String title;
+    @Column(nullable = false)
+    private String listingType;
+    @ElementCollection
+    @Column(nullable = false)
+    private List<String> imageUrls;
+    @Column(nullable = false)
     private Integer numberOfRooms;
     @Column(nullable = false)
     private Double roomArea; //in square meters
     @Column(nullable = false)
-    private Long numberOfBathrooms;
+    private Integer numberOfBathrooms;
     @Column(nullable = false)
     private Boolean isSharedBathroom;
     @Column(nullable = false)

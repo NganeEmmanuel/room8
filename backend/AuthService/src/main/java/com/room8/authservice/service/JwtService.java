@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +85,7 @@ public class JwtService {
         }
         try {
             return extractExpiration(jwtToken).after(new Date());
-        }catch (ExpiredJwtException e) {
+        }catch (ExpiredJwtException | SignatureException e) {
             return false;
         }
     }
