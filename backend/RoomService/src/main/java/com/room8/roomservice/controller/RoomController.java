@@ -3,6 +3,7 @@ package com.room8.roomservice.controller;
 import com.room8.roomservice.dto.ListingDTO;
 import com.room8.roomservice.dto.ListingRequest;
 import com.room8.roomservice.service.RoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class RoomController {
 
     @DeleteMapping("/delete/listing")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public String deleteRoom(@RequestBody ListingRequest listingRequest) {
+    public String deleteRoom(@Valid @RequestBody ListingRequest listingRequest) {
         roomService.deleteRoom(listingRequest);
         return "Deleted";
     }

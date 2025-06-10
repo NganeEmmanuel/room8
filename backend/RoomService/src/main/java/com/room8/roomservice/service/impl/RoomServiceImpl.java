@@ -2,7 +2,7 @@ package com.room8.roomservice.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.room8.roomservice.dto.*;
-import com.room8.roomservice.exception.InvalidRoomTypeException;
+import com.room8.roomservice.exception.InvalidRequestException;
 import com.room8.roomservice.exception.NotFoundException;
 import com.room8.roomservice.messaging.ListingEventPublisher;
 import com.room8.roomservice.repository.ApartmentRepository;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 
@@ -38,7 +39,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public ListingDTO getRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRoomTypeException {
+    public ListingDTO getRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRequestException {
+        if (listingRequest == null){
+            throw new InvalidRequestException("Listing request cannot be null");
+        } else if(
+                listingRequest.getRoomId() == null
+                || Objects.equals(listingRequest.getListingType(), "") || listingRequest.getListingType() == null
+        ) {
+                throw new InvalidRequestException("Room id and listingType cannot be null");
+        }
         return switch (listingRequest.getListingType()){
             case "SingleRoom" -> singleRoomMapper.toDTO(
                     singleRoomRepository.findById(listingRequest.getRoomId()).orElseThrow(
@@ -55,12 +64,13 @@ public class RoomServiceImpl implements RoomService {
                             () -> new NotFoundException("Invalid room id: " + listingRequest.getRoomId())
                     )
             );
-            default -> throw new InvalidRoomTypeException("Invalid room type. Select one of the available room types: SingleRoom, Studio, Apartment");
+            default -> throw new InvalidRequestException("Invalid room type. Select one of the available room types: SingleRoom, Studio, Apartment");
         };
     }
 
     @Override
     public ListingDTO updateRoom(ListingDTO listingDTO) throws NotFoundException {
+
         // check if room exist
         findListingById(listingDTO.getId(), listingDTO.getListingType());
         //save room if it does
@@ -71,7 +81,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void deleteRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRoomTypeException {
+    public void deleteRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRequestException {
         // Optional: send a deletion event if you want the search index to delete it too
         ListingDTO listingToDelete = getRoom(listingRequest); // reuse method
         // delete the room
@@ -88,6 +98,9 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void deleteAllRoomsByUserID(Long userId) throws NotFoundException {
+        if (userId == null){
+            throw new InvalidRequestException("User ID cannot be null");
+        }
         List<Long> singleRoomIds = singleRoomRepository.findIdsByLandlordId(userId);
         List<Long> studioIds = studioRepository.findIdsByLandlordId(userId);
         List<Long> apartmentIds = apartmentRepository.findIdsByLandlordId(userId);
@@ -104,6 +117,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private void findListingById(Long listingId, String listinType) throws NotFoundException {
+        if (listingId == null){
+            throw new InvalidRequestException("Listing id cannot be null");
+        }
         switch (listinType){
             case "SingleRoom" -> singleRoomRepository.findById(listingId).orElseThrow(
                     () -> new NotFoundException("Invalid room id: " + listingId)
@@ -114,13 +130,16 @@ public class RoomServiceImpl implements RoomService {
             case "Apartment" -> apartmentRepository.findById(listingId).orElseThrow(
                     () -> new NotFoundException("Invalid room id: " + listingId)
             );
-            default -> throw new InvalidRoomTypeException("Invalid room type. Select one of the available room types: SingleRoom, Studio, Apartment");
+            default -> throw new InvalidRequestException("Invalid room type. Select one of the available room types: SingleRoom, Studio, Apartment");
         }
     }
 
     private ListingDTO saveRoom(ListingDTO listingDTO) throws NotFoundException {
-        var room = convertTo(ApartmentDTO.class, listingDTO);
-        var entity = apartmentMapper.toEntity(room);
+        if(listingDTO == null) {
+            throw new InvalidRequestException("Listing cannot be null");
+        }else if(listingDTO.getListingType() == null){
+            throw new InvalidRequestException("ListingType cannot be null");
+        }
         return switch (listingDTO.getListingType()) {
             case "SingleRoom" -> singleRoomMapper.toDTO(
                     singleRoomRepository.save(singleRoomMapper.toEntity(
@@ -137,7 +156,7 @@ public class RoomServiceImpl implements RoomService {
                             convertTo(ApartmentDTO.class, listingDTO)
                     ))
             );
-            default -> throw new InvalidRoomTypeException("Unsupported listing type: " + listingDTO.getListingType());
+            default -> throw new InvalidRequestException("Unsupported listing type: " + listingDTO.getListingType());
         };
     }
 
