@@ -16,8 +16,8 @@ spring:
 
   elasticsearch:
     uris: ${ELASTIC_URI}
-    username: ${ELASTIC_USERNAME}
-    password: ${ELASTIC_PASSWORD}
+#    username: ${ELASTIC_USERNAME}
+#    password: ${ELASTIC_PASSWORD}
 
 # Logging
 logging:
