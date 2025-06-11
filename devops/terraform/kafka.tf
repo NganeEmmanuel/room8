@@ -1,13 +1,18 @@
 resource "aws_msk_cluster" "room8_kafka" {
   cluster_name           = "room8-kafka"
-  kafka_version          = "3.6.0" # Latest supported version as of now
+  kafka_version          = "3.6.0"
   number_of_broker_nodes = 2
 
   broker_node_group_info {
     instance_type   = "kafka.t3.small"
-    ebs_volume_size = 20
     client_subnets  = aws_subnet.private[*].id
     security_groups = [aws_security_group.kafka_sg.id]
+
+    storage_info {
+      ebs_storage_info {
+        volume_size = 20
+      }
+    }
   }
 
   encryption_info {
@@ -20,7 +25,7 @@ resource "aws_msk_cluster" "room8_kafka" {
   logging_info {
     broker_logs {
       cloudwatch_logs {
-        enabled = true
+        enabled   = true
         log_group = aws_cloudwatch_log_group.kafka_logs.name
       }
     }

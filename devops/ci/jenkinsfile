@@ -26,7 +26,7 @@ pipeline {
         stage('Build and Push Docker Images') {
             steps {
                 script {
-                    def services = ["ServiceRegistry", "APIGateway","AuthService","UserService"]
+                    def services = ["ServiceRegistry", "APIGateway","AuthService","UserService","RoomService","SearchService"]
 
                     services.each { service ->
                         def serviceSlug = service.toLowerCase()
@@ -62,7 +62,9 @@ pipeline {
                             "apigateway"      : "api-gateway",
                             "serviceregistry" : "service-registry",
                             "authservice"     : "auth-service",
-                            "userservice"     : "user-service"
+                            "userservice"     : "user-service",
+                            "roomservice"     : "room-service",
+                            "searchservice"     : "search-service"
                         ]
 
                         echo "🔁 Cloning room8-deployments repo..."
