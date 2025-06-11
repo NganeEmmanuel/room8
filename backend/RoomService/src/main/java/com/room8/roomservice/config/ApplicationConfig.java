@@ -3,7 +3,6 @@ package com.room8.roomservice.config;
 import com.room8.roomservice.service.impl.ApartmentMapper;
 import com.room8.roomservice.service.impl.SingleRoomMapper;
 import com.room8.roomservice.service.impl.StudioMapper;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,5 +23,10 @@ public class ApplicationConfig {
     @Bean
     public ApartmentMapper getApartmentMapper() {
         return new ApartmentMapper(modelMapper);
+    }
+
+    @Bean
+    public ModelMapper getModelMapper() {
+        return modelMapper;
     }
 }
