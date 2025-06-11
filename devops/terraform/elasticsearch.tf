@@ -3,9 +3,12 @@ resource "aws_opensearch_domain" "room8_elasticsearch" {
   engine_version        = "OpenSearch_2.11"
 
   cluster_config {
-    instance_type  = "t3.small.search"
-    instance_count = 1
-    zone_awareness_enabled = false
+    instance_type           = "t3.small.search"
+    instance_count          = 2
+    zone_awareness_enabled  = true
+    zone_awareness_config {
+      availability_zone_count = 2
+    }
   }
 
   ebs_options {
@@ -14,22 +17,22 @@ resource "aws_opensearch_domain" "room8_elasticsearch" {
     volume_type = "gp2"
   }
 
-  access_policies = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "es:*"
-        Resource  = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/room8-elasticsearch/*"
-        Condition = {
-          IpAddress = {
-            "aws:SourceIp" = var.team_ip_address
-          }
-        }
-      }
-    ]
-  })
+  # access_policies = jsonencode({
+  #   Version = "2012-10-17"
+  #   Statement = [
+  #     {
+  #       Effect    = "Allow"
+  #       Principal = "*"
+  #       Action    = "es:*"
+  #       Resource  = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/room8-elasticsearch/*"
+  #       Condition = {
+  #         IpAddress = {
+  #           "aws:SourceIp" = var.team_ip_address
+  #         }
+  #       }
+  #     }
+  #   ]
+  # })
 
   vpc_options {
     subnet_ids         = aws_subnet.private[*].id

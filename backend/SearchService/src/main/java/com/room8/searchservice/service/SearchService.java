@@ -1,6 +1,7 @@
 package com.room8.searchservice.service;
 
 import com.room8.searchservice.dto.ListingDTO;
+import com.room8.searchservice.dto.SearchFilterDTO;
 import com.room8.searchservice.model.ListingDocument;
 
 import java.util.List;

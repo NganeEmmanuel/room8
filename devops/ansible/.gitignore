@@ -1,5 +1,5 @@
 aws_login.pem
 common_commands.md
 jenkins_varaibles.md
-inventory/group_vars/all.secrets.yml
+inventory/group_vars/all.yml
 venv

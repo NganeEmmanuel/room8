@@ -24,4 +24,15 @@ output "elasticsearch_endpoint" {
   value       = aws_opensearch_domain.room8_elasticsearch.endpoint
 }
 
+output "kafka_bootstrap_servers" {
+  description = "Bootstrap broker string for client connection"
+  value       = aws_msk_cluster.room8_kafka.bootstrap_brokers
+}
+
+output "kafka_bootstrap_tls" {
+  description = "TLS endpoint (optional if you move to encryption)"
+  value       = aws_msk_cluster.room8_kafka.bootstrap_brokers_tls
+}
+
+
 

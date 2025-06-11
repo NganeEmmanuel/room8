@@ -1,11 +1,9 @@
 package com.room8.roomservice.service;
 
 import com.room8.roomservice.dto.ListingRequest;
-import com.room8.roomservice.exception.InvalidRoomTypeException;
+import com.room8.roomservice.exception.InvalidRequestException;
 import com.room8.roomservice.exception.NotFoundException;
 import com.room8.roomservice.dto.ListingDTO;
-
-import java.util.List;
 
 /**
  * The RoomService interface defines the contract for managing room listings
@@ -31,9 +29,9 @@ public interface RoomService {
      * @param listingRequest contains the ID and listingType of the room to retrieve
      * @return the room listing associated with the specified ID
      * @throws NotFoundException if no room listing is found with the given ID
-     * @throws InvalidRoomTypeException if the room type passed isn't a valid room type
+     * @throws InvalidRequestException if the room type passed isn't a valid room type
      */
-    ListingDTO getRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRoomTypeException;
+    ListingDTO getRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRequestException;
 
     /**
      * Updates an existing room listing.
@@ -49,9 +47,9 @@ public interface RoomService {
      *
      * @param listingRequest contains the ID and listingType of the room to be deleted
      * @throws NotFoundException if no room listing is found with the given ID
-     * @throws InvalidRoomTypeException if the room type passed isn't a valid room type
+     * @throws InvalidRequestException if the room type passed isn't a valid room type
      */
-    void deleteRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRoomTypeException;
+    void deleteRoom(ListingRequest listingRequest) throws NotFoundException, InvalidRequestException;
 
 
     /**

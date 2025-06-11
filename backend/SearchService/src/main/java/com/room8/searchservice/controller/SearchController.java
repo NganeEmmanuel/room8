@@ -1,5 +1,6 @@
 package com.room8.searchservice.controller;
 
+import com.room8.searchservice.dto.SearchFilterDTO;
 import com.room8.searchservice.model.ListingDocument;
 import com.room8.searchservice.service.SearchService;
 import lombok.RequiredArgsConstructor;
