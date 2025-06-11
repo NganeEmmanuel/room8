@@ -34,7 +34,7 @@ ENV SPRING_PROFILES_ACTIVE=prod
 # Copy the JAR built in the previous stage
 COPY --from=builder /app/target/SearchService-0.0.1-SNAPSHOT.jar /app/searchService.jar
 
-EXPOSE 8085
+EXPOSE 8086
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app/searchService.jar"]
