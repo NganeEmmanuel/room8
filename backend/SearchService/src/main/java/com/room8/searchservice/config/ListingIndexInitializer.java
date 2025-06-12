@@ -1,67 +1,85 @@
 package com.room8.searchservice.config;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.client.indices.GetIndexRequest;
+import org.opensearch.client.indices.CreateIndexResponse;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ListingIndexInitializer {
 
     private static final String INDEX_NAME = "listings";
-
-    private final ElasticsearchClient elasticsearchClient;
+    private final RestHighLevelClient openSearchClient;
 
     @PostConstruct
     public void createIndexIfNotExists() {
         try {
-            boolean exists = elasticsearchClient.indices()
-                    .exists(e -> e.index(INDEX_NAME)).value();
+            boolean exists = openSearchClient.indices()
+                    .exists(new GetIndexRequest(INDEX_NAME), RequestOptions.DEFAULT);
 
             if (!exists) {
-                CreateIndexResponse response = elasticsearchClient.indices().create(CreateIndexRequest.of(c -> c
-                        .index(INDEX_NAME)
-                        .mappings(m -> m
-                                .properties("landlordId", p -> p.long_(v -> v))
-                                .properties("title", p -> p.text(t -> t))
-                                .properties("imageUrls", p -> p.keyword(k -> k))
-                                .properties("numberOfRooms", p -> p.integer(i -> i))
-                                .properties("roomArea", p -> p.double_(d -> d))
-                                .properties("numberOfBathrooms", p -> p.integer(i -> i))
-                                .properties("isSharedBathroom", p -> p.boolean_(b -> b))
-                                .properties("bathroomArea", p -> p.double_(d -> d))
-                                .properties("numberOfKitchens", p -> p.integer(i -> i))
-                                .properties("isSharedKitchen", p -> p.boolean_(b -> b))
-                                .properties("kitchenArea", p -> p.double_(d -> d))
-                                .properties("bathroomLocation", p -> p.keyword(k -> k))
-                                .properties("listingCountry", p -> p.keyword(k -> k))
-                                .properties("listingState", p -> p.keyword(k -> k))
-                                .properties("listingCity", p -> p.keyword(k -> k))
-                                .properties("listingStreet", p -> p.keyword(k -> k))
-                                .properties("listingPrice", p -> p.double_(d -> d))
-                                .properties("listingDescription", p -> p.text(t -> t))
-                                .properties("listingStyle", p -> p.keyword(k -> k))
-                                .properties("numberOfHouseMates", p -> p.integer(i -> i))
-                                .properties("listedDate", p -> p.date(d -> d.format("epoch_millis")))
-                                .properties("lastUpdated", p -> p.date(d -> d.format("epoch_millis")))
-                                .properties("hasLivingRoom", p -> p.boolean_(b -> b.nullValue(true)))
-                                .properties("numberOfLivingRooms", p -> p.integer(i -> i.nullValue(0)))
-                                .properties("livingRoomArea", p -> p.double_(d -> d.nullValue(0.0)))
-                                .properties("hasOutDoorLivingArea", p -> p.boolean_(b -> b.nullValue(true)))
-                                .properties("outDoorArea", p -> p.double_(d -> d.nullValue(0.0)))
-                                .properties("listingType", p -> p.keyword(k -> k))
-                        )
-                ));
-                System.out.println("Index 'listings' created: " + response.acknowledged());
+                CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME);
+                request.mapping(getIndexMappings(), org.opensearch.common.xcontent.XContentType.JSON);
+
+                CreateIndexResponse response = openSearchClient.indices()
+                        .create(request, RequestOptions.DEFAULT);
+
+                if (response.isAcknowledged()) {
+                    log.info("✅ Index '{}' created successfully.", INDEX_NAME);
+                } else {
+                    log.warn("⚠️ Index '{}' creation not acknowledged.", INDEX_NAME);
+                }
             } else {
-                System.out.println("Index 'listings' already exists.");
+                log.info("ℹ️ Index '{}' already exists.", INDEX_NAME);
             }
-        } catch (Exception e) {
-            System.err.println("Failed to create 'listings' index: " + e.getMessage());
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("❌ Failed to create '{}' index: {}", INDEX_NAME, e.getMessage(), e);
         }
+    }
+
+    private String getIndexMappings() {
+        return """
+        {
+          "properties": {
+            "landlordId": { "type": "long" },
+            "title": { "type": "text" },
+            "imageUrls": { "type": "keyword" },
+            "numberOfRooms": { "type": "integer" },
+            "roomArea": { "type": "double" },
+            "numberOfBathrooms": { "type": "integer" },
+            "isSharedBathroom": { "type": "boolean" },
+            "bathroomArea": { "type": "double" },
+            "numberOfKitchens": { "type": "integer" },
+            "isSharedKitchen": { "type": "boolean" },
+            "kitchenArea": { "type": "double" },
+            "bathroomLocation": { "type": "keyword" },
+            "listingCountry": { "type": "keyword" },
+            "listingState": { "type": "keyword" },
+            "listingCity": { "type": "keyword" },
+            "listingStreet": { "type": "keyword" },
+            "listingPrice": { "type": "double" },
+            "listingDescription": { "type": "text" },
+            "listingStyle": { "type": "keyword" },
+            "numberOfHouseMates": { "type": "integer" },
+            "listedDate": { "type": "date", "format": "epoch_millis" },
+            "lastUpdated": { "type": "date", "format": "epoch_millis" },
+            "hasLivingRoom": { "type": "boolean", "null_value": true },
+            "numberOfLivingRooms": { "type": "integer", "null_value": 0 },
+            "livingRoomArea": { "type": "double", "null_value": 0.0 },
+            "hasOutDoorLivingArea": { "type": "boolean", "null_value": true },
+            "outDoorArea": { "type": "double", "null_value": 0.0 },
+            "listingType": { "type": "keyword" }
+          }
+        }
+        """;
     }
 }

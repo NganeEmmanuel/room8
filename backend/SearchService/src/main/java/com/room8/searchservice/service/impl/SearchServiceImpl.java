@@ -1,18 +1,28 @@
 package com.room8.searchservice.service.impl;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.room8.searchservice.dto.ListingDTO;
+import com.room8.searchservice.exception.IllegalArgumentException;
 import com.room8.searchservice.mapper.ListingMapper;
 import com.room8.searchservice.model.ListingDocument;
 import com.room8.searchservice.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.opensearch.action.delete.DeleteRequest;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.common.unit.TimeValue;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.index.query.*;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
-import com.room8.searchservice.exception.IllegalArgumentException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SearchServiceImpl implements SearchService {
 
-    private final ElasticsearchClient elasticsearchClient;
+    private final RestHighLevelClient openSearchClient;
+    private final ObjectMapper objectMapper;
 
     private static final String INDEX_NAME = "listings";
 
@@ -30,63 +41,63 @@ public class SearchServiceImpl implements SearchService {
         if (listingDTO == null) throw new IllegalArgumentException("ListingDTO cannot be null");
 
         ListingDocument doc = ListingMapper.toDocument(listingDTO);
+
         try {
-            IndexResponse response = elasticsearchClient.index(i -> i
-                    .index(INDEX_NAME)
+            IndexRequest request = new IndexRequest(INDEX_NAME)
                     .id(doc.getId())
-                    .document(doc)
-            );
-            log.info("Indexed document with ID: {}", response.id());
+                    .source(objectMapper.writeValueAsString(doc), XContentType.JSON);
+
+            openSearchClient.index(request, RequestOptions.DEFAULT);
+            log.info("✅ Indexed document with ID: {}", doc.getId());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to index listing", e);
+            throw new RuntimeException("❌ Failed to index listing", e);
         }
     }
 
     @Override
     public List<ListingDocument> searchListings(String query, String city, int page, int size) {
         try {
-            SearchResponse<ListingDocument> response;
+            SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
             if (query != null && !query.isEmpty()) {
-                response = elasticsearchClient.search(s -> s
-                                .index(INDEX_NAME)
-                                .query(q -> q
-                                        .bool(b -> b
-                                                .should(s1 -> s1.match(m -> m.field("title").query(query)))
-                                                .should(s2 -> s2.match(m -> m.field("listingDescription").query(query)))
-                                        )
-                                )
-                                .from(page * size)
-                                .size(size),
-                        ListingDocument.class
-                );
-            } else if (city != null && !city.isEmpty()) {
-                response = elasticsearchClient.search(s -> s
-                                .index(INDEX_NAME)
-                                .query(q -> q
-                                        .match(m -> m.field("listingCity").query(city))
-                                )
-                                .from(page * size)
-                                .size(size),
-                        ListingDocument.class
-                );
-            } else {
-                // Return everything
-                response = elasticsearchClient.search(s -> s
-                                .index(INDEX_NAME)
-                                .query(q -> q.matchAll(m -> m))
-                                .from(page * size)
-                                .size(size),
-                        ListingDocument.class
-                );
+                boolQuery.should(QueryBuilders.matchQuery("title", query));
+                boolQuery.should(QueryBuilders.matchQuery("listingDescription", query));
             }
 
-            return response.hits().hits().stream()
-                    .map(Hit::source)
+            if (city != null && !city.isEmpty()) {
+                boolQuery.must(QueryBuilders.matchQuery("listingCity", city));
+            }
+
+            if (boolQuery.should().isEmpty() && boolQuery.must().isEmpty()) {
+                sourceBuilder.query(QueryBuilders.matchAllQuery());
+            } else {
+                sourceBuilder.query(boolQuery);
+            }
+
+            sourceBuilder.from(page * size);
+            sourceBuilder.size(size);
+            sourceBuilder.timeout(TimeValue.timeValueSeconds(5));
+
+            searchRequest.source(sourceBuilder);
+            SearchResponse response = openSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+
+            return Arrays.stream(response.getHits().getHits())
+                    .map(hit -> {
+                        try {
+                            return objectMapper.readValue(hit.getSourceAsString(), ListingDocument.class);
+                        } catch (IOException e) {
+                            log.error("⚠️ Failed to parse search hit: {}", hit.getId(), e);
+                            return null;
+                        }
+                    })
+                    .filter(doc -> doc != null)
                     .collect(Collectors.toList());
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to search listings", e);
+            throw new RuntimeException("❌ Failed to search listings", e);
         }
     }
 
@@ -96,9 +107,11 @@ public class SearchServiceImpl implements SearchService {
             throw new IllegalArgumentException("Id cannot be null or empty");
         }
         try {
-            elasticsearchClient.delete(d -> d.index(INDEX_NAME).id(id));
+            DeleteRequest request = new DeleteRequest(INDEX_NAME, id);
+            openSearchClient.delete(request, RequestOptions.DEFAULT);
+            log.info("🗑️ Deleted listing with ID: {}", id);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete listing", e);
+            throw new RuntimeException("❌ Failed to delete listing", e);
         }
     }
 }
