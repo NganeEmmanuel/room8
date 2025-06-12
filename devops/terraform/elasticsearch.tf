@@ -17,27 +17,32 @@ resource "aws_opensearch_domain" "room8_elasticsearch" {
     volume_type = "gp2"
   }
 
-  # access_policies = jsonencode({
-  #   Version = "2012-10-17"
-  #   Statement = [
-  #     {
-  #       Effect    = "Allow"
-  #       Principal = "*"
-  #       Action    = "es:*"
-  #       Resource  = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/room8-elasticsearch/*"
-  #       Condition = {
-  #         IpAddress = {
-  #           "aws:SourceIp" = var.team_ip_address
-  #         }
-  #       }
-  #     }
-  #   ]
-  # })
+  access_policies = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = "*",
+        Action = "es:*",
+        Resource = "arn:aws:es:${var.aws_region}:${data.aws_caller_identity.current.account_id}:domain/room8-elasticsearch/*",
+        Condition = {
+          IpAddress = {
+            "aws:SourceIp" = [
+              "${aws_instance.bastion.public_ip}/32",
+              "${aws_eip.nat_eip.public_ip}/32"
+            ]
+          }
+        }
+      }
+    ]
+  })
 
-  vpc_options {
-    subnet_ids         = aws_subnet.private[*].id
-    security_group_ids = [aws_security_group.elasticsearch_sg.id]
-  }
+
+
+  # vpc_options {
+  #   subnet_ids         = aws_subnet.private[*].id
+  #   security_group_ids = [aws_security_group.elasticsearch_sg.id]
+  # }
 
   tags = {
     Name = "room8-elasticsearch"
