@@ -1,3 +1,13 @@
+resource "aws_msk_configuration" "room8_custom_config" {
+  name           = "room8-kafka-config"
+  kafka_versions = ["3.6.0"]
+  description    = "Enable auto topic creation"
+
+  server_properties = <<PROPERTIES
+auto.create.topics.enable=true
+PROPERTIES
+}
+
 resource "aws_msk_cluster" "room8_kafka" {
   cluster_name           = "room8-kafka"
   kafka_version          = "3.6.0"
@@ -29,6 +39,11 @@ resource "aws_msk_cluster" "room8_kafka" {
         log_group = aws_cloudwatch_log_group.kafka_logs.name
       }
     }
+  }
+
+  configuration_info {
+    arn      = aws_msk_configuration.room8_custom_config.arn
+    revision = aws_msk_configuration.room8_custom_config.latest_revision
   }
 
   tags = {
