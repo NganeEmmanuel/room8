@@ -10,6 +10,8 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 
 import java.net.URI;
 
@@ -27,11 +29,14 @@ public class ElasticsearchConfig {
             URI uri = new URI(elasticsearchUrl);
             HttpHost httpHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 
-            RestClient restClient = RestClient.builder(httpHost).build();
+            RestClient restClient = RestClient.builder(httpHost)
+                    .setDefaultHeaders(new Header[]{
+                            new BasicHeader("Content-Type", "application/json"),
+                            new BasicHeader("Accept", "application/json")
+                    })
+                    .build();
 
-            RestClientTransport transport = new RestClientTransport(
-                    restClient, new JacksonJsonpMapper()
-            );
+            RestClientTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
 
             return new ElasticsearchClient(transport);
         } catch (Exception e) {
@@ -39,4 +44,5 @@ public class ElasticsearchConfig {
             throw new RuntimeException(e);
         }
     }
+
 }
