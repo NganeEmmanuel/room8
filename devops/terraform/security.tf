@@ -234,30 +234,30 @@ resource "aws_security_group" "redis_sg" {
 }
 
 
-# -----------------------------------------------------------------------------
-# 6) Elastic Search
-# -----------------------------------------------------------------------------
-resource "aws_security_group" "elasticsearch_sg" {
-  name        = "room8-elasticsearch-sg"
-  description = "Allow Elasticsearch traffic from app nodes"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.app_sg.id, aws_security_group.bastion_sg.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = { Name = "room8-elasticsearch-sg" }
-}
+# # -----------------------------------------------------------------------------
+# # 6) Elastic Search
+# # -----------------------------------------------------------------------------
+# resource "aws_security_group" "elasticsearch_sg" {
+#   name        = "room8-elasticsearch-sg"
+#   description = "Allow Elasticsearch traffic from app nodes"
+#   vpc_id      = aws_vpc.main.id
+#
+#   ingress {
+#     from_port       = 443
+#     to_port         = 443
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.app_sg.id, aws_security_group.bastion_sg.id]
+#   }
+#
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#
+#   tags = { Name = "room8-elasticsearch-sg" }
+# }
 
 
 
