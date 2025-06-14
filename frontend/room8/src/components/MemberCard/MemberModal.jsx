@@ -1,42 +1,44 @@
-import { useState, useEffect } from "react"
-import { X, Linkedin, Github, Mail } from "lucide-react"
+import { useState, useEffect } from "react";
+import { X, Linkedin, Github, Mail } from "lucide-react";
 
 const MemberModal = ({ member, isOpen, onClose }) => {
-  const [imageError, setImageError] = useState(false)
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
-        onClose()
+        onClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape)
-      document.body.style.overflow = "hidden"
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset"
+      document.body.style.overflow = "unset";
     }
 
-    
     return () => {
-      document.removeEventListener("keydown", handleEscape)
-      document.body.style.overflow = "unset"
-    }
-  }, [isOpen, onClose])
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
 
   const handleImageError = () => {
-    setImageError(true)
-  }
+    setImageError(true);
+  };
 
   if (!isOpen || !member) {
-    return null
+    return null;
   }
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-gray-600 bg-opacity-50"
+        onClick={onClose}
+      />
 
       {/* Modal Content */}
       <div className="relative bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -58,7 +60,9 @@ const MemberModal = ({ member, isOpen, onClose }) => {
             >
               {imageError ? (
                 <div className="w-28 h-28 rounded-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-white font-bold text-3xl">{member.name.charAt(0)}</span>
+                  <span className="text-white font-bold text-3xl">
+                    {member.name.charAt(0)}
+                  </span>
                 </div>
               ) : (
                 <img
@@ -69,20 +73,28 @@ const MemberModal = ({ member, isOpen, onClose }) => {
                 />
               )}
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{member.name}</h2>
-            <p className="text-blue-600 font-medium text-lg mb-4">{member.title}</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              {member.name}
+            </h2>
+            <p className="text-blue-600 font-medium text-lg mb-4">
+              {member.title}
+            </p>
           </div>
 
           {/* About Section */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
-            <p className="text-gray-600 leading-relaxed">{member.description}</p>
+            <p className="text-gray-600 leading-relaxed">
+              {member.description}
+            </p>
           </div>
 
           {/* Additional Info */}
           {member.bio && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Biography</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Biography
+              </h3>
               <p className="text-gray-600 leading-relaxed">{member.bio}</p>
             </div>
           )}
@@ -90,10 +102,15 @@ const MemberModal = ({ member, isOpen, onClose }) => {
           {/* Skills */}
           {member.skills && member.skills.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Skills
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {member.skills.map((skill, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -103,7 +120,9 @@ const MemberModal = ({ member, isOpen, onClose }) => {
 
           {/* Social Links */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Connect</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Connect
+            </h3>
             <div className="flex gap-3 justify-center flex-wrap">
               {member.linkedin && (
                 <a
@@ -143,7 +162,7 @@ const MemberModal = ({ member, isOpen, onClose }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MemberModal
+export default MemberModal;

@@ -1,4 +1,3 @@
-// src/components/bids/PlaceBidPanel.jsx
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 
@@ -12,17 +11,13 @@ const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
             type="button"
             id={id}
             onClick={() => onChange({ target: { name: id, type: 'checkbox', checked: !checked }})}
-            className={`${
-                checked ? 'bg-blue-600' : 'bg-gray-200'
-            } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+            className={`${checked ? 'bg-blue-600' : 'bg-gray-200'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
             role="switch"
             aria-checked={checked}
         >
             <span
                 aria-hidden="true"
-                className={`${
-                checked ? 'translate-x-5' : 'translate-x-0'
-                } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
             />
         </button>
     </div>
@@ -31,20 +26,27 @@ const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
 
 const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
   const [proposal, setProposal] = useState('');
-  const [shareUserInfo, setShareUserInfo] = useState(true); // Default to sharing
+  const [amount, setAmount] = useState(''); // ADDED: State for the bid amount
+  const [shareUserInfo, setShareUserInfo] = useState(true);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // MODIFIED: Added validation for proposal and amount
     if (proposal.trim() === '') {
         alert('Please write a proposal before submitting.');
         return;
     }
-    // Pass the bid data up to the parent component
-    onSubmit({ proposal, shareUserInfo });
+    if (!amount || Number(amount) <= 0) {
+        alert('Please enter a valid bid amount.');
+        return;
+    }
+    // MODIFIED: Pass the bid data, including the amount, up to the parent component
+    onSubmit({ proposal, amount: Number(amount), shareUserInfo });
   };
 
   const handleCancel = () => {
     setProposal('');
+    setAmount(''); // ADDED: Reset amount on cancel
     setShareUserInfo(true);
     onClose();
   };
@@ -54,10 +56,9 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end  transition-opacity">
+    <div className="fixed inset-0 z-50 flex justify-end  bg-opacity-40 transition-opacity">
       <div className={`w-full max-w-lg h-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex flex-col h-full">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
                 <div>
                     <h2 className="text-xl font-semibold text-gray-900">Place Your Bid</h2>
@@ -71,8 +72,27 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
                 </button>
             </div>
 
-            {/* Form Content */}
+            {/* MODIFIED: Changed div to form to handle submission correctly */}
             <form onSubmit={handleSubmit} className="flex-grow p-6 overflow-y-auto space-y-6">
+
+                {/* ADDED: Amount Input Field with validation */}
+                <div>
+                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                        Bid Amount (in FCFA)
+                    </label>
+                    <input
+                        type="number"
+                        id="amount"
+                        name="amount"
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., 55000"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        required
+                        min="1" // Browser-level validation for positive numbers
+                    />
+                </div>
+
                 <div>
                     <label htmlFor="proposal" className="block text-sm font-medium text-gray-700 mb-2">
                         Your Proposal
@@ -82,7 +102,7 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
                         name="proposal"
                         rows="8"
                         className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Introduce yourself, explain why you're a good fit, and any other relevant details for the landlord..."
+                        placeholder="Introduce yourself, explain why you're a good fit..."
                         value={proposal}
                         onChange={(e) => setProposal(e.target.value)}
                         required
@@ -92,7 +112,7 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
                 <div>
                     <h3 className="text-md font-medium text-gray-900 mb-2">Share Your Profile Details</h3>
                     <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200 mb-4">
-                        To help the landlord make an informed decision, we recommend sharing a snapshot of your user information (lifestyle, habits, etc.) with your bid. This significantly increases your chances of being selected.
+                        To help the landlord make an informed decision, we recommend sharing a snapshot of your user information.
                     </p>
                     <ToggleSwitch
                         id="shareUserInfo"
@@ -104,7 +124,6 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
                 </div>
             </form>
 
-            {/* Footer with Actions */}
             <div className="p-4 border-t bg-gray-50">
                 <div className="flex justify-end space-x-3">
                     <button
@@ -116,7 +135,7 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
                     </button>
                     <button
                         type="button"
-                        onClick={handleSubmit} // Trigger form submission
+                        onClick={handleSubmit} // This will trigger the form's onSubmit
                         className="px-8 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
                     >
                         Submit Bid

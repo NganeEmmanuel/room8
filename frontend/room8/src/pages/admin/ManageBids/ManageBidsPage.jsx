@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import {useBids} from "../../../context/BidContext.jsx";
 
 // Placeholder for DashboardHeader. In your actual app, import your own.
 const DashboardHeader = ({ title, subtitle }) => (
@@ -10,89 +11,12 @@ const DashboardHeader = ({ title, subtitle }) => (
     </div>
 );
 
-// Expanded and updated mock data for both Tenant and Landlord views
-const mockBidsData = [
-  {
-    id: "bidTenant1",
-    ListingId: "101",
-    listingTitle: "Luxury Downtown Apartment",
-    bidderId: "userYouTenant", // Bid made BY the logged-in tenant
-    landlordId: "landlordPrestige",
-    landlordName: "Prestige Rentals",
-    proposal: "This is my proposal for the downtown apartment. My detailed profile is kept secret for the moment, willing to share if required",
-    amount: 75000,
-    currency: "FCFA",
-    status: "pending",
-    bidDate: "2025-06-10T11:00:00Z",
-    shareUserInfo: false, // Tenant IS sharing their info for this bid
-    bidderInfo: { name: "You (Tenant)", email: "tenant@example.com", phoneNumber: "555-123-4567", profileImage: "https://i.pravatar.cc/150?u=tenantYou", userInfo: {  } }
-  },
-  {
-    id: "bidTenant2",
-    ListingId: "202",
-    listingTitle: "Charming Studio in Bastos",
-    bidderId: "userYouTenant", // Bid made BY the logged-in tenant
-    landlordId: "landlordHome",
-    landlordName: "Home Sweet Home",
-    proposal: "I would like to apply for the charming studio. I'm sharing my detailed profile for this awesome listing.",
-    amount: 50000,
-    currency: "FCFA",
-    status: "accepted",
-    bidDate: "2025-06-05T09:00:00Z",
-    shareUserInfo: true, // Tenant IS  sharing their info for this bid
-    bidderInfo: { name: "You (Tenant)", email: "tenant@example.com", phoneNumber: "555-123-4567", profileImage: "https://i.pravatar.cc/150?u=tenantYou", userInfo:
-           { occupation: 'Software Engineer', employmentStatus: 'Employed', nationality: 'Canadian', languagesSpoken: ['English', 'French'],
-             smokingStatus: 'Non-smoker', addictionStatus: 'None', hasPets: false, petPreference: 'None', petsAllowed: [], dietaryRestrictions: 'None',
-             otherDietaryRestrictions: [], cleanlinessLevel: 'Very Tidy', sleepSchedule: 'Early Bird', comfortableWithGuests: 'Yes, with notice', partyHabits: 'Rarely', sharesFood: 'Sometimes, please ask',
-             preferredRoomTemperature: 'Moderate', willingToShareBathroom: true, hasMedicalConditions: true, medicalConditions: ['Pollen Allergy'], isDisabled: false,
-             disability: 'None', personalityType: 'Introvert', noiseTolerance: 'Prefers quiet', enjoysSocializingWithRoommates: 'Occasionally', willingToSplitUtilities: true,
-            monthlyIncome: 6000, incomeCurrency: 'FCFA',
-           } }
-  },
-  {
-    id: "bidLandlord1",
-    ListingId: "yourProperty123",
-    listingTitle: "Cozy Room near Omnisports",
-    bidderId: "userAlex",
-    landlordId: "landlordMain", // Bid received BY the logged-in landlord
-    landlordName: "You (Landlord)",
-    proposal: "I am a quiet professional, non-smoker, and have excellent references. My full profile is attached for your review.",
-    amount: 45000,
-    currency: "FCFA",
-    status: "pending",
-    bidDate: "2025-06-12T14:30:00Z",
-    shareUserInfo: true, // This bidder shared their info
-    bidderInfo: { name: "Alex P.", email: "alex.p@example.com", phoneNumber: "111-222-3333", profileImage: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80",
-      userInfo:
-           { occupation: 'Software Engineer', employmentStatus: 'Employed', nationality: 'Canadian', languagesSpoken: ['English', 'French'],
-             smokingStatus: 'Non-smoker', addictionStatus: 'None', hasPets: false, petPreference: 'None', petsAllowed: [], dietaryRestrictions: 'None',
-             otherDietaryRestrictions: [], cleanlinessLevel: 'Very Tidy', sleepSchedule: 'Early Bird', comfortableWithGuests: 'Yes, with notice', partyHabits: 'Rarely', sharesFood: 'Sometimes, please ask',
-             preferredRoomTemperature: 'Moderate', willingToShareBathroom: true, hasMedicalConditions: true, medicalConditions: ['Pollen Allergy'], isDisabled: false,
-             disability: 'None', personalityType: 'Introvert', noiseTolerance: 'Prefers quiet', enjoysSocializingWithRoommates: 'Occasionally', willingToSplitUtilities: true,
-            monthlyIncome: 6000, incomeCurrency: 'FCFA',
-           }
-    }
-  },
-  {
-    id: "bidLandlord2",
-    ListingId: "yourProperty456",
-    listingTitle: "Modern Flat in Hippodrome",
-    bidderId: "userSandra",
-    landlordId: "landlordMain", // Bid received BY the logged-in landlord
-    landlordName: "You (Landlord)",
-    proposal: "Hello, I am interested in your property. My proposal is attached but I have chosen to keep my detailed information private for now.",
-    amount: 90000,
-    currency: "FCFA",
-    status: "pending",
-    bidDate: "2025-06-14T10:00:00Z",
-    shareUserInfo: false, // This bidder did NOT share their info
-    bidderInfo: { name: "Sandra B.", email: "sandra.b@example.com", phoneNumber: "222-333-4444", profileImage: "https://i.pravatar.cc/150?u=sandra", userInfo: { } }
-  }
-];
+
+
 
 
 const ManageBidsPage = ({ isTenantView = false, isLandlordView = false }) => {
-  const [bids] = useState(mockBidsData);
+  const { bids } = useBids();  //using global state not local
   const navigate = useNavigate();
 
   const handleViewBid = (bid) => {

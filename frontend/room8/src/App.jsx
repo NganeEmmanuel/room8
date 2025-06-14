@@ -28,6 +28,7 @@ import BidDetailsPage from './pages/admin/ManageBids/BidDetailsPage';
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
+import {BidsProvider} from "./context/BidContext.jsx";
 
 // This layout wraps all authenticated admin routes
 
@@ -41,6 +42,7 @@ function App() {
 
 
   return (
+      <BidsProvider>
     <Router>
       <Routes>
         {/* Public Routes with PublicLayout */}
@@ -108,6 +110,7 @@ function App() {
         <Route path="*" element={<div>404 Page Not Found</div>} />
       </Routes>
     </Router>
+        </BidsProvider>
   );
 }
 

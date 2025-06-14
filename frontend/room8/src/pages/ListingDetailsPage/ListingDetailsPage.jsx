@@ -11,6 +11,7 @@ import istockphoto from "../../assets/images/istockphoto.jpg"
 import Spinner from "./components/Spinner.jsx";
 // ADDED: Import the new sliding panel component
 import PlaceBidPanel from "../../components/bids/PlaceBidPanel.jsx";
+import {useBids} from "../../context/BidContext.jsx";
 
 const ListingDetailsPage = () => {
   const [searchParams] = useSearchParams()
@@ -22,6 +23,8 @@ const ListingDetailsPage = () => {
   const [isBidPanelOpen, setIsBidPanelOpen] = useState(false)
   const navigate = useNavigate()
   const isAuthenticated = !!localStorage.getItem("accessToken")
+
+  const { addBid } = useBids(); // Get the addBid function from the context
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -51,6 +54,7 @@ const ListingDetailsPage = () => {
               { id: 1, user: { name: "Sandra", avatar: istockphoto }, proposal: "I am interested", shareUserInfo: true },
               { id: 2, user: { name: "Mike", avatar: istockphoto }, proposal: "I would like to apply", shareUserInfo: false },
             ],
+             landlord: { id: "landlordMain", name: "Mock Landlord Name" }, // Added landlord info
             similarListings: [
               {
                 id: "456",
@@ -89,29 +93,44 @@ const ListingDetailsPage = () => {
   }
 
   // ADDED: A handler to process the data from the PlaceBidPanel
-  const handleBidSubmit = ({ proposal, shareUserInfo }) => {
-    console.log("Submitting bid with the following data:");
-    console.log({
-      listingId: listing.id,
+  const handleBidSubmit = ({ amount, proposal, shareUserInfo }) => {
+    // This is the new bid object that matches the structure in our context
+    const newBid = {
+      id: `bid_${Date.now()}`,
+      ListingId: listing.id,
+      listingTitle: listing.title,
+      bidderId: "userYouTenant", // This should come from your auth system
+      landlordId: listing.landlord.id, // Get landlordId from listing data
+      landlordName: listing.landlord.name,
       proposal,
+      amount,
+      currency: "FCFA",
+      status: "pending",
+      bidDate: new Date().toISOString(),
       shareUserInfo,
-      // In a real app, you'd get the bidder's ID from your auth context
-      bidderId: "currentUser"
-    });
+      bidderInfo: {
+        name: "You (Tenant)",
+        email: "tenant@example.com",
+        phoneNumber: "555-123-4567",
+        profileImage: "https://i.pravatar.cc/150?u=tenantYou",
+        userInfo:
+           { occupation: 'Software Engineer', employmentStatus: 'Employed', nationality: 'Canadian', languagesSpoken: ['English', 'French'],
+             smokingStatus: 'Non-smoker', addictionStatus: 'None', hasPets: false, petPreference: 'None', petsAllowed: [], dietaryRestrictions: 'None',
+             otherDietaryRestrictions: [], cleanlinessLevel: 'Very Tidy', sleepSchedule: 'Early Bird', comfortableWithGuests: 'Yes, with notice', partyHabits: 'Rarely', sharesFood: 'Sometimes, please ask',
+             preferredRoomTemperature: 'Moderate', willingToShareBathroom: true, hasMedicalConditions: true, medicalConditions: ['Pollen Allergy'], isDisabled: false,
+             disability: 'None', personalityType: 'Introvert', noiseTolerance: 'Prefers quiet', enjoysSocializingWithRoommates: 'Occasionally', willingToSplitUtilities: true,
+            monthlyIncome: 6000, incomeCurrency: 'FCFA',
+           }
+      }
+    };
 
-    // Here you would make your API call to the backend.
-    // For now, we'll just log it and close the panel.
+    addBid(newBid); // This updates the GLOBAL state
+
     alert("Your bid has been submitted successfully!");
     setIsBidPanelOpen(false);
 
-    // OPTIONAL: You could add the new bid to the top of the list for instant feedback
-    const newBid = {
-        id: Date.now(), // temporary unique id
-        user: { name: "You", avatar: istockphoto },
-        proposal,
-        shareUserInfo,
-    };
-    setListing(prev => ({ ...prev, bids: [newBid, ...prev.bids] }));
+    // Optional: navigate to the bids page to see the result
+    navigate('/admin/tenant/bids');
   };
 
 

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   ChevronLeft, User, Mail, Phone, Home, FileText, Check, X, Trash2,
-   Building, Languages, Droplets, Utensils,
-  BedDouble, Thermometer, UserCheck, Heart, Users, DollarSign, Snowflake,
-  EyeOff, PlusCircle, Bath, PartyPopper
+  Building, Languages, Droplets, Utensils, BedDouble, Thermometer,
+  UserCheck, Heart, Users, DollarSign, Snowflake, EyeOff, PlusCircle,
+  Bath, PartyPopper
 } from 'lucide-react';
+import { useBids } from '../../../context/BidContext.jsx'; // Import the context hook
 
 // Helper: Toggle Switch Component
 const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
@@ -63,8 +64,10 @@ const InfoSection = ({ title, children }) => (
 const BidDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { updateBidSharing } = useBids(); // Get the update function from context
   const { bid, isTenantView } = location.state || {};
 
+  // This state is still needed for the immediate visual feedback of the toggle switch
   const [shareInfo, setShareInfo] = useState(bid?.shareUserInfo || false);
 
   if (!bid) {
@@ -77,16 +80,23 @@ const BidDetailsPage = () => {
   }
 
   const { listingTitle, bidderInfo, proposal, status, ListingId } = bid;
-  const shouldDisplayInfo = isTenantView || shareInfo;
   const userInfo = bidderInfo.userInfo || {};
+
+  // This logic remains the same, but now `bid.shareUserInfo` will be up-to-date from the context
+  const shouldDisplayInfo = isTenantView || bid.shareUserInfo;
 
   const handleWithdraw = () => { alert(`Your bid for ${listingTitle} has been withdrawn.`); navigate(-1); };
   const handleAccept = () => { alert(`Accepted bid from ${bidderInfo.name}.`); navigate(-1); };
   const handleReject = () => { alert(`Rejected bid from ${bidderInfo.name}.`); navigate(-1); };
 
+  // UPDATED HANDLER
   const handleSharingToggle = (newSharingStatus) => {
+    // 1. Update the local state for instant UI change
     setShareInfo(newSharingStatus);
-    console.log(`API CALL: Update bid ${bid.id} to shareUserInfo: ${newSharingStatus}`);
+
+    // 2. Update the GLOBAL state so the change is persistent
+    updateBidSharing(bid.id, newSharingStatus);
+
     alert(`Your information sharing preference has been updated.`);
   };
 
@@ -142,7 +152,6 @@ const BidDetailsPage = () => {
                 <InfoItem icon={Home} label="Nationality" value={userInfo.nationality} />
                 <InfoItem icon={Languages} label="Languages Spoken" value={Array.isArray(userInfo.languagesSpoken) ? userInfo.languagesSpoken.join(', ') : 'N/A'} />
             </InfoSection>
-
             <InfoSection title="Lifestyle & Habits">
                 <InfoItem icon={Snowflake} label="Smoking Status" value={userInfo.smokingStatus} />
                 <InfoItem icon={EyeOff} label="Addiction Status" value={userInfo.addictionStatus} />
@@ -156,20 +165,17 @@ const BidDetailsPage = () => {
                 <InfoItem icon={Bath} label="Willing to Share Bathroom" isBoolean value={userInfo.willingToShareBathroom} />
                 <InfoItem icon={Utensils} label="Dietary Restrictions" value={userInfo.dietaryRestrictions} />
             </InfoSection>
-
             <InfoSection title="Health Information">
                 <InfoItem icon={PlusCircle} label="Has Medical Conditions" isBoolean value={userInfo.hasMedicalConditions} />
                 {userInfo.hasMedicalConditions && <InfoItem icon={Heart} label="Conditions" value={Array.isArray(userInfo.medicalConditions) ? userInfo.medicalConditions.join(', ') : 'N/A'} />}
                 <InfoItem icon={User} label="Has Disability" isBoolean value={userInfo.isDisabled} />
                 {userInfo.isDisabled && <InfoItem icon={FileText} label="Disability Details" value={userInfo.disability} />}
             </InfoSection>
-
             <InfoSection title="Personality & Social Habits">
                 <InfoItem icon={User} label="Personality Type" value={userInfo.personalityType} />
                 <InfoItem icon={UserCheck} label="Noise Tolerance" value={userInfo.noiseTolerance} />
                 <InfoItem icon={Users} label="Enjoys Socializing?" value={userInfo.enjoysSocializingWithRoommates} />
             </InfoSection>
-
             <InfoSection title="Financial Responsibility">
                 <InfoItem icon={DollarSign} label="Willing to Split Utilities" isBoolean value={userInfo.willingToSplitUtilities} />
                 <InfoItem icon={DollarSign} label="Monthly Income" value={userInfo.monthlyIncome ? `${userInfo.incomeCurrency} ${userInfo.monthlyIncome.toLocaleString()}` : 'Not Disclosed'} />
