@@ -1,5 +1,6 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext.jsx';
 // import PrivateRoute from './components/PrivateRoute/PrivateRoute'; // protects admin routes, commented for testing purposes
 
 // Public Pages
@@ -30,6 +31,7 @@ import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
 
+
 // This layout wraps all authenticated admin routes
 
 
@@ -37,8 +39,9 @@ import {BidsProvider} from "./context/BidContext.jsx";
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
- // const isAuthenticated = !!localStorage.getItem('accessToken');
-    const isAuthenticated = true; // Override for now to test admin section
+    const { isAuthenticated} = useAuth();
+
+    // const isAuthenticated = true; // Override for now to test admin section
 
 
   return (
