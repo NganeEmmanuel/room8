@@ -24,10 +24,11 @@ import EditListingPage from './pages/admin/ManageListings/EditListingPage'; // P
 import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx"; // This layout wraps all authenticated admin routes
 import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
 import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
-
+import BidDetailsPage from './pages/admin/ManageBids/BidDetailsPage';
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
+import {BidsProvider} from "./context/BidContext.jsx";
 
 // This layout wraps all authenticated admin routes
 
@@ -41,12 +42,12 @@ function App() {
 
 
   return (
+      <BidsProvider>
     <Router>
       <Routes>
         {/* Public Routes with PublicLayout */}
         <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
           <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<HomePage />} />
           <Route path="/listings" element={<ListingsPage />} />
           <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
           {/*  have /listingDetails and also use a query param ?listingId=...
@@ -54,6 +55,7 @@ function App() {
               or continue using query params. For simplicity, /listingDetails is kept.
           */}
           <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/search" element={<ListingsSearchResultsPage />} />
           <Route path="/ourservices" element={<OurServicesPage />} />
           <Route path="/team" element={<OurTeam />} />
@@ -93,6 +95,8 @@ function App() {
           <Route path="/admin/landlord/listings/:listingId/edit" element={<EditListingPage />} />
           <Route path="/admin/landlord/bids" element={<ManageBidsPage isLandlordView={true} />} />
 
+          <Route path="/admin/bids/:bidId" element={<BidDetailsPage />} />
+
           {/* Common Admin Routes */}
           <Route path="/admin/profile" element={<ProfilePage />} />
           <Route path="/admin/settings" element={<SettingsPage/>} />
@@ -106,6 +110,7 @@ function App() {
         <Route path="*" element={<div>404 Page Not Found</div>} />
       </Routes>
     </Router>
+        </BidsProvider>
   );
 }
 

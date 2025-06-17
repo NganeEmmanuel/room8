@@ -1,13 +1,17 @@
+// src/pages/listing/ListingDetailsPage.jsx
+
 import { useState, useEffect } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import ImageBanner from "./components/ImageBanner"
 import SimilarListings from "./components/SimilarListings"
-import BidsSection from "./components/BidsSection"
 import WishlistToggle from "./components/WishlistToggle"
 import PropertyDetails from "./components/PropertyDetails"
 import istockphoto from "../../assets/images/istockphoto.jpg"
 import Spinner from "./components/Spinner.jsx";
+// ADDED: Import the new sliding panel component
+import PlaceBidPanel from "../../components/bids/PlaceBidPanel.jsx";
+import {useBids} from "../../context/BidContext.jsx";
 
 const ListingDetailsPage = () => {
   const [searchParams] = useSearchParams()
@@ -15,9 +19,12 @@ const ListingDetailsPage = () => {
   const [listing, setListing] = useState(null)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [showBidForm, setShowBidForm] = useState(false)
+  // CHANGED: State is now for the panel, not an inline form
+  const [isBidPanelOpen, setIsBidPanelOpen] = useState(false)
   const navigate = useNavigate()
   const isAuthenticated = !!localStorage.getItem("accessToken")
+
+  const { addBid } = useBids(); // Get the addBid function from the context
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -44,9 +51,10 @@ const ListingDetailsPage = () => {
             petFriendly: true,
             furnished: true,
             bids: [
-              { id: 1, user: { name: "Sandra", avatar: istockphoto }, amount: 30000, currency: "FCFA" },
-              { id: 2, user: { name: "Sandra", avatar: istockphoto }, amount: 28000, currency: "FCFA" },
+              { id: 1, user: { name: "Sandra", avatar: istockphoto }, proposal: "I am interested", shareUserInfo: true },
+              { id: 2, user: { name: "Mike", avatar: istockphoto }, proposal: "I would like to apply", shareUserInfo: false },
             ],
+             landlord: { id: "landlordMain", name: "Mock Landlord Name" }, // Added landlord info
             similarListings: [
               {
                 id: "456",
@@ -76,31 +84,69 @@ const ListingDetailsPage = () => {
 
   const handlePlaceBidClick = () => {
     if (!isAuthenticated) {
-      navigate("/login")
+     // navigate("/login")
+      setIsBidPanelOpen(true)
     } else {
-      setShowBidForm(true)
+      // CHANGED: This now opens the panel
+      setIsBidPanelOpen(true)
     }
   }
+
+  // ADDED: A handler to process the data from the PlaceBidPanel
+  const handleBidSubmit = ({ amount, proposal, shareUserInfo }) => {
+    // This is the new bid object that matches the structure in our context
+    const newBid = {
+      id: `bid_${Date.now()}`,
+      ListingId: listing.id,
+      listingTitle: listing.title,
+      bidderId: "userYouTenant", // This should come from your auth system
+      landlordId: listing.landlord.id, // Get landlordId from listing data
+      landlordName: listing.landlord.name,
+      proposal,
+      amount,
+      currency: "FCFA",
+      status: "pending",
+      bidDate: new Date().toISOString(),
+      shareUserInfo,
+      bidderInfo: {
+        name: "You (Tenant)",
+        email: "tenant@example.com",
+        phoneNumber: "555-123-4567",
+        profileImage: "https://i.pravatar.cc/150?u=tenantYou",
+        userInfo:
+           { occupation: 'Software Engineer', employmentStatus: 'Employed', nationality: 'Canadian', languagesSpoken: ['English', 'French'],
+             smokingStatus: 'Non-smoker', addictionStatus: 'None', hasPets: false, petPreference: 'None', petsAllowed: [], dietaryRestrictions: 'None',
+             otherDietaryRestrictions: [], cleanlinessLevel: 'Very Tidy', sleepSchedule: 'Early Bird', comfortableWithGuests: 'Yes, with notice', partyHabits: 'Rarely', sharesFood: 'Sometimes, please ask',
+             preferredRoomTemperature: 'Moderate', willingToShareBathroom: true, hasMedicalConditions: true, medicalConditions: ['Pollen Allergy'], isDisabled: false,
+             disability: 'None', personalityType: 'Introvert', noiseTolerance: 'Prefers quiet', enjoysSocializingWithRoommates: 'Occasionally', willingToSplitUtilities: true,
+            monthlyIncome: 6000, incomeCurrency: 'FCFA',
+           }
+      }
+    };
+
+    addBid(newBid); // This updates the GLOBAL state
+
+    alert("Your bid has been submitted successfully!");
+    setIsBidPanelOpen(false);
+
+    // Optional: navigate to the bids page to see the result
+    navigate('/admin/tenant/bids');
+  };
+
 
   const handleBackToSearch = () => {
     navigate("/search")
   }
 
-  const handleAcceptBid = (bidId) => {
-    console.log("Accepting bid:", bidId)
-  }
 
-  const handleRejectBid = (bidId) => {
-    console.log("Rejecting bid:", bidId)
-  }
 
   const handleToggleWishlist = () => {
     setIsWishlisted(!isWishlisted)
   }
 
   if (isLoading) {
-  return <Spinner />
-}
+    return <Spinner />
+  }
 
   if (!listing) {
     return (
@@ -147,7 +193,6 @@ const ListingDetailsPage = () => {
 
           <ImageBanner images={listing.images} />
 
-          {/* Desktop-only Wishlist */}
           <div className="hidden md:flex justify-end my-2">
             <WishlistToggle
               listingId={listing.id}
@@ -167,47 +212,34 @@ const ListingDetailsPage = () => {
 
         {/* Right Sidebar */}
         <div className="md:w-1/3 w-full">
-          {/*<div className="bg-white rounded-lg shadow p-4 flex flex-col justify-start h-full">*/}
             <h2 className="text-xl font-semibold mb-4">Bids</h2>
 
-            {!showBidForm ? (
-              <button
-                onClick={handlePlaceBidClick}
-                className="mb-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden md:block"
-              >
-                Place a Bid
-              </button>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <input
-                    type="number"
-                    placeholder="Enter your bid"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2"
-                  />
-                  <button className="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                    Submit Bid
-                  </button>
-                  <button
-                    onClick={() => setShowBidForm(false)}
-                    className="mt-2 w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                  >
-                    Cancel
-                  </button>
-                </div>
+            {/* REMOVED: The old inline bid form is gone */}
 
+            {/* This button is always visible now (on desktop) */}
+            <button
+              onClick={handlePlaceBidClick}
+              className="mb-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden md:block"
+            >
+              Place a Bid
+            </button>
 
-                <BidsSection
-                  bids={listing.bids}
-                  onAccept={handleAcceptBid}
-                  onReject={handleRejectBid}
-                />
-              </>
-            )}
-          </div>
+            {/*<BidsSection*/}
+            {/*  bids={listing.bids}*/}
+            {/*  onAccept={handleAcceptBid}*/}
+            {/*  onReject={handleRejectBid}*/}
+            {/*/>*/}
         </div>
       </div>
 
+      {/* ADDED: The PlaceBidPanel is now rendered here, controlled by state */}
+      <PlaceBidPanel
+          isOpen={isBidPanelOpen}
+          onClose={() => setIsBidPanelOpen(false)}
+          onSubmit={handleBidSubmit}
+          listingTitle={listing.title}
+      />
+    </div>
   )
 }
 

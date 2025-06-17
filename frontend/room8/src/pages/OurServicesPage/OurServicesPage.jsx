@@ -1,5 +1,4 @@
 import React from 'react';
-import { useEffect, useState } from "react"
 import heroImage from "../../assets/images/heroimage.png"
 const services = [
   {

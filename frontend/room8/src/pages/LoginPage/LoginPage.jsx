@@ -51,16 +51,26 @@ function LoginPage() {
 
         {/* Links */}
         <div className="mt-4 text-center text-sm text-gray-600">
-          Don’t have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">
-            Signup
+        Don’t have an account?{' '}
+        <Link to="/signup" className="text-blue-600 hover:underline">
+          Signup
+        </Link>
+      </div>
+
+      <div className="mt-1 text-center text-sm">
+        <a href="#" className="text-blue-600 hover:underline block">
+          Privacy Policy
+        </a>
+        <div className="flex justify-center gap-8 mt-1">
+          <Link to="/home" className="text-blue-600 hover:underline">
+            Home
+          </Link>
+          <Link to="/search" className="text-blue-600 hover:underline">
+            Browse Listings
           </Link>
         </div>
-        <div className="mt-1 text-center">
-          <a href="#" className="text-blue-600 text-sm hover:underline">
-            Privacy policy
-          </a>
-        </div>
+</div>
+
       </div>
     </div>
   );
