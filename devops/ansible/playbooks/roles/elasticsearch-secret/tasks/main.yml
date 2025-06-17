@@ -1,0 +1,9 @@
+- name: Create elasticsearch secret
+  template:
+    src: elasticsearch-secret.yaml.j2
+    dest: /tmp/elasticsearch-secret.yaml
+
+- name: Apply elasticsearch secret to Kubernetes
+  shell: kubectl apply -f /tmp/elasticsearch-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

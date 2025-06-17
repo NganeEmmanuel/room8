@@ -10,10 +10,10 @@ pipelineJob("room8-ci-cd") {
                     remote {
                         url("https://github.com/NganeEmmanuel/room8.git")
                     }
-                    branches("main")
+                    branches("master")
                 }
             }
-            scriptPath("Jenkinsfile")
+            scriptPath("devops/ci/jenkinsfile")
         }
     }
 }

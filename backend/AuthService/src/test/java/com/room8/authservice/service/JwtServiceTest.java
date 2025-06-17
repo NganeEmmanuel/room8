@@ -2,12 +2,14 @@ package com.room8.authservice.service;
 
 import com.room8.authservice.redis.JwtBlacklistRedisService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +45,7 @@ class JwtServiceTest {
     @Test
     void testExtractUserEmail_invalidToken() {
         String invalidToken = "invalidToken";
-        assertThrows(io.jsonwebtoken.JwtException.class, () -> jwtService.extractUserEmail(invalidToken));
+        assertThrows(JwtException.class, () -> jwtService.extractUserEmail(invalidToken));
     }
 
     @Test
@@ -94,10 +96,8 @@ class JwtServiceTest {
         TimeUnit.SECONDS.sleep(3);
 
         boolean isValid = jwtService.isJwtTokenValid(token);
-        // Token should be invalid as it is expired after the delay.
         assertFalse(isValid);
     }
-
 
     @Test
     void testIsJwtTokenExpired_withDelay() throws InterruptedException {
@@ -110,8 +110,6 @@ class JwtServiceTest {
 
         // Now check if the token is expired
         boolean isExpired = jwtService.isJwtTokenExpired(token);
-
-        // Since we waited for 3 seconds, the token should not yet be expired
         assertFalse(isExpired);
 
         // Wait an additional 3 seconds (total 6 seconds) for token to expire
@@ -121,7 +119,6 @@ class JwtServiceTest {
         isExpired = jwtService.isJwtTokenExpired(token);
         assertTrue(isExpired);
     }
-
 
     @Test
     void testIsJwtTokenExpired_validToken() {
@@ -157,6 +154,43 @@ class JwtServiceTest {
     @Test
     void testExtractClaim_invalidToken() {
         String invalidToken = "invalidToken";
-        assertThrows(io.jsonwebtoken.JwtException.class, () -> jwtService.extractClaim(invalidToken, Claims::getSubject));
+        assertThrows(JwtException.class, () -> jwtService.extractClaim(invalidToken, Claims::getSubject));
+    }
+
+    @Test
+    void testExtractUserRoles_validToken() {
+        String userEmail = "testuser@example.com";
+        List<String> roles = List.of("ROLE_USER", "ROLE_ADMIN");
+        String token = jwtService.generateTokenWithRoles(userEmail, roles, 3600000); // 1 hour expiration
+
+        List<String> extractedRoles = jwtService.extractUserRoles(token);
+        assertEquals(roles, extractedRoles);
+    }
+
+    @Test
+    void testExtractUserRoles_invalidToken() {
+        String invalidToken = "invalidToken";
+        assertThrows(JwtException.class, () -> jwtService.extractUserRoles(invalidToken));
+    }
+
+    @Test
+    void testExtractUserRoles_noRoles() {
+        String userEmail = "testuser@example.com";
+        String token = jwtService.generateJwtToken(userEmail, 3600000); // 1 hour expiration
+
+        List<String> extractedRoles = jwtService.extractUserRoles(token);
+        assertTrue(extractedRoles.isEmpty());
+    }
+
+    @Test
+    void testIsJwtTokenValid_invalidSignature() {
+        String userEmail = "testuser@example.com";
+        long expirationTimeMillis = 3600000; // 1 hour expiration
+        String token = generateSampleToken(userEmail, expirationTimeMillis);
+
+        // Modify the token to simulate an invalid signature
+        String tamperedToken = token.substring(0, token.lastIndexOf('.') + 1) + "tampered";
+
+        assertFalse(jwtService.isJwtTokenValid(tamperedToken));
     }
 }

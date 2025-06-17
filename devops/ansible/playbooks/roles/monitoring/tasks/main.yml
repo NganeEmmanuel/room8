@@ -1,0 +1,82 @@
+- name: Add Prometheus Helm repo
+  shell: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  args:
+    creates: ~/.cache/helm/repository/prometheus-community-index.yaml
+
+# - name: Update Helm repos
+#   shell: helm repo update
+
+- name: Create monitoring namespace (kubectl fallback)
+  shell: kubectl get namespace monitoring || kubectl create namespace monitoring
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Install kube-prometheus-stack WITH /grafana root fix
+  community.kubernetes.helm:
+    name: monitoring-stack
+    chart_ref: prometheus-community/kube-prometheus-stack
+    release_namespace: monitoring
+    create_namespace: false
+    values:
+      grafana:
+        adminPassword: "admin123"
+        ingress:
+          enabled: false
+        service:
+          type: ClusterIP
+        grafana.ini:
+          server:
+            root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      prometheus:
+        ingress:
+          enabled: false
+        service:
+          type: ClusterIP
+        prometheusSpec:
+          externalUrl: "http://{{ master_node }}/prometheus"
+          retention: 10d
+          serviceMonitorSelector: {}
+          podMonitorSelector: {}
+          ruleSelector: {}
+          maximumStartupDurationSeconds: 300
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+
+- name: Copy unified ingress to remote
+  copy:
+    src: roles/monitoring/files/unified-ingress.yaml
+    dest: /tmp/unified-ingress.yaml
+
+- name: Deploy unified ingress
+  shell: kubectl apply -f /tmp/unified-ingress.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Copy ServiceMonitor for service-registry to remote
+  copy:
+    src: roles/monitoring/files/servicemonitor-service-registry.yaml
+    dest: /tmp/servicemonitor-service-registry.yaml
+
+- name: Deploy ServiceMonitor for service-registry
+  shell: kubectl apply -f /tmp/servicemonitor-service-registry.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Copy ServiceMonitor for api-gateway to remote
+  copy:
+    src: roles/monitoring/files/servicemonitor-api-gateway.yaml
+    dest: /tmp/servicemonitor-api-gateway.yaml
+
+- name: Deploy ServiceMonitor for api-gateway
+  shell: kubectl apply -f /tmp/servicemonitor-api-gateway.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Show Grafana credentials
+  debug:
+    msg: |
+      Grafana Login:
+      ➤ URL: http://{{ master_node }}/grafana
+      ➤ Username: admin
+      ➤ Password: admin123

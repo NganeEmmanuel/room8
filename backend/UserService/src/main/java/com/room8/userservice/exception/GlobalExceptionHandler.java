@@ -4,12 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 @SuppressWarnings("unused")
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -92,7 +93,7 @@ public class GlobalExceptionHandler {
      *
      * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
      * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
-     * @return A ResponseEntity containing a generic error message and HTTP status(404).
+     * @return A ResponseEntity containing a generic error message and HTTP status.
      */
     @ExceptionHandler(NoUpdateNeededException.class)
     public ResponseEntity<String> handleNoUpdateNeededException(NoUpdateNeededException ex, WebRequest request) {
@@ -112,4 +113,28 @@ public class GlobalExceptionHandler {
         logger.error("user not authorized: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
+
+    /**
+     * Handles BadRequestException exception and returns a valid message and status code
+     *
+     * @param ex The Exception. This parameter allows access to the exception's message and stack trace.
+     * @param request The WebRequest that led to the exception. This parameter can provide additional context about the request.
+     * @return A ResponseEntity containing a generic error message and HTTP status(401).
+     */
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(BadRequestException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationErrors(MethodArgumentNotValidException ex, WebRequest request) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation failed");
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
 }
+

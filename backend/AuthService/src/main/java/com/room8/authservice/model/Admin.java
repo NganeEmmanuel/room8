@@ -1,6 +1,5 @@
 package com.room8.authservice.model;
 
-import com.room8.authservice.enums.UserAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

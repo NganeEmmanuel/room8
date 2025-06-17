@@ -22,7 +22,7 @@ room8/
 │   ├── ServiceRegistry/    # Eureka service register for service descovery
 │   ├── UserService/        # Handles User related logic
 │   ├── AuthService/        # Handles uthentication and authorization Logic
-│   ├── ListingService/     # Listing service handling room listings
+│   ├── ListingService/     # Listing service handling room listings (RoomService)
 │   ├── BidService/         # Handles the biding logic on listings
 │   └── ContactService/     # Handles contacting users via email and phone number
 │   ├── FeedbackService/    # Handle feedback logic like rating and reviews
@@ -34,11 +34,13 @@ room8/
 │   ├── ci/                 # Jenkinsfiles, pipelines
 │   ├── terraform/          # Terraform scripts for infra
 │   ├── ansible/            # Playbooks and roles
-│   ├── docker/             # Dockerfiles and Docker Compose files
-│   ├── k8s/                # Kubernetes manifests
-│   └── scripts/            # Helper bash or Python scripts
+│   ├── Readme.md           # information about this directory and devops workflow
 ├── Documentation
-├── Jenkinsfile/
+├── e2e-tests/              # Selenium-based full-stack E2E tests
+│   ├── tests/              # Your actual test scripts (e.g., login_test.java, bidding_test.java)
+│   ├── utils/              # Helper functions (e.g., login helpers, setup browser)
+│   ├── requirements.txt    #  Maven config
+│   └── README.md      
 └── README.md
 ```
 

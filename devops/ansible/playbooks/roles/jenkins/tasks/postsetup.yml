@@ -1,3 +1,18 @@
+# Install Git on Jenkins host  --------> this is new
+- name: Ensure Git is installed
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+
+- name: Ensure Jenkins init.groovy.d directory exists
+  file:
+    path: /var/lib/jenkins/init.groovy.d
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+
 # Upload admin user Groovy init script
 - name: Create Jenkins admin user
   template:
@@ -35,3 +50,16 @@
     owner: jenkins
     group: jenkins
     mode: '0644'
+
+# Add Jenkins user to Docker group
+- name: Add Jenkins user to Docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+
+# Restart Jenkins to apply group membership
+- name: Restart Jenkins to apply Docker group changes
+  service:
+    name: jenkins
+    state: restarted
