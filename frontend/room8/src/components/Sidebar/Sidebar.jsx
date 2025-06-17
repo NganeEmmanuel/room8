@@ -89,21 +89,24 @@ const Sidebar = ({ role }) => {
 
   // Determine which links to show based on role
   const getRoleLinks = () => {
-    switch (role) {
-      case "tenant":
-        return tenantLinks;
-      case "landlord":
-        return landlordLinks;
-      case "tenant-landlord":
-        return [
-          ...tenantLinks,
-          { type: "divider", name: "Landlord Section" },
-          ...landlordLinks,
-        ];
-      default:
-        return [];
+  const hasTenant = role.includes("tenant");
+  const hasLandlord = role.includes("landlord");
+
+  if (hasTenant && hasLandlord) {
+      return [
+        ...tenantLinks,
+        { type: "divider", name: "Landlord Section" },
+        ...landlordLinks,
+      ];
+    } else if (hasTenant) {
+      return tenantLinks;
+    } else if (hasLandlord) {
+      return landlordLinks;
+    } else {
+      return [];
     }
   };
+
 
   const roleLinks = getRoleLinks();
   const allLinks = [...commonLinks, ...roleLinks];

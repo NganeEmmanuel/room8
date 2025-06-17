@@ -8,39 +8,6 @@ spring:
   main:
     web-application-type: reactive
 
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: false
-          lower-case-service-id: true
-      default-filters:
-        - AuthenticationFilter
-      routes:
-        - id: user-service
-          uri: http://user-service.default.svc.cluster.local
-          predicates:
-            - Path=/user-service/**
-          filters:
-            - StripPrefix=1
-        - id: auth-service
-          uri: http://auth-service.default.svc.cluster.local
-          predicates:
-            - Path=/auth-service/**
-          filters:
-            - StripPrefix=1
-        - id: room-service
-          uri: http://room-service.default.svc.cluster.local
-          predicates:
-            - Path=/room-service/**
-          filters:
-            - StripPrefix=1
-        - id: search-service
-          uri: http://search-service.default.svc.cluster.local
-          predicates:
-            - Path=/search-service/**
-          filters:
-            - StripPrefix=1
 eureka:
   instance:
     hostname: api-gateway

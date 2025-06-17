@@ -6,15 +6,18 @@ import TenantLandlordDashboard from '../../../components/admin/TenantLandlordDas
 
 // Assuming these components also accept a userName prop
 const userName = localStorage.getItem('userName') || 'User'; // Get userName for passing down
+const role = JSON.parse(localStorage.getItem("userRole")); // Default for testing
+
+  const hasTenant = role.includes("tenant");
+  const hasLandlord = role.includes("landlord");
 
 const Dashboard = () => {
-  const role = localStorage.getItem('userRole') || "tenant-landlord"; // Default for testing
 
-  if (role === "landlord") return <LandlordDashboard userName={userName} />;
-
-  if (role === "tenant-landlord") return <TenantLandlordDashboard userName={userName} />;
+  if (hasTenant && hasLandlord) return <TenantLandlordDashboard userName={userName} />;
+  
+  if (hasLandlord) return <LandlordDashboard userName={userName} />;
   // Defaulting to TenantDashboard if role is "tenant" or not matching the above
-  if (role === "tenant") return <TenantDashboard userName={userName} />;
+  if (hasTenant) return <TenantDashboard userName={userName} />;
 
   // Fallback if role is something unexpected, or render the combined one by default.
   return <TenantLandlordDashboard userName={userName} />;

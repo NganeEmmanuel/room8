@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8081/api/v1/auth'; //todo change when testing
+const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8765'; //todo change when testing
 
 const apiClient = axios.create({
   baseURL: BASE_URL,

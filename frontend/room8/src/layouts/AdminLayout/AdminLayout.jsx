@@ -5,7 +5,7 @@ import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 
 const AdminLayout = ({ isAuthenticated }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const userRole = localStorage.getItem("userRole");
+  const userRole = JSON.parse(localStorage.getItem("userRole")); 
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

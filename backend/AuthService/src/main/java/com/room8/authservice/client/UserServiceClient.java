@@ -11,7 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 @Component
-@FeignClient(name = "user-service", url = "http://user-service.default.svc.cluster.local", configuration = FeignConfig.class)
+@FeignClient(
+        name = "${user-service.name}",
+        url = "${user-service.url}",
+        configuration = FeignConfig.class
+)
 public interface UserServiceClient {
     @GetMapping("/api/v1/user/get-user/email")
     ResponseEntity<User> getUserFromEmail(@RequestParam String email);

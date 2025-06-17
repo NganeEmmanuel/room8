@@ -31,8 +31,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if (requestPath.equals("/auth-service/api/v1/auth/login")
                     || requestPath.equals("/auth-service/api/v1/auth/signup/tenant")
                     || requestPath.equals("/auth-service/api/v1/auth/signup/landlord")
-//                    || requestPath.equals("/api/v1/auth/authenticate-user")
-//                    || requestPath.equals("/auth-service/api/v1/auth/authenticate-user")
+                    || requestPath.equals("/api/v1/auth/refresh-token")
             ) {
                 return chain.filter(exchange);
             }

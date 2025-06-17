@@ -7,22 +7,22 @@ import {
   isValidPhoneNumber,
   isStrongPassword,
   isSafeInput,
-} from '../utils/validators';
-import { saveTokens, getRefreshToken } from '../utils/tokenUtils';
-import { useAuth } from '../context/AuthContext';
+} from '../../utils/validators';
+import { getRefreshToken } from '../../utils/tokenUtils';
+import { useAuth } from '../../context/AuthContext';
 
 const endpoints = {
-  tenant: '/tenant/signup',
-  landlord: '/landlord/signup',
-  login: '/login',
-  refresh: '/refresh',
+  tenant: '/auth-service/api/v1/auth/signup/tenant',
+  landlord: '/auth-service/api/v1/auth/signup/landlord',
+  login: '/auth-service/api/v1/auth/login',
+  refresh: '/auth-service/api/v1/auth/refresh-token',
 };
 
-const validateSignup = ({ firstname, lastname, email, phoneNumber, password }) => {
-  if (![firstname, lastname, email, phoneNumber, password].every(isNotEmpty)) {
+const validateSignup = ({ firstName, lastName, email, phoneNumber, password }) => {
+  if (![firstName, lastName, email, phoneNumber, password].every(isNotEmpty)) {
     throw new Error('All fields must be filled.');
   }
-  if (![firstname, lastname, email, phoneNumber, password].every(isSafeInput)) {
+  if (![firstName, lastName, email, phoneNumber, password].every(isSafeInput)) {
     throw new Error('Invalid characters detected.');
   }
   if (!isValidEmail(email)) throw new Error('Invalid email format.');
@@ -31,15 +31,14 @@ const validateSignup = ({ firstname, lastname, email, phoneNumber, password }) =
 };
 
 export const useAuthService = () => {
-  const { setAuthData, clearAuthData } = useAuth();
+  const { setAuthDataState, clearAuthData } = useAuth();
 
   const signup = async (data) => {
     try {
       validateSignup(data);
       const url = data.userType === 'landlord' ? endpoints.landlord : endpoints.tenant;
       const response = await apiClient.post(url, data);
-      saveTokens(response.data);
-      setAuthData(response.data);
+      setAuthDataState(response.data);
       toast.success('Signup successful!');
       return response.data;
     } catch (err) {
@@ -54,8 +53,7 @@ export const useAuthService = () => {
         throw new Error('Invalid login credentials.');
       }
       const response = await apiClient.post(endpoints.login, { email, password });
-      saveTokens(response.data);
-      setAuthData(response.data);
+      setAuthDataState(response.data);
       toast.success('Login successful!');
       return response.data;
     } catch (err) {
@@ -76,8 +74,7 @@ export const useAuthService = () => {
           },
         }
       );
-      saveTokens(response.data);
-      setAuthData(response.data);
+      setAuthDataState(response.data);
       return response.data.token;
     } catch (err) {
       clearAuthData();
