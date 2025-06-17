@@ -33,6 +33,7 @@ import BidDetailsPage from './pages/admin/ManageBids/BidDetailsPage';
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
+import AuthRestorer from './auth/AuthRestorer.jsx';
 
 
 // This layout wraps all authenticated admin routes
@@ -42,14 +43,16 @@ import {BidsProvider} from "./context/BidContext.jsx";
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
+
     const { isAuthenticated} = useAuth();
 
     // const isAuthenticated = true; // Override for now to test admin section
-    localStorage.setItem("userRole", JSON.stringify(["landlord"]));
+    // localStorage.setItem("userRole", JSON.stringify(["tenant"]));
 
 
   return (
       <BidsProvider>
+        <AuthRestorer />
         <Router>
           <Routes>
             {/* Public Routes with PublicLayout */}

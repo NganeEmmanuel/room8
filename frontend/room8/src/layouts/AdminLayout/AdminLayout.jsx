@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/NavBar/NavBar.jsx";
 import Sidebar from "../../components/Sidebar/Sidebar.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const AdminLayout = ({ isAuthenticated }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const userRole = JSON.parse(localStorage.getItem("userRole")); 
+  const { authDataState } = useAuth();
+  const userRole = authDataState.userRole
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

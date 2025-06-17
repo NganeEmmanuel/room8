@@ -89,8 +89,8 @@ const Sidebar = ({ role }) => {
 
   // Determine which links to show based on role
   const getRoleLinks = () => {
-  const hasTenant = role.includes("tenant");
-  const hasLandlord = role.includes("landlord");
+  const hasTenant = role.includes("TENANT");
+  const hasLandlord = role.includes("LANDLORD");
 
   if (hasTenant && hasLandlord) {
       return [

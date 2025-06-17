@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getAccessToken, getRefreshToken, clearTokens, saveTokens } from '../utils/tokenUtils';
+import { decodeJwt } from '../utils/jwtUtils';
+import { clearRole, getRole, saveRole } from '../utils/roleUtils';
 
 const AuthContext = createContext();
 
@@ -7,22 +9,29 @@ export const AuthProvider = ({ children }) => {
   const [authDataState, setAuthDataState] = useState({
     accessToken: getAccessToken(),
     refreshToken: getRefreshToken(),
+    userRole: getRole() || null,
   });
 
   const isAuthenticated = !!authDataState.accessToken;
 
   const clearAuthData = () => {
     clearTokens();
-    setAuthDataState({ accessToken: null, refreshToken: null });
+    clearRole()
+    setAuthDataState({ accessToken: null, refreshToken: null, userRole: null });
   };
 
-  const setTokens = ({ token, refreshToken }) => {
-    saveTokens({token, refreshToken})
-    setAuthDataState({ accessToken: token, refreshToken });
+  // Helper to save tokens and roles at once
+  const setTokensAndRole = ({ token, refreshToken }) => {
+    saveTokens({ token, refreshToken });
+    const decoded = decodeJwt(token);
+    console.log('called jwt')
+    const roles = decoded?.roles || null; // assuming roles is an array in your token
+    saveRole(roles)
+    setAuthDataState({ accessToken: token, refreshToken, userRole: roles });
   };
 
   return (
-    <AuthContext.Provider value={{ authDataState, isAuthenticated, setAuthDataState: setTokens, clearAuthData }}>
+    <AuthContext.Provider value={{ authDataState, isAuthenticated, setAuthDataState: setTokensAndRole, clearAuthData }}>
       {children}
     </AuthContext.Provider>
   );
