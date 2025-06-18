@@ -1,5 +1,5 @@
 // Updated AuthService.js to use AuthContext and enhance UX
-import apiClient from '../../utils/apiClient';
+import apiClient from '../../api/apiClient';
 import { toast } from 'react-toastify';
 import {
   isNotEmpty,

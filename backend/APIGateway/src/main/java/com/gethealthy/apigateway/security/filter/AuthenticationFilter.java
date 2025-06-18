@@ -1,6 +1,8 @@
 package com.gethealthy.apigateway.security.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +17,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
+//    @Autowired
     @Autowired
-    private WebClient loadBalancedWebClient; // Injected load-balanced WebClient
+    private WebClient webClient;  // plain WebClient
+//    private WebClient loadBalancedWebClient; // Injected load-balanced WebClient
+
+    @Value("${auth-service.url}")
+    private String authServiceUrl;
 
     public AuthenticationFilter() {
         super(Config.class);
@@ -46,9 +53,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 return this.onError(exchange, "Invalid Authorization header");
             }
 
-            return loadBalancedWebClient
+            return webClient
                     .post()
-                    .uri("lb://auth-service/api/v1/auth/authenticate-user")
+                    .uri(authServiceUrl + "/api/v1/auth/authenticate-user")
                     .header(HttpHeaders.AUTHORIZATION, authHeader)
                     .retrieve()
                     .bodyToMono(Boolean.class)

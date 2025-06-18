@@ -8,17 +8,21 @@ import {
   PowerIcon,
   HeartIcon,
   EyeIcon,
+  MagnifyingGlassIcon
 } from "@heroicons/react/24/outline";
 import React from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = ({ role }) => {
+
+  const {authDataState, clearAuthData} = useAuth()
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userRole");
-    navigate("/login");
+    clearAuthData()
+    navigate("/search");
   };
 
   const isActive = (path) => {
@@ -37,6 +41,11 @@ const Sidebar = ({ role }) => {
       to: "/admin/dashboard",
       icon: <HomeIcon className="w-5 h-5" />,
     },
+    {
+      name: "Browse Listings",
+      to: "/admin/browse",
+      icon: <MagnifyingGlassIcon className="w-5 h-5" />,
+    }
   ];
 
   // Tenant-specific links

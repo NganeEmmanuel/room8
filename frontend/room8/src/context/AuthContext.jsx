@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
     accessToken: getAccessToken(),
     refreshToken: getRefreshToken(),
     userRole: getRole() || null,
+    userInfo: null, // 👈 new
   });
 
   const isAuthenticated = !!authDataState.accessToken;
@@ -30,8 +31,12 @@ export const AuthProvider = ({ children }) => {
     setAuthDataState({ accessToken: token, refreshToken, userRole: roles });
   };
 
+  const setUserInfo = (userDTO) => {
+    setAuthDataState(prev => ({ ...prev, userInfo: userDTO }));
+  };
+
   return (
-    <AuthContext.Provider value={{ authDataState, isAuthenticated, setAuthDataState: setTokensAndRole, clearAuthData }}>
+    <AuthContext.Provider value={{ authDataState, isAuthenticated, setAuthDataState: setTokensAndRole, clearAuthData, setUserInfo }}>
       {children}
     </AuthContext.Provider>
   );

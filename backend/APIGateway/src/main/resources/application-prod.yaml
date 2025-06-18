@@ -44,3 +44,6 @@ cors:
   allowed-origins:
     - https://room8.com
     - https://www.room8.com  # if needed
+
+auth-service:
+  url: lb://auth-service  # In prod use: http://auth-service.default.svc.cluster.local or lb://auth-service

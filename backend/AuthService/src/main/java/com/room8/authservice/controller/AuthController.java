@@ -67,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.refreshToken(refreshToken));
     }
 
-    @GetMapping("/get-logged-in-user")
+    @GetMapping("/me")
     public ResponseEntity<UserDTO> getLoggedInUser(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 

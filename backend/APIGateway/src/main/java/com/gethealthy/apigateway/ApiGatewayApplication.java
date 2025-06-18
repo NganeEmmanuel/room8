@@ -18,9 +18,9 @@ public class ApiGatewayApplication {
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
-    @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
-    }
+//    @Bean
+//    public WebClient.Builder webClientBuilder() {
+//        return WebClient.builder();
+//    }
 
 }

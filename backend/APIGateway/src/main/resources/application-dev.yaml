@@ -21,7 +21,7 @@ spring:
           filters:
             - StripPrefix=1
         - id: room-service
-          uri: http://localhost:8083
+          uri: http://localhost:8084
           predicates:
             - Path=/room-service/**
           filters:
@@ -37,7 +37,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: false
+    fetch-registry: false
 
 cors:
   allowed-origins:
     - http://localhost:5173
+
+auth-service:
+  url: http://localhost:8081
