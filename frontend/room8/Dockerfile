@@ -3,28 +3,24 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy dependencies and install first (faster rebuilds)
+# Copy dependencies and install
 COPY package.json package-lock.json* ./
 RUN npm install
 
-# Copy the rest of the application
+# Copy rest of the application
 COPY . .
 
-# Build the application
+# Build with Vite (assumes base: '/room8/')
 RUN npm run build
 
-
-# Stage 2: Serve with a lightweight web server
+# Stage 2: Serve with nginx
 FROM nginx:alpine AS production
 
-# Copy built assets from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built assets into /usr/share/nginx/html/room8
+COPY --from=builder /app/dist /usr/share/nginx/html/room8
 
-# Replace default nginx config (optional but recommended)
+# Replace default nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port
 EXPOSE 80
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
