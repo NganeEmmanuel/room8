@@ -3,7 +3,7 @@ import { Bars3Icon, UserCircleIcon, PowerIcon } from "@heroicons/react/24/outlin
 import React, { useEffect, useState } from "react";
 import NotificationBell from "./NotificationBell.jsx";
 
-const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
+const Navbar = ({ isAuthenticated, userRole, toggleSidebar, userFirstName }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
@@ -13,11 +13,8 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
   // State for notification count (optional, but good for an icon)// Example count
 
   useEffect(() => {
-    const storedUserName = localStorage.getItem('userName');
-    if (storedUserName) {
-      setUserName(storedUserName);
-    } else if (userRole) {
-      setUserName(userRole);
+    if (userFirstName) {
+      setUserName(userFirstName);
     } else {
       setUserName('Guest');
       navigate('/home')
@@ -26,7 +23,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
 
     // In a real app, you would fetch actual notification count here
     // For now, it's a static example
-  }, [ userRole]);
+  }, [userFirstName]);
 
   const isAdminArea = currentPath.startsWith('/admin');
 
@@ -95,7 +92,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar }) => {
                   className="flex items-center gap-2 text-gray-800 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-md"
                 >
                   <UserCircleIcon className="w-6 h-6" />
-                  <span className="font-medium">{userName}</span>
+                  <span className="font-medium">{userFirstName}</span>
                 </Link>
               </li>
             </>

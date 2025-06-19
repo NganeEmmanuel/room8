@@ -5,7 +5,10 @@ import { getAccessToken, getRefreshToken } from '../../utils/tokenUtils';
 import { useAuthService } from '../authService/AuthService';
 import { useAuth } from '../../context/AuthContext';
 
-const BASE_URL = import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8765';
+const BASE_URL =
+  typeof window !== 'undefined' && window._env_?.VITE_AUTH_BASE_URL
+    ? window._env_.VITE_AUTH_BASE_URL
+    : import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8765';
 
 export const useUserService = () => {
   const { refreshToken } = useAuthService();
@@ -32,8 +35,6 @@ export const useUserService = () => {
         throw err;
       }
     };
-
-
 
 
 

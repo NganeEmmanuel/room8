@@ -57,7 +57,7 @@ function App() {
           <Routes>
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
-              <Route path="/h" element={<Navigate to="/home" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
               <Route path="/listings" element={<ListingsPage />} />
               <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}

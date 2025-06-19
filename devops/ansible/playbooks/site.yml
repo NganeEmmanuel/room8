@@ -14,3 +14,5 @@
     - redis-secretes        # set up redis secretes for elasticache
     - elasticsearch-secret  # setup elastic search secretes
     - kafka-secretes        # Setup apache kafka secretes
+    - frontend-secretes     # Setup frontend secretes
+    - api-gateway-secret    # Setup api gateway secrete
