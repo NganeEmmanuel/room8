@@ -53,7 +53,7 @@ function App() {
   return (
       <BidsProvider>
         <AuthRestorer />
-        <Router>
+        <Router basename={import.meta.env.PROD ? "/room8" : "/"}>
           <Routes>
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
