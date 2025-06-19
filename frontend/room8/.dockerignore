@@ -3,8 +3,6 @@ dist
 .vite
 .git
 .gitignore
-Dockerfile
-nginx.conf
 
 .vscode
 .idea
