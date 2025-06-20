@@ -10,6 +10,7 @@ import {
   EyeIcon,
 } from "@heroicons/react/24/outline";
 import React from "react";
+import {StarIcon} from "@heroicons/react/24/solid";
 
 const Sidebar = ({ role }) => {
   const navigate = useNavigate();
@@ -84,6 +85,12 @@ const Sidebar = ({ role }) => {
       name: "Settings",
       to: "/admin/settings",
       icon: <Cog6ToothIcon className="w-5 h-5" />,
+
+    },
+       {
+    name: "Manage Reviews",
+    to: "/admin/reviews",
+    icon: <StarIcon className="w-5 h-5" />,
     },
   ];
 

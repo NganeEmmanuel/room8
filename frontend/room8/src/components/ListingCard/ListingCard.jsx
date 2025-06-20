@@ -101,7 +101,7 @@ const ListingCard = ({
         <p className="text-sm text-gray-500 truncate flex items-center gap-1">
           <FaLocationDot className="w-4 h-4 text-gray-400" /> {location || "No location"}
         </p>
-        <p className="text-blue-600 font-bold text-xl">{price}</p>
+        <p className="text-blue-600 font-bold text-xl">{price + ' FCFA'}</p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-gray-600 pt-2 border-t border-gray-100 mt-2">
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, {  useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import {useBids} from "../../../context/BidContext.jsx";

@@ -6,7 +6,8 @@ import {
   UserCheck, Heart, Users, DollarSign, Snowflake, EyeOff, PlusCircle,
   Bath, PartyPopper
 } from 'lucide-react';
-import { useBids } from '../../../context/BidContext.jsx'; // Import the context hook
+import { useBids } from '../../../context/BidContext.jsx';
+import {toast} from "react-toastify"; // Import the context hook
 
 // Helper: Toggle Switch Component
 const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
@@ -85,9 +86,9 @@ const BidDetailsPage = () => {
   // This logic remains the same, but now `bid.shareUserInfo` will be up-to-date from the context
   const shouldDisplayInfo = isTenantView || bid.shareUserInfo;
 
-  const handleWithdraw = () => { alert(`Your bid for ${listingTitle} has been withdrawn.`); navigate(-1); };
-  const handleAccept = () => { alert(`Accepted bid from ${bidderInfo.name}.`); navigate(-1); };
-  const handleReject = () => { alert(`Rejected bid from ${bidderInfo.name}.`); navigate(-1); };
+  const handleWithdraw = () => { toast.success(`Your bid for ${listingTitle} has been withdrawn.`); navigate(-1); };
+  const handleAccept = () => { toast.success(`Accepted bid from ${bidderInfo.name}.`); navigate(-1); };
+  const handleReject = () => { toast.success(`Rejected bid from ${bidderInfo.name}.`); navigate(-1); };
 
   // UPDATED HANDLER
   const handleSharingToggle = (newSharingStatus) => {
@@ -97,7 +98,7 @@ const BidDetailsPage = () => {
     // 2. Update the GLOBAL state so the change is persistent
     updateBidSharing(bid.id, newSharingStatus);
 
-    alert(`Your information sharing preference has been updated.`);
+    toast.success("your information sharing preference has bben updated")
   };
 
   return (

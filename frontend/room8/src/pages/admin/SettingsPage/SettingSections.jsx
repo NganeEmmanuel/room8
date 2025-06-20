@@ -4,6 +4,7 @@ import {
   InputField, SelectField, TextareaField, ToggleSwitch, TagInput, SectionCard
 } from './SettingsFieldComponents';
 import {User, Shield, Info, Palette, Eye, LogOut, Trash2, Settings2, Sparkles, FileText, Users2, Activity, TrendingUp} from 'lucide-react';
+import {toast} from "react-toastify";
 
 
 export const PersonalInformationSection = ({ userData, handleChange }) => (
@@ -24,10 +25,10 @@ export const SecuritySettingsSection = () => {
     const handlePasswordChange = (e) => {
         e.preventDefault();
         if (newPassword !== confirmNewPassword) {
-            alert("New passwords do not match!");
+            toast.error("New passwords do not match!");
             return;
         }
-        alert("Password change submitted (placeholder)!");
+        toast.success("Password change submitted ");
         setCurrentPassword(''); setNewPassword(''); setConfirmNewPassword('');
     };
 

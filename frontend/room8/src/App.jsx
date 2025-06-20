@@ -1,5 +1,7 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import PrivateRoute from './components/PrivateRoute/PrivateRoute'; // protects admin routes, commented for testing purposes
 
 // Public Pages
@@ -25,10 +27,15 @@ import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx"; // This 
 import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
 import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
 import BidDetailsPage from './pages/admin/ManageBids/BidDetailsPage';
+import ManageReviewsPage from './pages/admin/ManageReviews/ManageReviewsPage';
+import EditReviewPage from './pages/admin/ManageReviews/EditReviewPage';
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
+import ReviewDetailsPage from "./pages/admin/ManageReviews/ReviewDetailsPage.jsx";
+import {ReviewProvider} from "./context/ReviewContext.jsx";
+
 
 // This layout wraps all authenticated admin routes
 
@@ -42,6 +49,7 @@ function App() {
 
 
   return (
+      <ReviewProvider>
       <BidsProvider>
     <Router>
       <Routes>
@@ -66,6 +74,7 @@ function App() {
         {/* Auth Routes (typically no shared layout or a very minimal one) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+
 
         {/* Admin Routes (Protected by AdminLayout which should enforce auth) */}
         {/* The AdminLayout itself can handle redirecting if not authenticated,
@@ -96,6 +105,10 @@ function App() {
           <Route path="/admin/landlord/bids" element={<ManageBidsPage isLandlordView={true} />} />
 
           <Route path="/admin/bids/:bidId" element={<BidDetailsPage />} />
+          <Route path="/admin/reviews" element={<ManageReviewsPage />} />
+          <Route path="/admin/reviews/:reviewId" element={<ReviewDetailsPage />} />
+          <Route path="/admin/reviews/:reviewId/edit" element={<EditReviewPage />} />
+
 
           {/* Common Admin Routes */}
           <Route path="/admin/profile" element={<ProfilePage />} />
@@ -109,8 +122,23 @@ function App() {
         {/* This should be outside the authenticated admin routes block if you want a public 404 */}
         <Route path="*" element={<div>404 Page Not Found</div>} />
       </Routes>
+
+       <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
     </Router>
         </BidsProvider>
+      </ReviewProvider>
   );
 }
 

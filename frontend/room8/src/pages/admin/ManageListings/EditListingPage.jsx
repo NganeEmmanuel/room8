@@ -1,28 +1,53 @@
-// src/pages/admin/ManageListings/EditListingPage.jsx
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import ListingForm from './ListingForm';
+import { MOCK_LISTINGS_DB } from './mockData';
+import {toast} from "react-toastify"; // Let's move mock data to its own file
 
 const EditListingPage = () => {
-  const { listingId } = useParams();
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Listing ${listingId} updated (simulation)!`);
-    navigate(`/admin/landlord/listings`); // Or back to listing details
-  };
+  const { listingId } = useParams();
+
+  const [listing, setListing] = useState(null);
+
+  useEffect(() => {
+    // In a real app, this would be an API call:
+    // fetch(`/api/listings/${listingId}`).then(...)
+    console.log(`Fetching data for listing ID: ${listingId}`);
+    const listingToEdit = MOCK_LISTINGS_DB.find(l => l.id === listingId);
+    if (listingToEdit) {
+          setListing(listingToEdit);
+        } else {
+          console.error(`Listing with ID ${listingId} not found.`);
+          // --- 2. Replace alert with an error toast ---
+          toast.error(`Listing not found! Redirecting...`);
+          navigate('/admin/landlord/listings');
+        }
+      }, [listingId, navigate]);
+
+    const handleUpdateSubmit = (listingData) => {
+      // In a real app, this would be a PUT/PATCH request to your API
+      console.log(`UPDATING listing ${listingId} with data:`, listingData);
+
+      // --- 3. Replace alert with a success toast ---
+      toast.success(`Listing ${listingId} updated successfully!`);
+
+      navigate('/admin/landlord/listings');
+    };
+
+  // Show a loading state while fetching data
+  if (!listing) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Edit Listing: {listingId}</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Add your form fields here, pre-filled with listing data */}
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-          <input type="text" id="title" name="title" defaultValue={`Existing Title for ${listingId}`} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-        </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
-        <button type="button" onClick={() => navigate(-1)} className="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Cancel</button>
-      </form>
-    </div>
+    <ListingForm
+      initialData={listing}
+      onFormSubmit={handleUpdateSubmit}
+      pageTitle="Edit Listing"
+      submitButtonText="Save Changes"
+    />
   );
 };
+
 export default EditListingPage;

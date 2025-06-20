@@ -9,6 +9,7 @@ import {
     PrivacySettingsSection
 } from './SettingSections.jsx';
 import { User, Shield, Palette, Eye, Settings2 } from 'lucide-react';
+import {toast} from "react-toastify";
 
 
 const SettingsPage = () => {
@@ -36,7 +37,7 @@ const SettingsPage = () => {
 
     const handleSaveSettings = () => {
         // await api.saveUserSettings(userData);
-        alert("Settings Saved!");
+        toast.success("Settings Saved!");
     };
 
     const navigationItems = [

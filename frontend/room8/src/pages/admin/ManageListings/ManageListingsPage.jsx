@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../../components/shared/DashboardHeader';
 import ListingCard from '../../../components/ListingCard/ListingCard';
 import { PlusCircleIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
+import ConfirmModal from '../../../components/shared/ConfirmModal';
 
 const ManageListingsPage = ({ isLandlordView = false }) => {
   const navigate = useNavigate();
@@ -59,18 +61,35 @@ const ManageListingsPage = ({ isLandlordView = false }) => {
       bids: 2,
     }
   ]);
+  // --- NEW: State for controlling the modal ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState(null);
 
   const handleEditListing = (listingId) => {
     navigate(`/admin/landlord/listings/${listingId}/edit`);
   };
 
   const handleDeleteListing = (listingId) => {
-    if (window.confirm(`Are you sure you want to delete listing ${listingId}?`)) {
-      console.log(`Deleting listing ${listingId}...`);
-      // API call to delete the listing would go here
-      setLandlordListings(prevListings => prevListings.filter(listing => listing.id !== listingId));
-      alert(`Listing ${listingId} deleted (simulation).`);
-    }
+    // Instead of showing window.confirm, we set state to open our modal
+    setListingToDelete(listingId);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    // This function is called when the user clicks "Confirm" in the modal
+    if (!listingToDelete) return;
+
+    console.log(`Deleting listing ${listingToDelete}...`);
+    // API call to delete the listing would go here
+
+    setLandlordListings(prev => prev.filter(listing => listing.id !== listingToDelete));
+
+    // Show a success toast!
+    toast.success(`Listing ${listingToDelete} has been deleted.`);
+
+    // Close the modal and reset state
+    setIsModalOpen(false);
+    setListingToDelete(null);
   };
 
   const handleCreateNewListing = () => {
@@ -78,6 +97,7 @@ const ManageListingsPage = ({ isLandlordView = false }) => {
   };
 
   return (
+      <>
     <div className="space-y-6">
       <DashboardHeader
         title="Manage Your Listings"
@@ -133,6 +153,17 @@ const ManageListingsPage = ({ isLandlordView = false }) => {
         </div>
       )}
     </div>
+          <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Listing"
+      >
+        <p>Are you sure you want to permanently delete this listing?</p>
+        <p className="mt-2 font-semibold text-red-700">This action cannot be undone.</p>
+      </ConfirmModal>
+        </>
+
   );
 };
 
