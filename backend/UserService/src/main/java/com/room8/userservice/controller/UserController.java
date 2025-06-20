@@ -2,10 +2,11 @@ package com.room8.userservice.controller;
 
 import com.room8.userservice.enums.UserAuthority;
 import com.room8.userservice.model.User;
-import com.room8.userservice.model.UserDTO;
-import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.dto.UserDTO;
+import com.room8.userservice.dto.UserInfoDTO;
 import com.room8.userservice.model.UserRole;
 import com.room8.userservice.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,14 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
 public class UserController {
 
     private final UserService userService;
     @PostMapping("/add")
-    public ResponseEntity<User> addUser(@RequestBody User request) {
+    public ResponseEntity<User> addUser(@Valid @RequestBody User request) {
         return ResponseEntity.ok(userService.addUser(request));
     }
 
@@ -75,5 +76,10 @@ public class UserController {
     @GetMapping("/getRole")
     public ResponseEntity<UserRole> getRole(@RequestParam UserAuthority role) {
         return ResponseEntity.ok(userService.getRole(role));
+    }
+
+    @GetMapping("/check-conflict")
+    public ResponseEntity<Boolean> checkConflict(@RequestParam String email, @RequestParam String phoneNumber) {
+        return ResponseEntity.ok(userService.checkConflict(email, phoneNumber));
     }
 }

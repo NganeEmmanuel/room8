@@ -1,0 +1,48 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+      default-filters:
+        - AuthenticationFilter
+      routes:
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - StripPrefix=1
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth-service/**
+          filters:
+            - StripPrefix=1
+        - id: room-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/room-service/**
+          filters:
+            - StripPrefix=1
+        - id: search-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/search-service/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: false
+    fetch-registry: false
+
+cors:
+  allowed-origins:
+    - http://localhost:5173
+
+auth-service:
+  url: http://localhost:8081

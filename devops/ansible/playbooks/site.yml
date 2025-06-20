@@ -1,12 +1,18 @@
 ---
-- name: Provision jenkins, argocd and configure Kubernetes cluster
+- name: Provision jenkins, argocd and configure Kubernetes cluster, ingress controllers, monitoring and secretes
   hosts: bastion
   become: true
 
   roles:
-    - helm             # Helm first so it's available for all Helm-based installs
-    - ingress_nginx    # Needs Helm, and runs before ArgoCD to expose it
+    - helm                  # Helm first so it's available for all Helm-based installs
+    - ingress_nginx         # Needs Helm, and runs before ArgoCD to expose it
     - nginx-forwarder
-    - argocd           # Exposed via ingress
-    - jenkins          # If Jenkins will also be exposed (optional)
-    - monitoring
+    - argocd                # Exposed via ingress
+    - jenkins               # If Jenkins will also be exposed (optional)
+    - monitoring            # configure service monitors for microservices
+    - db-init               # Create databases and db user and password for microservices
+    - redis-secretes        # set up redis secretes for elasticache
+    - elasticsearch-secret  # setup elastic search secretes
+    - kafka-secretes        # Setup apache kafka secretes
+    - frontend-secretes     # Setup frontend secretes
+    - api-gateway-secret    # Setup api gateway secrete

@@ -5,8 +5,8 @@ import com.room8.userservice.enums.UserAuthority;
 import com.room8.userservice.exception.UserInfoNotFoundException;
 import com.room8.userservice.exception.UserNotFoundException;
 import com.room8.userservice.model.User;
-import com.room8.userservice.model.UserDTO;
-import com.room8.userservice.model.UserInfoDTO;
+import com.room8.userservice.dto.UserDTO;
+import com.room8.userservice.dto.UserInfoDTO;
 import com.room8.userservice.model.UserRole;
 
 public interface UserService {
@@ -91,4 +91,12 @@ public interface UserService {
      * @return the role objects
      */
     UserRole getRole(UserAuthority role);
+
+    /**
+     *
+     * @param email new user email
+     * @param phoneNumber new user phone number
+     * @return false if no entry can be found in the database associated with email or phone number
+     */
+    Boolean checkConflict(String email, String phoneNumber);
 }

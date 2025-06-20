@@ -1,7 +1,9 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css'; // ✅ Required for styles
+
+import { useAuth } from './context/AuthContext.jsx';
 // import PrivateRoute from './components/PrivateRoute/PrivateRoute'; // protects admin routes, commented for testing purposes
 
 // Public Pages
@@ -27,14 +29,11 @@ import SettingsPage from "./pages/admin/SettingsPage/SettingsPage.jsx"; // This 
 import TenantSavedListingsPage from "./pages/admin/TenantSavedListingsPage/TenantSavedListingsPage.jsx";
 import TenantRecentlyViewedPage from "./pages/admin/TenantRecentlyViewedPage/TenantRecentlyViewedPage.jsx";
 import BidDetailsPage from './pages/admin/ManageBids/BidDetailsPage';
-import ManageReviewsPage from './pages/admin/ManageReviews/ManageReviewsPage';
-import EditReviewPage from './pages/admin/ManageReviews/EditReviewPage';
 // Layouts
 import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
-import ReviewDetailsPage from "./pages/admin/ManageReviews/ReviewDetailsPage.jsx";
-import {ReviewProvider} from "./context/ReviewContext.jsx";
+import AuthRestorer from './auth/AuthRestorer.jsx';
 
 
 // This layout wraps all authenticated admin routes
@@ -44,101 +43,87 @@ import {ReviewProvider} from "./context/ReviewContext.jsx";
 
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
- // const isAuthenticated = !!localStorage.getItem('accessToken');
-    const isAuthenticated = true; // Override for now to test admin section
+
+    const { isAuthenticated} = useAuth();
+
+    // const isAuthenticated = true; // Override for now to test admin section
+    // localStorage.setItem("userRole", JSON.stringify(["tenant"]));
 
 
   return (
-      <ReviewProvider>
       <BidsProvider>
-    <Router>
-      <Routes>
-        {/* Public Routes with PublicLayout */}
-        <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/listings" element={<ListingsPage />} />
-          <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
-          {/*  have /listingDetails and also use a query param ?listingId=...
-              Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
-              or continue using query params. For simplicity, /listingDetails is kept.
-          */}
-          <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/search" element={<ListingsSearchResultsPage />} />
-          <Route path="/ourservices" element={<OurServicesPage />} />
-          <Route path="/team" element={<OurTeam />} />
+        <AuthRestorer />
+        <Router basename={import.meta.env.PROD ? "/room8" : "/"}>
+          <Routes>
+            {/* Public Routes with PublicLayout */}
+            <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
+              <Route path="/listings" element={<ListingsPage />} />
+              <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
+              {/*  have /listingDetails and also use a query param ?listingId=...
+                  Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
+                  or continue using query params. For simplicity, /listingDetails is kept.
+              */}
+              <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/search" element={<ListingsSearchResultsPage />} />
+              <Route path="/ourservices" element={<OurServicesPage />} />
+              <Route path="/team" element={<OurTeam />} />
 
-          {/* Add other public pages like /about, /services if needed */}
-        </Route>
+              {/* Add other public pages like /about, /services if needed */}
+            </Route>
 
-        {/* Auth Routes (typically no shared layout or a very minimal one) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+            {/* Auth Routes (typically no shared layout or a very minimal one) */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
 
+            {/* Admin Routes (Protected by AdminLayout which should enforce auth) */}
+            {/* The AdminLayout itself can handle redirecting if not authenticated,
+                or you can wrap individual routes with a PrivateRoute component.
+                For now, AdminLayout is assumed to manage its content based on isAuthenticated.
+            */}
+            <Route
+              element={
+                isAuthenticated ? (
+                  <AdminLayout isAuthenticated={isAuthenticated} />
+                ) : (
+                  <Navigate to="/login" replace state={{ from: window.location.pathname }} />
+                )
+              }
+            >
+              {/* Main Dashboard - this intelligently renders Tenant, Landlord, or TenantLandlordDashboard */}
+              <Route path="/admin/dashboard" element={<Dashboard />} />
 
-        {/* Admin Routes (Protected by AdminLayout which should enforce auth) */}
-        {/* The AdminLayout itself can handle redirecting if not authenticated,
-            or you can wrap individual routes with a PrivateRoute component.
-            For now, AdminLayout is assumed to manage its content based on isAuthenticated.
-        */}
-        <Route
-          element={
-            isAuthenticated ? (
-              <AdminLayout isAuthenticated={isAuthenticated} />
-            ) : (
-              <Navigate to="/login" replace state={{ from: window.location.pathname }} />
-            )
-          }
-        >
-          {/* Main Dashboard - this intelligently renders Tenant, Landlord, or TenantLandlordDashboard */}
-          <Route path="/admin/dashboard" element={<Dashboard />} />
+              {/* Tenant Specific Routes (linked from "View All" on TenantDashboard or future sidebar links) */}
+              <Route path="/admin/tenant/saved" element={<TenantSavedListingsPage />} />
+              <Route path="/admin/tenant/bids" element={<ManageBidsPage isTenantView={true} />} />
+              <Route path="/admin/tenant/recent" element={<TenantRecentlyViewedPage/>} />
 
-          {/* Tenant Specific Routes (linked from "View All" on TenantDashboard or future sidebar links) */}
-          <Route path="/admin/tenant/saved" element={<TenantSavedListingsPage />} />
-          <Route path="/admin/tenant/bids" element={<ManageBidsPage isTenantView={true} />} />
-          <Route path="/admin/tenant/recent" element={<TenantRecentlyViewedPage/>} />
+              {/* Landlord Specific Routes (linked from "View All" on LandlordDashboard or future sidebar links) */}
+              <Route path="/admin/landlord/listings" element={<ManageListingsPage isLandlordView={true} />} />
+              <Route path="/admin/landlord/listings/new" element={<CreateListingPage />} />
+              <Route path="/admin/landlord/listings/:listingId/edit" element={<EditListingPage />} />
+              <Route path="/admin/landlord/bids" element={<ManageBidsPage isLandlordView={true} />} />
 
-          {/* Landlord Specific Routes (linked from "View All" on LandlordDashboard or future sidebar links) */}
-          <Route path="/admin/landlord/listings" element={<ManageListingsPage isLandlordView={true} />} />
-          <Route path="/admin/landlord/listings/new" element={<CreateListingPage />} />
-          <Route path="/admin/landlord/listings/:listingId/edit" element={<EditListingPage />} />
-          <Route path="/admin/landlord/bids" element={<ManageBidsPage isLandlordView={true} />} />
+              <Route path="/admin/bids/:bidId" element={<BidDetailsPage />} />
 
-          <Route path="/admin/bids/:bidId" element={<BidDetailsPage />} />
-          <Route path="/admin/reviews" element={<ManageReviewsPage />} />
-          <Route path="/admin/reviews/:reviewId" element={<ReviewDetailsPage />} />
-          <Route path="/admin/reviews/:reviewId/edit" element={<EditReviewPage />} />
+              {/* Common Admin Routes */}
+              <Route path="/admin/profile" element={<ProfilePage />} />
+              <Route path="/admin/settings" element={<SettingsPage/>} />
 
+              {/* Fallback for any /admin/* routes not matched above within the AdminLayout */}
+              <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+            </Route>
 
-          {/* Common Admin Routes */}
-          <Route path="/admin/profile" element={<ProfilePage />} />
-          <Route path="/admin/settings" element={<SettingsPage/>} />
+            {/* Fallback for any other unmatched routes (optional, good for 404) */}
+            {/* This should be outside the authenticated admin routes block if you want a public 404 */}
+            <Route path="*" element={<div>404 Page Not Found</div>} />
+          </Routes>
 
-          {/* Fallback for any /admin/* routes not matched above within the AdminLayout */}
-          <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-        </Route>
-
-        {/* Fallback for any other unmatched routes (optional, good for 404) */}
-        {/* This should be outside the authenticated admin routes block if you want a public 404 */}
-        <Route path="*" element={<div>404 Page Not Found</div>} />
-      </Routes>
-
-       <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-
-    </Router>
-        </BidsProvider>
-      </ReviewProvider>
+          <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+        </Router>
+      </BidsProvider>
   );
 }
 

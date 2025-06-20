@@ -1,11 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/NavBar/NavBar.jsx";
 import Sidebar from "../../components/Sidebar/Sidebar.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useUserService } from "../../services/userService/userService.js";
+import Loader from "../../components/shared/Loader.jsx";
 
 const AdminLayout = ({ isAuthenticated }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const userRole = localStorage.getItem("userRole");
+  const { authDataState } = useAuth();
+  const { fetchCurrentUser } = useUserService(); // handles token + refresh
+  const [loading, setLoading] = useState(true);
+  const { userRole = [], userInfo } = authDataState;
+  // const userRole = authDataState.userRole
+  // const { userInfo } = authDataState;
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        if (!userInfo) {
+          await fetchCurrentUser(); // uses context & sets userInfo inside
+        }
+      } catch (error) {
+        console.error("Failed to fetch user info:", error);
+        // optional: redirect to login or show a user-friendly error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserInfo();
+  }, [userInfo, fetchCurrentUser]);
+
+  if (loading || !userInfo) return <Loader />;
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
@@ -46,6 +73,7 @@ const AdminLayout = ({ isAuthenticated }) => {
             isAuthenticated={isAuthenticated}
             userRole={userRole}
             toggleSidebar={toggleSidebar}
+            userFirstName={userInfo.firstName}
           />
         </div>
 

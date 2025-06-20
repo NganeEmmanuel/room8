@@ -8,18 +8,21 @@ import {
   PowerIcon,
   HeartIcon,
   EyeIcon,
+  MagnifyingGlassIcon
 } from "@heroicons/react/24/outline";
 import React from "react";
-import {StarIcon} from "@heroicons/react/24/solid";
+import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = ({ role }) => {
+
+  const {authDataState, clearAuthData} = useAuth()
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userRole");
-    navigate("/login");
+    clearAuthData()
+    navigate("/search");
   };
 
   const isActive = (path) => {
@@ -38,6 +41,11 @@ const Sidebar = ({ role }) => {
       to: "/admin/dashboard",
       icon: <HomeIcon className="w-5 h-5" />,
     },
+    {
+      name: "Browse Listings",
+      to: "/admin/browse",
+      icon: <MagnifyingGlassIcon className="w-5 h-5" />,
+    }
   ];
 
   // Tenant-specific links
@@ -85,32 +93,29 @@ const Sidebar = ({ role }) => {
       name: "Settings",
       to: "/admin/settings",
       icon: <Cog6ToothIcon className="w-5 h-5" />,
-
-    },
-       {
-    name: "Manage Reviews",
-    to: "/admin/reviews",
-    icon: <StarIcon className="w-5 h-5" />,
     },
   ];
 
   // Determine which links to show based on role
   const getRoleLinks = () => {
-    switch (role) {
-      case "tenant":
-        return tenantLinks;
-      case "landlord":
-        return landlordLinks;
-      case "tenant-landlord":
-        return [
-          ...tenantLinks,
-          { type: "divider", name: "Landlord Section" },
-          ...landlordLinks,
-        ];
-      default:
-        return [];
+  const hasTenant = role.includes("TENANT");
+  const hasLandlord = role.includes("LANDLORD");
+
+  if (hasTenant && hasLandlord) {
+      return [
+        ...tenantLinks,
+        { type: "divider", name: "Landlord Section" },
+        ...landlordLinks,
+      ];
+    } else if (hasTenant) {
+      return tenantLinks;
+    } else if (hasLandlord) {
+      return landlordLinks;
+    } else {
+      return [];
     }
   };
+
 
   const roleLinks = getRoleLinks();
   const allLinks = [...commonLinks, ...roleLinks];

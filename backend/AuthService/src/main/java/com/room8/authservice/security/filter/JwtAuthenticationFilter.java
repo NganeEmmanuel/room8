@@ -1,9 +1,10 @@
 package com.room8.authservice.security.filter;
 
 import com.room8.authservice.client.UserServiceClient;
-import com.room8.authservice.service.AuthService;
-import com.room8.authservice.service.JwtService;
 import com.room8.authservice.redis.UserRedisService;
+import com.room8.authservice.service.JwtService;
+import com.room8.authservice.utils.CheckEndpoints;
+import com.room8.authservice.utils.EmailUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +20,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final AuthService authService;
     private final UserRedisService userRedisService;
     private final UserServiceClient userServiceClient;
+    private final EmailUtils emailUtils;
+    private final CheckEndpoints checkEndpoints;
 
     @Override
     protected void doFilterInternal(
@@ -30,12 +32,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        final String path = request.getServletPath();
+
+        // Bypass authentication for public endpoints
+        if (CheckEndpoints.isPublicEndpoint(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String email;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            // Return 401 Unauthorized if the Authorization header is missing or invalid
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: No Bearer token provided");
+//            filterChain.doFilter(request, response);
             return;
         }
 
@@ -54,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
 
         // check if token contains email, it's a valid email format, and Authenticate User
-        if (email != null && authService.isCorrectEmailFormat(email) && user != null) {
+        if (email != null && emailUtils.isCorrectEmailFormat(email) && user != null) {
             request.setAttribute("email", email);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

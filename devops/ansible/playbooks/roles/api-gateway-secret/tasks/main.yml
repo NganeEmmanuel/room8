@@ -1,0 +1,9 @@
+- name: Create api-gateway secret
+  template:
+    src: api-gateway-secret.yaml.j2
+    dest: /tmp/api-gateway-secret.yaml
+
+- name: Apply api-gateway secret to Kubernetes
+  shell: kubectl apply -f /tmp/api-gateway-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

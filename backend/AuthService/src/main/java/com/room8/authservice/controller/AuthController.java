@@ -1,11 +1,12 @@
 package com.room8.authservice.controller;
 
 
-import com.room8.authservice.auth.AuthenticationRequest;
-import com.room8.authservice.auth.AuthenticationResponse;
-import com.room8.authservice.auth.RegisterRequest;
-import com.room8.authservice.model.UserDTO;
+import com.room8.authservice.dto.AuthenticationRequest;
+import com.room8.authservice.dto.AuthenticationResponse;
+import com.room8.authservice.dto.RegisterRequest;
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.service.AuthService;
+import com.room8.authservice.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,12 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailUtils emailUtils;
 
     @PostMapping("/signup/tenant")
     public ResponseEntity<AuthenticationResponse> registerTenant(@RequestBody RegisterRequest request) {
@@ -65,7 +67,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.refreshToken(refreshToken));
     }
 
-    @GetMapping("/get-logged-in-user")
+    @GetMapping("/me")
     public ResponseEntity<UserDTO> getLoggedInUser(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 
@@ -101,6 +103,6 @@ public class AuthController {
 
     @GetMapping("/get-email-from-token")
     ResponseEntity<String> getUserEmailFromToken(@RequestParam String token){
-        return ResponseEntity.ok(authService.extractEmailFromToken(token));
+        return ResponseEntity.ok(emailUtils.extractEmailFromToken(token));
     }
 }

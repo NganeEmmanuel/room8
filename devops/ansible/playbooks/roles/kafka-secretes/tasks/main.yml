@@ -1,0 +1,9 @@
+- name: Create kafka secret
+  template:
+    src: kafka-secret.yaml.j2
+    dest: /tmp/kafka-secret.yaml
+
+- name: Apply kafka secret to Kubernetes
+  shell: kubectl apply -f /tmp/kafka-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

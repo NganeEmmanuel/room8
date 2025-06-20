@@ -1,10 +1,10 @@
 package com.room8.authservice.service;
 
-import com.room8.authservice.auth.AuthenticationRequest;
-import com.room8.authservice.auth.AuthenticationResponse;
-import com.room8.authservice.auth.RegisterRequest;
+import com.room8.authservice.dto.AuthenticationRequest;
+import com.room8.authservice.dto.AuthenticationResponse;
+import com.room8.authservice.dto.RegisterRequest;
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.exception.*;
-import com.room8.authservice.model.UserDTO;
 
 public interface AuthService {
     /**
@@ -94,25 +94,4 @@ public interface AuthService {
      */
     Boolean markedAsPhoneVerified(String phoneNumber, String otp) throws UserNotFoundException;
 
-
-    /**
-     * Check if an email is not present in the database
-     * @param email string email to confirm its existence
-     * @return true if the email doesn't exist in the database, and false otherwise
-     */
-    Boolean isEmailNotExist(String email);
-
-    /**
-     * Check if a string is a correct email format
-     * @param email string to check the format for correctness
-     * @return true if string is a valid email format and false otherwise
-     */
-    Boolean isCorrectEmailFormat(String email);
-
-    /**
-     * Extracts the email from the jwt token
-     * @param token jwt token from which the user's email is to be extracted
-     * @return extracted email if token is valid and error if not
-     */
-    String extractEmailFromToken(String token);
 }

@@ -20,22 +20,27 @@ room8/
 ├── backend/
 │   ├── ApiGateway/         # single access for applciation
 │   ├── ServiceRegistry/    # Eureka service register for service descovery
-│   ├── User_Auth/          # User authentication and authorization service
-│   ├── ListingService/     # Listing service handling room listings
+│   ├── UserService/        # Handles User related logic
+│   ├── AuthService/        # Handles uthentication and authorization Logic
+│   ├── ListingService/     # Listing service handling room listings (RoomService)
 │   ├── BidService/         # Handles the biding logic on listings
 │   └── ContactService/     # Handles contacting users via email and phone number
 │   ├── FeedbackService/    # Handle feedback logic like rating and reviews
 │   ├── SearchService/      # Handles search related logic including filtering search
+│   ├── NotificationService/   # Handles notification logic
 ├── frontend/
-│   ├── room8               # frontend application
+│   ├── room8               # fronend react application
 ├── devops/
 │   ├── ci/                 # Jenkinsfiles, pipelines
 │   ├── terraform/          # Terraform scripts for infra
 │   ├── ansible/            # Playbooks and roles
-│   ├── docker/             # Dockerfiles and Docker Compose files
-│   ├── k8s/                # Kubernetes manifests
-│   └── scripts/            # Helper bash or Python scripts
-└── Documentation
+│   ├── Readme.md           # information about this directory and devops workflow
+├── Documentation
+├── e2e-tests/              # Selenium-based full-stack E2E tests
+│   ├── tests/              # Your actual test scripts (e.g., login_test.java, bidding_test.java)
+│   ├── utils/              # Helper functions (e.g., login helpers, setup browser)
+│   ├── requirements.txt    #  Maven config
+│   └── README.md      
 └── README.md
 ```
 
@@ -91,17 +96,23 @@ The backend consists of several microservices, each handling a specific function
 - Uses **MSQL** for storage of listings.
 
 ### **6. Bid Service**
-- Manages tennant bids on listings.
+- Manages tenant bids on listings.
 - Uses **MYSQL** for storage of listings.
 
 ### **7. Feedback Service**
 - Handles user reviews and ratings.
 - Uses **MYSQL** to store feedback data.
 
-### **8. Search Service**
+### **8. Contact Service**
+- Handles sending emails and text related information to users
+
+### **9. Search Service**
 - Provides search functionality for rooms and roommates.
 - Uses **Elasticsearch** for fast querying.
 
+### **10. Notification Service**
+- Handles user notifications within the applications
+- uses message que (Apache Kafka)
 ---
 
 ## Frontend Architecture

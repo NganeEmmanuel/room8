@@ -13,17 +13,26 @@ public class RefreshTokenRedisService {
 
     // Store refresh token in Redis with expiration
     public void storeRefreshToken(String email, String refreshToken, long expirationInMinutes) {
+        if (email == null || refreshToken == null) {
+            throw new NullPointerException("Email and refresh token must not be null");
+        }
         redisTemplate.opsForValue().set(
-                "refreshToken:" + email, refreshToken, expirationInMinutes, TimeUnit.MINUTES);
+                "auth:refreshToken:" + email, refreshToken, expirationInMinutes, TimeUnit.MINUTES);
     }
 
     // Retrieve refresh token
     public String getRefreshToken(String email) {
-        return redisTemplate.opsForValue().get("refreshToken:" + email);
+        if (email == null) {
+            throw new NullPointerException("Email must not be null");
+        }
+        return redisTemplate.opsForValue().get("auth:refreshToken:" + email);
     }
 
     // Delete refresh token (invalidate old one)
     public void invalidateRefreshToken(String email) {
-        redisTemplate.delete("refreshToken:" + email);
+        if (email == null) {
+            throw new NullPointerException("Email must not be null");
+        }
+        redisTemplate.delete("auth:refreshToken:" + email);
     }
 }

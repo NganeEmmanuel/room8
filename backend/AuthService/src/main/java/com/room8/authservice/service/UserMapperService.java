@@ -1,8 +1,8 @@
 package com.room8.authservice.service;
 
 
+import com.room8.authservice.dto.UserDTO;
 import com.room8.authservice.model.User;
-import com.room8.authservice.model.UserDTO;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,7 @@ public class UserMapperService implements MapperService<UserDTO, User> {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setRole(user.getRole());
         return userDTO;
     }
 

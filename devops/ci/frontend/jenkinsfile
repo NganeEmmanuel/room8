@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_NAMESPACE = "nganeemmanuel/room8"
+        DEPLOYMENTS_REPO = "https://github.com/NganeEmmanuel/room8-deployments.git"
+        DEPLOYMENTS_BRANCH = "master"
+        SERVICE_NAME = "frontend"
+        IMAGE_NAME = "${DOCKERHUB_NAMESPACE}-${SERVICE_NAME}"
+        BUILD_CONTEXT = "frontend/room8"
+        DEPLOYMENT_YAML_PATH = "base/frontend/deployment.yaml"
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    env.IMAGE_TAG = new Date().format("yyyyMMddHHmmss")
+                    echo "📌 Image Tag: ${env.IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Checkout Frontend Source') {
+            steps {
+                git 'https://github.com/NganeEmmanuel/room8.git'
+            }
+        }
+
+        stage('Build and Push Frontend Image') {
+            steps {
+                script {
+                    def fullImage = "${IMAGE_NAME}:${IMAGE_TAG}"
+
+                    echo "📦 Building Docker image: ${fullImage}"
+                    sh """
+                        docker build -t ${fullImage} \
+                                     -f ${BUILD_CONTEXT}/Dockerfile \
+                                     ${BUILD_CONTEXT}
+                    """
+
+                    echo "🚀 Pushing image to Docker Hub..."
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh """
+                            echo \$PASS | docker login -u \$USER --password-stdin
+                            docker push ${fullImage}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Update Deployment Manifests') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-cred', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    script {
+                        echo "🔁 Cloning room8-deployments repo..."
+                        sh "rm -rf room8-deployments"
+                        sh "git clone https://${GIT_USER}:${GIT_PASS}@github.com/NganeEmmanuel/room8-deployments.git"
+
+                        echo "🔧 Updating deployment manifest..."
+                        sh """
+                            sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|" room8-deployments/${DEPLOYMENT_YAML_PATH}
+                        """
+
+                        dir("room8-deployments") {
+                            sh '''
+                                git config user.name "jenkins-bot"
+                                git config user.email "jenkins@room8.local"
+                                git add .
+                                git commit -m "🚀 Update frontend image to ${IMAGE_TAG}" || echo "No changes to commit"
+                                git push origin ${DEPLOYMENTS_BRANCH}
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh '''
+                    docker image prune -af
+                    docker container prune -f
+                    rm -rf ~/.m2/repository
+                '''
+            }
+        }
+    }
+}

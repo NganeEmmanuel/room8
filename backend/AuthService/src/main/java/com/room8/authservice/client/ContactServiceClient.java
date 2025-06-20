@@ -1,6 +1,6 @@
 package com.room8.authservice.client;
 
-import com.room8.authservice.model.VerificationRequest;
+import com.room8.authservice.dto.VerificationRequest;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
-@FeignClient("CONTACT-SERVICE")
+@FeignClient("contact-service")
 public interface ContactServiceClient {
 
     @PostMapping("api/v1/contact/send-verification-email")

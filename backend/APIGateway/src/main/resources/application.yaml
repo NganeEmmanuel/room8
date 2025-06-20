@@ -1,0 +1,48 @@
+spring:
+  profiles:
+    active: dev
+
+  application:
+    name: api-gateway
+
+  main:
+    web-application-type: reactive
+
+eureka:
+  instance:
+    hostname: api-gateway
+
+server:
+  port: 8765
+  forward-headers-strategy: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    gateway:
+      enabled: true          # <-- 🔥 REQUIRED to access /actuator/gateway/routes
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
+logging:
+  level:
+    com:
+      netflix:
+        discovery: DEBUG
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
+        web:
+          server: DEBUG
+    reactor:
+      netty: DEBUG

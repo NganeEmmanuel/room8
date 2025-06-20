@@ -33,7 +33,7 @@
         service:
           type: ClusterIP
         prometheusSpec:
-          externalUrl: "http://<E-IP>/prometheus"
+          externalUrl: "http://{{ master_node }}/prometheus"
           retention: 10d
           serviceMonitorSelector: {}
           podMonitorSelector: {}
@@ -77,6 +77,6 @@
   debug:
     msg: |
       Grafana Login:
-      ➤ URL: http://<E-IP>/grafana
+      ➤ URL: http://{{ master_node }}/grafana
       ➤ Username: admin
       ➤ Password: admin123

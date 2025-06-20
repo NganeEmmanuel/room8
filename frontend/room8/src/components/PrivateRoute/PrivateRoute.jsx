@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 const PrivateRoute = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('accessToken'); // or use context
+  const isAuthenticated = !!localStorage.getItem('access_token'); // or use context
   const location = useLocation();
 
   return isAuthenticated ? (

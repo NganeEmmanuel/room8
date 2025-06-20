@@ -1,0 +1,31 @@
+spring:
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+
+  kafka:
+    bootstrap-servers: localhost:29092  # Use embedded Kafka for tests if available
+    consumer:
+      group-id: test-search-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    properties:
+      spring:
+        kafka:
+          consumer:
+            auto-offset-reset: earliest
+    listener:
+      missing-topics-fatal: false
+
+  elasticsearch:
+    uris: http://localhost:9201  # Use TestContainers or a mock instance
+
+eureka:
+  client:
+    enabled: false  # Disable Eureka during tests
+
+logging:
+  level:
+    org.elasticsearch: ERROR
+    org.springframework.data.elasticsearch: ERROR

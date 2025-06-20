@@ -1,0 +1,9 @@
+- name: Create frontend secret
+  template:
+    src: frontend-secret.yaml.j2
+    dest: /tmp/frontend-secret.yaml
+
+- name: Apply frontend secret to Kubernetes
+  shell: kubectl apply -f /tmp/frontend-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf

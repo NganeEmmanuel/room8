@@ -1,0 +1,20 @@
+# Kafka (shared for all profiles, can be overridden)
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      batch-size: 1       # Flush even a single message
+      linger-ms: 0        # No delay
+      acks: all           # Ensures durability
+      retries: 3          # Good safety net
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
