@@ -10,6 +10,10 @@ import {
     PersonalitySocialHabitsSection,
     FinancialResponsibilitySection,
 } from './SettingSections.jsx';
+import { updateUserInfo } from '../../../services/userInfoService/userInfoService';
+
+import { useAuthService } from '../../../services/authService/AuthService';
+
 
 
 const backdropVariants = {
@@ -25,6 +29,8 @@ const panelVariants = {
 
 const EditProfilePanel = ({ isOpen, onClose, onSave, initialData }) => {
     const [userData, setUserData] = useState(initialData || {});
+    const { refreshToken } = useAuthService();
+
 
     useEffect(() => {
         if (isOpen) {
@@ -47,10 +53,16 @@ const EditProfilePanel = ({ isOpen, onClose, onSave, initialData }) => {
         }
     };
 
-    const handleSave = () => {
-        if (onSave) onSave(userData);
-        onClose();
+    const handleSave = async () => {
+        try {
+            await updateUserInfo(userData, initialData, refreshToken); // ✅ Pass the function
+            if (onSave) onSave(userData);
+            onClose();
+        } catch (err) {
+            console.error("Save failed", err);
+        }
     };
+
 
     return (
         <AnimatePresence>

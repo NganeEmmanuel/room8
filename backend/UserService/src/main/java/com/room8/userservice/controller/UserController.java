@@ -63,6 +63,17 @@ public class UserController {
         }
     }
 
+    @PutMapping("/user-info/update")
+    public ResponseEntity<UserInfoDTO> updateUserInfo( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                                                   @RequestBody UserInfoDTO userInfoDTO) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            return ResponseEntity.ok(userService.updateUserInfo(userInfoDTO, token));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PutMapping("/mark-as-verified/email")
     public ResponseEntity<User> markUserAsEmailVerified(@RequestBody String email) {
         return ResponseEntity.ok(userService.markUserAsEmailVerified(email));

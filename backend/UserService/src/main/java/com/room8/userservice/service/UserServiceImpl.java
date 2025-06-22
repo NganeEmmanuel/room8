@@ -6,6 +6,7 @@ import com.room8.userservice.exception.*;
 import com.room8.userservice.model.User;
 import com.room8.userservice.dto.UserDTO;
 import com.room8.userservice.dto.UserInfoDTO;
+import com.room8.userservice.model.UserInfo;
 import com.room8.userservice.model.UserRole;
 import com.room8.userservice.repository.UserInfoRepository;
 import com.room8.userservice.repository.UserRepository;
@@ -29,7 +30,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public User addUser(User user) {
         validateUserRequest(user);
-        return userRepository.save(user);
+        //save user in database
+        userRepository.save(user);
+
+        //create and save user info file/row in database
+        var userInfo = UserInfo.builder()
+                .user(user)
+                .build();
+        userInfoRepository.save(userInfo);
+        return user;
+
     }
 
     @Override
@@ -128,6 +138,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean checkConflict(String email, String phoneNumber) {
         return  userRepository.findByEmailOrPhoneNumber(email, phoneNumber).isPresent();
+    }
+
+    @Override
+    public UserInfoDTO updateUserInfo(UserInfoDTO userInfoDTO, String token) {
+        var userEmail = authenticationServiceClient.getUserEmailFromToken(token).getBody();
+        checkNullValue(userEmail);
+        var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException(userEmail));
+        var userInfo = userInfoMapperService.toEntity(userInfoDTO);
+        userInfo.setUser(user); //add user
+        userInfo.setLastUpdated(new Date()); //update last updated date
+        return userInfoMapperService.toDTO(userInfoRepository.save(userInfo));
     }
 
     // ------------------- Private Helpers -----------------------

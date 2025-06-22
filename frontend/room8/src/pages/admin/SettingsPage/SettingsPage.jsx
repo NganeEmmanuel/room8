@@ -9,18 +9,22 @@ import {
     PrivacySettingsSection
 } from './SettingSections.jsx';
 import { User, Shield, Palette, Eye, Settings2 } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext.jsx';
 
 
 const SettingsPage = () => {
     const [userData, setUserData] = useState({}); // State is kept for form inputs
     const [activeSection, setActiveSection] = useState('personal-info');
+    const { authDataState } = useAuth();
+    const { userInfo } = authDataState;
     useNavigate();
 
     // In a real app, you would fetch the user's settings data here
     useEffect(() => {
         // const fetchedData = await api.getUserSettings();
         // setUserData(fetchedData);
-    }, []);
+        setUserData(userInfo)
+    }, [userInfo]);
 
 
     useEffect(() => {

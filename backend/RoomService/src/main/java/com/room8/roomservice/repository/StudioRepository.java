@@ -10,4 +10,6 @@ public interface StudioRepository extends JpaRepository<Studio, Long> {
     List<Long> findIdsByLandlordId(Long userId);
 
     void deleteAllByLandlordId(Long userId);
+
+    List<Studio> findAllByLandlordId(Long landlordId);
 }

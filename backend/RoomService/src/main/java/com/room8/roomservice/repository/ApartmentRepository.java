@@ -10,4 +10,6 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
     List<Long> findIdsByLandlordId(Long userId);
 
     void deleteAllByLandlordId(Long userId);
+
+    List<Apartment> findAllByLandlordId(Long landlordId);
 }

@@ -60,17 +60,24 @@ const ProfileSection = ({ title, icon: Icon, children }) => (
 );
 
 
-const UserProfileDisplayPage = ({ profileData, onEditProfile }) => {
+const UserProfileDisplayPage = ({ userinfo, profileData, onEditProfile }) => {
     if (!profileData) {
         return <div className="text-center p-10">No profile data available.</div>;
     }
+    
+    //user data
+     const { 
+        firstName = '', lastName = '', email = '', 
+        phoneNumber = '', role = [], isEmailVerified = false, 
+        isPhoneVerified = false
+    } = userinfo;
 
+    //additional user
      const {
-        firstName = '', lastName = '', email = '', phoneNumber = '', role = [], profileImagePath = '',
+        profileImagePath = '',
         occupation = '', nationality = '', languagesSpoken = [], aboutMe = '',
         smokingStatus = '', hasPets = false, petsAllowed = [], cleanlinessLevel = '',
         phoneNumberVisibility = 'Only Me', emailVisibility = 'Only Me', lifestyleHabitsVisibility = 'Connections Only',
-        isEmailVerified = false, isPhoneVerified = false,
         // New fields
         dietaryRestrictions, otherDietaryRestrictions = [], sleepSchedule, comfortableWithGuests,
         partyHabits, sharesFood, preferredRoomTemperature, willingToShareBathroom,
@@ -78,6 +85,7 @@ const UserProfileDisplayPage = ({ profileData, onEditProfile }) => {
         personalityType, noiseTolerance, enjoysSocializingWithRoommates,
         willingToSplitUtilities, monthlyIncome, incomeCurrency
     } = profileData;
+
 
     const displayName = `${firstName} ${lastName}`.trim() || 'User';
     const isOwner = true; // Placeholder for your app's auth logic
@@ -102,7 +110,10 @@ const UserProfileDisplayPage = ({ profileData, onEditProfile }) => {
                          {role.length > 0 && (
                             <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs sm:text-sm font-medium capitalize">
                                 <Award className="inline w-4 h-4 mr-1.5" />
-                                {(Array.isArray(role) ? role.join(' & ') : role)}
+                                {Array.isArray(role)
+  ? role.map(r => r.userAuthority).join(' & ')
+  : role?.userAuthority || "No role"}
+
                             </div>
                         )}
                     </div>

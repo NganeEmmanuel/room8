@@ -10,4 +10,6 @@ public interface SingleRoomRepository extends JpaRepository<SingleRoom, Long> {
     List<Long> findIdsByLandlordId(Long userId);
 
     void deleteAllByLandlordId(Long userId);
+
+    List<SingleRoom> findAllByLandlordId(Long landlordId);
 }
