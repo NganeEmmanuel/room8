@@ -26,6 +26,16 @@ public class SearchController {
         return ResponseEntity.ok(results);
     }
 
+    @PostMapping("/filter")
+    public ResponseEntity<List<ListingDocument>> searchListingsWithFilter(
+            @RequestBody SearchFilterDTO filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<ListingDocument> results = searchService.searchListings(filter, page, size);
+        return ResponseEntity.ok(results);
+    }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteListing(@PathVariable String id) {
         searchService.deleteListingById(id);
