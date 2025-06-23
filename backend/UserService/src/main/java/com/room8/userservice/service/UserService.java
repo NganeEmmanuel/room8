@@ -99,4 +99,12 @@ public interface UserService {
      * @return false if no entry can be found in the database associated with email or phone number
      */
     Boolean checkConflict(String email, String phoneNumber);
+
+    /**
+     *
+     * @param userInfoDTO user information to be updated
+     * @return updated user information
+     * @throws UserNotFoundException if the user is not found
+     */
+    UserInfoDTO updateUserInfo(UserInfoDTO userInfoDTO, String token) throws UserNotFoundException;
 }

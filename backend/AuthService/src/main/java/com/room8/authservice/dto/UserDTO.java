@@ -24,6 +24,8 @@ public class UserDTO {
     private String email;
     @NotBlank
     private String phoneNumber;
+    private Boolean isEmailVerified;
+    private Boolean isPhoneVerified;
     @NotEmpty
     private List<UserRole> role;
 

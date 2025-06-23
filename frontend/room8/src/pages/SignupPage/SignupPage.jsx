@@ -53,7 +53,7 @@ function SignupPage() {
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-4">
-          <img src="/logo.png" alt="Room8 Logo" className="h-12" />
+          <img src={import.meta.env.PROD ? '/room8/logo.png' : 'logo.png'} alt="Room8 Logo" className="h-12" />
         </div>
 
         <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Create Your Account</h2>

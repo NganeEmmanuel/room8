@@ -12,6 +12,7 @@ import com.room8.roomservice.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -114,6 +115,28 @@ public class RoomServiceImpl implements RoomService {
         apartmentRepository.deleteAllByLandlordId(userId);
 
         listingEventPublisher.publishBulkDeleteEvent(allIds);
+    }
+
+    @Override
+    public List<ListingDTO> getRooms(GetListingRequest listingRequest) throws NotFoundException {
+        List<ListingDTO> rooms = new ArrayList<>();
+        singleRoomRepository.findAllByLandlordId(listingRequest.getLandlordId())
+                .forEach(singleRoom -> {
+                    rooms.add(singleRoomMapper.toDTO(singleRoom));
+                });
+
+        studioRepository.findAllByLandlordId(listingRequest.getLandlordId())
+                .forEach(studio -> {
+                    rooms.add(studioMapper.toDTO(studio));
+                });
+
+        apartmentRepository.findAllByLandlordId(listingRequest.getLandlordId())
+                .forEach(apartment -> {
+                    rooms.add(apartmentMapper.toDTO(apartment));
+                });
+
+
+        return rooms;
     }
 
     private void findListingById(Long listingId, String listinType) throws NotFoundException {

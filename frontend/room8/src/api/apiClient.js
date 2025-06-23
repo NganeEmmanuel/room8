@@ -14,16 +14,5 @@ const apiClient = axios.create({
   },
 });
 
-// Retry logic on network failure
-apiClient.interceptors.response.use(null, async error => {
-  const config = error.config;
-  if (!config || config.__retry) return Promise.reject(error);
-  config.__retry = true;
-  if (!error.response) {
-    toast.error("Network error. Retrying...");
-    return apiClient(config);
-  }
-  return Promise.reject(error);
-});
 
 export default apiClient;

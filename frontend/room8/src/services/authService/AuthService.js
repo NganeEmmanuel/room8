@@ -1,4 +1,3 @@
-// Updated AuthService.js to use AuthContext and enhance UX
 import apiClient from '../../api/apiClient';
 import { toast } from 'react-toastify';
 import {
@@ -10,6 +9,7 @@ import {
 } from '../../utils/validators';
 import { getRefreshToken } from '../../utils/tokenUtils';
 import { useAuth } from '../../context/AuthContext';
+import { withRetry } from '../../utils/retryUtils';
 
 const endpoints = {
   tenant: '/auth-service/api/v1/auth/signup/tenant',
@@ -37,7 +37,8 @@ export const useAuthService = () => {
     try {
       validateSignup(data);
       const url = data.userType === 'landlord' ? endpoints.landlord : endpoints.tenant;
-      const response = await apiClient.post(url, data);
+
+      const response = await withRetry(() => apiClient.post(url, data), 1, 1000); // retry once
       setAuthDataState(response.data);
       toast.success('Signup successful!');
       return response.data;
@@ -52,7 +53,8 @@ export const useAuthService = () => {
       if (!isValidEmail(email) || !isNotEmpty(password)) {
         throw new Error('Invalid login credentials.');
       }
-      const response = await apiClient.post(endpoints.login, { email, password });
+
+      const response = await withRetry(() => apiClient.post(endpoints.login, { email, password }), 1, 1000);
       setAuthDataState(response.data);
       toast.success('Login successful!');
       return response.data;
@@ -77,7 +79,7 @@ export const useAuthService = () => {
       setAuthDataState(response.data);
       return response.data.token;
     } catch (err) {
-      clearAuthData();
+      // clearAuthData();
       toast.error('Session expired. Please login again.');
       throw err;
     }

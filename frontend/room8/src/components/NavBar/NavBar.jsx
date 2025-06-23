@@ -70,7 +70,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar, userFirstName }) => 
         {!isAdminArea && (
           <div className="text-2xl font-bold text-blue-600 tracking-tight">
             <Link to={getHomeLink()}>
-              <img src="/room8/logo.png" alt="Room8 Logo" className="h-12" />
+              <img src={import.meta.env.PROD ? '/room8/logo.png' : 'logo.png'} alt="Room8 Logo" className="h-12" />
             </Link>
           </div>
         )}

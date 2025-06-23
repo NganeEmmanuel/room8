@@ -2,6 +2,7 @@ package com.room8.searchservice.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.room8.searchservice.dto.ListingDTO;
+import com.room8.searchservice.dto.SearchFilterDTO;
 import com.room8.searchservice.exception.IllegalArgumentException;
 import com.room8.searchservice.mapper.ListingMapper;
 import com.room8.searchservice.model.ListingDocument;
@@ -99,6 +100,103 @@ public class SearchServiceImpl implements SearchService {
             throw new RuntimeException("❌ Failed to search listings", e);
         }
     }
+
+    @Override
+    public List<ListingDocument> searchListings(SearchFilterDTO filter, int page, int size) {
+        try {
+            SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+            if (filter.getQuery() != null && !filter.getQuery().isEmpty()) {
+                boolQuery.should(QueryBuilders.matchQuery("title", filter.getQuery()));
+                boolQuery.should(QueryBuilders.matchQuery("listingDescription", filter.getQuery()));
+            }
+
+            // Location filters
+            if (filter.getCountry() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("listingCountry", filter.getCountry()));
+            }
+            if (filter.getState() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("listingState", filter.getState()));
+            }
+            if (filter.getCity() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("listingCity", filter.getCity()));
+            }
+
+            // Enum & other filters
+            if (filter.getListingType() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("listingType", filter.getListingType()));
+            }
+            if (filter.getListingStyle() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("listingStyle", filter.getListingStyle().name()));
+            }
+            if (filter.getBathroomLocation() != null) {
+                boolQuery.must(QueryBuilders.matchQuery("bathroomLocation", filter.getBathroomLocation().name()));
+            }
+
+            // Numeric filters
+            if (filter.getNumberOfRooms() != null) {
+                boolQuery.must(QueryBuilders.termQuery("numberOfRooms", filter.getNumberOfRooms()));
+            }
+            if (filter.getNumberOfBathrooms() != null) {
+                boolQuery.must(QueryBuilders.termQuery("numberOfBathrooms", filter.getNumberOfBathrooms()));
+            }
+            if (filter.getNumberOfKitchens() != null) {
+                boolQuery.must(QueryBuilders.termQuery("numberOfKitchens", filter.getNumberOfKitchens()));
+            }
+            if (filter.getNumberOfHouseMates() != null) {
+                boolQuery.must(QueryBuilders.termQuery("numberOfHouseMates", filter.getNumberOfHouseMates()));
+            }
+
+            // Price range
+            if (filter.getMinPrice() != null || filter.getMaxPrice() != null) {
+                RangeQueryBuilder priceRange = QueryBuilders.rangeQuery("listingPrice");
+                if (filter.getMinPrice() != null) {
+                    priceRange.gte(filter.getMinPrice());
+                }
+                if (filter.getMaxPrice() != null) {
+                    priceRange.lte(filter.getMaxPrice());
+                }
+                boolQuery.must(priceRange);
+            }
+
+            // Use match_all if no filters provided
+            if (boolQuery.should().isEmpty() && boolQuery.must().isEmpty()) {
+                sourceBuilder.query(QueryBuilders.matchAllQuery());
+            } else {
+                sourceBuilder.query(boolQuery);
+            }
+
+            // Pagination & sorting
+            sourceBuilder.from(page * size);
+            sourceBuilder.size(size);
+            sourceBuilder.timeout(TimeValue.timeValueSeconds(5));
+            sourceBuilder.sort("listedDate", org.opensearch.search.sort.SortOrder.DESC); // sort by newest
+
+            searchRequest.source(sourceBuilder);
+
+            SearchResponse response = openSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+
+            return Arrays.stream(response.getHits().getHits())
+                    .map(hit -> {
+                        try {
+                            return objectMapper.readValue(hit.getSourceAsString(), ListingDocument.class);
+                        } catch (IOException e) {
+                            log.error("⚠️ Failed to parse search hit: {}", hit.getId(), e);
+                            return null;
+                        }
+                    })
+                    .filter(doc -> doc != null)
+                    .collect(Collectors.toList());
+
+        } catch (IOException e) {
+            throw new RuntimeException("❌ Failed to perform filtered search", e);
+        }
+    }
+
+
 
     @Override
     public void deleteListingById(String id) {

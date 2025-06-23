@@ -14,6 +14,9 @@ public interface SearchService {
     // Search listings by keyword, location, filters etc. - simple example
     List<ListingDocument> searchListings(String query, String city, int page, int size);
 
+    List<ListingDocument> searchListings(SearchFilterDTO filter, int page, int size);
+
+
     // Delete a listing document by id
     void deleteListingById(String id);
 }

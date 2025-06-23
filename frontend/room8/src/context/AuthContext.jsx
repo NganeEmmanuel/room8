@@ -7,8 +7,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [authDataState, setAuthDataState] = useState({
-    accessToken: getAccessToken(),
-    refreshToken: getRefreshToken(),
+    accessToken: getAccessToken() || null,
+    refreshToken: getRefreshToken() || null,
     userRole: getRole() || null,
     userInfo: null, // 👈 new
   });
@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }) => {
   const setTokensAndRole = ({ token, refreshToken }) => {
     saveTokens({ token, refreshToken });
     const decoded = decodeJwt(token);
-    console.log('called jwt')
     const roles = decoded?.roles || null; // assuming roles is an array in your token
     saveRole(roles)
     setAuthDataState({ accessToken: token, refreshToken, userRole: roles });
