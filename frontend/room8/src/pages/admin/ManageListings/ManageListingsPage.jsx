@@ -42,7 +42,7 @@ const ManageListingsPage = ({ isLandlordView = true }) => {
         if (authDataState.userInfo) {
             fetchListings();
         }
-    }, [authDataState.userInfo ]);
+    }, [authDataState.userInfo, fetchListings]);
 
     // --- Event Handlers (Your function names are preserved) ---
     const handleCreateNewListing = () => {

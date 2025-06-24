@@ -7,7 +7,6 @@ import com.room8.roomservice.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class RoomController {
         return roomService.getRoom(listingRequest);
     }
 
-    @PostMapping("/get/listings")
+    @GetMapping("/get/listings")
     @ResponseStatus(HttpStatus.OK)
     public List<ListingDTO> getRooms(@RequestBody GetListingRequest listingRequest) {
         return roomService.getRooms(listingRequest);
