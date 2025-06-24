@@ -115,8 +115,8 @@ export const useListingService = () => {
 
         // Using withRetry on the API call, as requested
         const res = await withRetry(() =>
-          apiClient.get(`${API_BASE_URL}/get/listings`, getListingRequest, {
-            headers: { Authorization: `Bearer ${accessToken}` },
+          apiClient.post(`${API_BASE_URL}/get/listings`, getListingRequest, {
+           headers: { Authorization: `Bearer ${accessToken}` },
           }), 1, 1000
         );
         return res.data;

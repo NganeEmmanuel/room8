@@ -31,11 +31,11 @@ const ManageListingsPage = ({ isLandlordView = true }) => {
         } catch (error) {
             // The service hook now handles error toasts
             console.error("Error fetching listings:", error);
-            setListings([]);
+             setListings([]);
         } finally {
             setIsListingsLoading(false);
         }
-    }, [getMyListings]);
+    }, []);
 
     useEffect(() => {
         // Only fetch if the user info has been loaded by the App-level component

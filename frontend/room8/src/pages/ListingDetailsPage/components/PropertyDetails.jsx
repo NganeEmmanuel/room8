@@ -58,7 +58,7 @@ const PropertyDetails = ({ listing }) => {
       {/* Price and Actions */}
       <div className="flex flex-wrap items-center justify-between mt-4 pb-4 border-b border-gray-200">
         <p className="text-blue-500 font-bold text-lg">
-          {price.toLocaleString()} {currency} /per month
+          {price} {currency} /per month
         </p>
         <div className="flex space-x-2 mt-2 sm:mt-0">
           <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">

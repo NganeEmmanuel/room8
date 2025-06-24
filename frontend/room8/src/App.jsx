@@ -36,6 +36,7 @@ import {BidsProvider} from "./context/BidContext.jsx";
 import AuthRestorer from './auth/AuthRestorer.jsx';
 import {useEffect} from "react";
 import {useUserService} from "./services/userService/userService.js";
+import SearchPage from "./pages/SearchPage.jsx";
 
 
 // This layout wraps all authenticated admin routes
@@ -72,14 +73,12 @@ function App() {
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
               <Route path="/" element={<Navigate to="/home" replace />} />
+
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
               <Route path="/listings" element={<ListingsPage />} />
-              <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
-              {/*  have /listingDetails and also use a query param ?listingId=...
-                  Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
-                  or continue using query params. For simplicity, /listingDetails is kept.
-              */}
-              <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+              <Route path="/listingDetails/:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
+
+              <Route path="/search/:term" element={<ListingsSearchResultsPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search" element={<ListingsSearchResultsPage />} />
               <Route path="/ourservices" element={<OurServicesPage />} />
