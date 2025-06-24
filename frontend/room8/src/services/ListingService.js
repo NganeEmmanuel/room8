@@ -180,7 +180,7 @@ export const useListingService = () => {
 
     // This calls your singular GET endpoint: /get/listing
     // and sends the body using the 'data' property, which Axios requires for GET requests.
-    const apiCall = (token) => apiClient.get(`${API_BASE_URL}/get/listing`, {
+    const apiCall = (token) => apiClient.post(`${API_BASE_URL}/get/listings`, {
         headers: { Authorization: `Bearer ${token}` },
         data: listingRequest
     });

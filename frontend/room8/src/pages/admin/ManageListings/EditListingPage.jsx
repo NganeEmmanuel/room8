@@ -1,53 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ListingForm from './ListingForm';
-import { MOCK_LISTINGS_DB } from './mockData';
-import {toast} from "react-toastify"; // Let's move mock data to its own file
+import { toast } from "react-toastify";
+import { useListingService } from '../../../services/ListingService';
+// Add this line
+import { mapDtoToInitialData } from '../../../constants/listingUtils';
+
 
 const EditListingPage = () => {
-  const navigate = useNavigate();
-  const { listingId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation(); // Hook to access the state passed during navigation
 
-  const [listing, setListing] = useState(null);
+    // Get the listing object from the navigation state
+    const listingToEdit = location.state?.listingToEdit;
 
-  useEffect(() => {
-    // In a real app, this would be an API call:
-    // fetch(`/api/listings/${listingId}`).then(...)
-    console.log(`Fetching data for listing ID: ${listingId}`);
-    const listingToEdit = MOCK_LISTINGS_DB.find(l => l.id === listingId);
-    if (listingToEdit) {
-          setListing(listingToEdit);
-        } else {
-          console.error(`Listing with ID ${listingId} not found.`);
-          // --- 2. Replace alert with an error toast ---
-          toast.error(`Listing not found! Redirecting...`);
-          navigate('/admin/landlord/listings');
+    const { updateListing } = useListingService();
+
+    // Set the initial data for the form directly from the object we received
+    const [initialData] = useState(mapDtoToInitialData(listingToEdit));
+
+    // This handles the case where the user refreshes the edit page or accesses it directly.
+    // In that case, `listingToEdit` will be null.
+    useEffect(() => {
+        if (!listingToEdit) {
+            toast.error("Could not find listing data. Returning to list.");
+            navigate('/admin/landlord/listings');
         }
-      }, [listingId, navigate]);
+    }, [listingToEdit, navigate]);
 
-    const handleUpdateSubmit = (listingData) => {
-      // In a real app, this would be a PUT/PATCH request to your API
-      console.log(`UPDATING listing ${listingId} with data:`, listingData);
-
-      // --- 3. Replace alert with a success toast ---
-      toast.success(`Listing ${listingId} updated successfully!`);
-
-      navigate('/admin/landlord/listings');
+    const handleUpdateSubmit = async (listingData) => {
+        try {
+            await updateListing(listingData);
+            navigate('/admin/landlord/listings');
+        } catch (error) {
+            console.error(`Failed to update listing:`, error);
+        }
     };
 
-  // Show a loading state while fetching data
-  if (!listing) {
-    return <div>Loading...</div>;
-  }
+    // This will show a fallback message while redirecting if the page was refreshed
+    if (!initialData) {
+        return <div className="p-8 text-center">Redirecting...</div>;
+    }
 
-  return (
-    <ListingForm
-      initialData={listing}
-      onFormSubmit={handleUpdateSubmit}
-      pageTitle="Edit Listing"
-      submitButtonText="Save Changes"
-    />
-  );
+    // The form receives the data instantly and is ready for editing
+    return (
+        <ListingForm
+            initialData={initialData}
+            onFormSubmit={handleUpdateSubmit}
+            pageTitle="Edit Listing"
+            submitButtonText="Save Changes"
+        />
+    );
 };
 
 export default EditListingPage;

@@ -1,170 +1,172 @@
-// src/pages/admin/ManageListings/ManageListingsPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../../components/shared/DashboardHeader';
 import ListingCard from '../../../components/ListingCard/ListingCard';
 import { PlusCircleIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import ConfirmModal from '../../../components/shared/ConfirmModal';
+import { useListingService } from '../../../services/ListingService';
 
-const ManageListingsPage = ({ isLandlordView = false }) => {
-  const navigate = useNavigate();
+const ManageListingsPage = ({ isLandlordView = true }) => {
+    // --- Hooks ---
+    const navigate = useNavigate();
+    const { getMyListings, deleteListing } = useListingService();
 
-  // Mock data for landlords' listings
-  const [landlordListings, setLandlordListings] = useState([
-    {
-      id: "101",
-      title: "Luxury Downtown Apartment",
-      location: "City Center, Yaoundé",
-      price: 80000,
-      currency: "FCFA",
-      image: "https://via.placeholder.com/400x250?text=Luxury+Apt",
-      roomType: "Entire Apartment",
-      toilets: 2,
-      kitchen: 1,
-      roommates: 0,
-      rooms: 3,
-      size: "120 sqm",
-      views: 145,
-      bids: 8,
-    },
-    {
-      id: "102",
-      title: "Student-Friendly Room",
-      location: "Near University, Ngoa-Ekelle",
-      price: 40000,
-      currency: "FCFA",
-      image: "https://via.placeholder.com/400x250?text=Student+Room",
-      roomType: "Private Room",
-      toilets: 1,
-      kitchen: 1,
-      roommates: 2,
-      rooms: 1,
-      size: "20 sqm",
-      views: 89,
-      bids: 5,
-    },
-    {
-      id: "103",
-      title: "Modern 1-Bedroom Flat",
-      location: "Bonamoussadi, Douala",
-      price: 65000,
-      currency: "FCFA",
-      image: "https://via.placeholder.com/400x250?text=Modern+Flat",
-      roomType: "Entire Apartment",
-      toilets: 1,
-      kitchen: 1,
-      roommates: 0,
-      rooms: 1,
-      size: "45 sqm",
-      views: 50,
-      bids: 2,
+    // --- State Management ---
+    const [listings, setListings] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [listingToDelete, setListingToDelete] = useState(null);
+
+    // --- Data Fetching ---
+    // This hook runs once when the component mounts to fetch your listings
+   // In ManageListingsPage.jsx
+
+useEffect(() => {
+    const fetchListings = async () => {
+        setIsLoading(true);
+        try {
+            const responseData = await getMyListings();
+            console.log("1. DATA FROM API:", responseData); // This will now show the object with the "content" array
+
+            // --- THIS IS THE FIX ---
+            // Get the array from the 'content' property of the response.
+            // The `|| []` is a safety net in case the response is ever empty.
+            setListings(responseData.content || []);
+
+        } catch (error) {
+            console.error("Error fetching listings:", error);
+            setListings([]); // On error, ensure listings is an empty array
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchListings();
+}, []); // The empty array [] means this runs only once// The empty array [] means this runs only once
+
+    // --- Event Handlers ---
+    const handleCreateNewListing = () => {
+        navigate('/admin/landlord/listings/new');
+    };
+
+    const handleEditListing = (listing) => {
+        // Navigates to the edit page and passes the entire listing object in the state
+        // This makes the edit page load instantly without a new API call.
+        navigate(`/admin/landlord/listings/${listing.id}/edit`, { state: { listingToEdit: listing } });
+    };
+
+    const handleDeleteClick = (listing) => {
+        // Opens the confirmation modal before deleting
+        setListingToDelete(listing);
+        setIsModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!listingToDelete) return;
+
+        try {
+            await deleteListing(listingToDelete.id, listingToDelete.listingType);
+
+            // Remove the deleted listing from the state to update the UI instantly
+            setListings(prevListings => prevListings.filter(listing => listing.id !== listingToDelete.id));
+
+            toast.success(`Listing "${listingToDelete.title}" has been deleted.`);
+        } catch (error) {
+            console.error(`Failed to delete listing ${listingToDelete.id}:`, error);
+        } finally {
+            // Close the modal and reset the state
+            setIsModalOpen(false);
+            setListingToDelete(null);
+        }
+    };
+
+    // --- JSX Rendering ---
+    if (isLoading) {
+        return (
+             <div className="p-8 text-center text-gray-500">
+                <p>Loading your listings...</p>
+            </div>
+        );
     }
-  ]);
-  // --- NEW: State for controlling the modal ---
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [listingToDelete, setListingToDelete] = useState(null);
 
-  const handleEditListing = (listingId) => {
-    navigate(`/admin/landlord/listings/${listingId}/edit`);
-  };
+    return (
+        <>
+            <div className="space-y-6">
+                <DashboardHeader
+                    title="Manage Your Listings"
+                    subtitle="View, edit, or delete your properties"
+                />
 
-  const handleDeleteListing = (listingId) => {
-    // Instead of showing window.confirm, we set state to open our modal
-    setListingToDelete(listingId);
-    setIsModalOpen(true);
-  };
+                <div className="flex justify-end mb-6">
+                    <button
+                        onClick={handleCreateNewListing}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <PlusCircleIcon className="w-5 h-5 mr-2" />
+                        Create New Listing
+                    </button>
+                </div>
 
-  const confirmDelete = () => {
-    // This function is called when the user clicks "Confirm" in the modal
-    if (!listingToDelete) return;
+                {listings.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {listings.map(listing => (
 
-    console.log(`Deleting listing ${listingToDelete}...`);
-    // API call to delete the listing would go here
+                        <ListingCard
+                key={listing.id}
+                listingId={listing.id}
 
-    setLandlordListings(prev => prev.filter(listing => listing.id !== listingToDelete));
+                // --- This section now correctly maps your data to the card's props ---
+                title={listing.title}
+                location={`${listing.listingCity}, ${listing.listingState}`}
+                price={listing.listingPrice} // Use the correct source property
+                image={listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls[0] : undefined} // Use the first image from the array
+                roomType={listing.listingType} // Pass the listingType to the roomType prop
+                toilets={listing.numberOfBathrooms} // Map numberOfBathrooms to toilets
+                kitchen={listing.numberOfKitchens} // Map numberOfKitchens to kitchen
+                roommates={listing.numberOfHouseMates} // Map numberOfHouseMates to roommates
+                rooms={listing.numberOfRooms} // Map numberOfRooms to rooms
+                size={`${listing.roomArea} sqm`} // Build the size string from roomArea
 
-    // Show a success toast!
-    toast.success(`Listing ${listingToDelete} has been deleted.`);
+                // Props that are in your card but not your DTO can be given default values
+                views={listing.views || 0}
+                bids={listing.bids || 0}
+                isWishlisted={false}
 
-    // Close the modal and reset state
-    setIsModalOpen(false);
-    setListingToDelete(null);
-  };
-
-  const handleCreateNewListing = () => {
-    navigate('/admin/landlord/listings/new');
-  };
-
-  return (
-      <>
-    <div className="space-y-6">
-      <DashboardHeader
-        title="Manage Your Listings"
-        subtitle="View, edit, or delete your properties"
-      />
-
-      <div className="flex justify-end mb-6">
-        <button
-          onClick={handleCreateNewListing}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          <PlusCircleIcon className="w-5 h-5 mr-2" />
-          Create New Listing
-        </button>
-      </div>
-
-      {landlordListings.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {landlordListings.map(listing => (
-            <ListingCard
-              key={listing.id}
-              listingId={listing.id}
-              title={listing.title}
-              location={listing.location}
-              price={listing.price}
-              currency={listing.currency}
-              image={listing.image}
-              roomType={listing.roomType}
-              toilets={listing.toilets}
-              kitchen={listing.kitchen}
-              roommates={listing.roommates}
-              rooms={listing.rooms}
-              size={listing.size}
-              views={listing.views}
-              bids={listing.bids}
-              isLandlordView={isLandlordView} // Pass this to show edit/delete buttons
-              onEditListing={handleEditListing}
-              onDeleteListing={handleDeleteListing}
+                // Function props
+                isLandlordView={isLandlordView}
+                onEditListing={() => handleEditListing(listing)}
+                onDeleteListing={() => handleDeleteClick(listing)}
+                onWishlistClick={() => { /* Placeholder function */ }}
             />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
-          <BuildingLibraryIcon className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Listings Found</h3>
-          <p className="text-gray-500 mb-4">You haven't created any properties yet.</p>
-          <button
-            onClick={handleCreateNewListing}
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-lg font-medium"
-          >
-            Create Your First Listing
-          </button>
-        </div>
-      )}
-    </div>
-          <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={confirmDelete}
-        title="Delete Listing"
-      >
-        <p>Are you sure you want to permanently delete this listing?</p>
-        <p className="mt-2 font-semibold text-red-700">This action cannot be undone.</p>
-      </ConfirmModal>
-        </>
+        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <BuildingLibraryIcon className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No Listings Found</h3>
+                        <p className="text-gray-500 mb-4">You haven't created any properties yet.</p>
+                        <button
+                            onClick={handleCreateNewListing}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-lg font-medium"
+                        >
+                            Create Your First Listing
+                        </button>
+                    </div>
+                )}
+            </div>
 
-  );
+            <ConfirmModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Listing"
+            >
+                <p>Are you sure you want to permanently delete this listing?</p>
+                <p className="mt-2 font-semibold text-red-700">This action cannot be undone.</p>
+            </ConfirmModal>
+        </>
+    );
 };
 
 export default ManageListingsPage;

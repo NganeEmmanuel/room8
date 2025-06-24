@@ -1,23 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ListingForm, { ListingStyle, BathroomLocation } from './ListingForm';
-import {toast} from "react-toastify";
-
-// The initial blank state for a new listing
-const initialListingData = {
-  listingTitle: '', numberOfRooms: 1, roomArea: '', numberOfBathrooms: 1, isSharedBathroom: false, bathroomArea: '', numberOfKitchens: 1, isSharedKitchen: false, kitchenArea: '',
-  bathroomLocation: Object.keys(BathroomLocation)[0], listingCountry: '', listingState: '', listingCity: '', listingStreet: '', listingPrice: '', listingDescription: '',
-  listingStyle: Object.keys(ListingStyle)[0], numberOfHouseMates: 0, images: [], imagePreviews: [],
-};
+import ListingForm from './ListingForm';
+import { toast } from "react-toastify";
+import { useListingService } from '../../../services/ListingService';
+import { useAuth } from '../../../context/AuthContext';
+// Add this line
+import { initialListingData } from '../../../constants/listingUtils';
 
 const CreateListingPage = () => {
     const navigate = useNavigate();
+    const { createListing } = useListingService();
 
-    const handleCreateSubmit = (listingData) => {
-        // In a real app, you would make an API POST request here
-        console.log("CREATING new listing with data:", listingData);
-         toast.success("New listing created successfully!");
-        navigate('/admin/landlord/listings');
+    const { userInfo } = useAuth();
+
+    const handleCreateSubmit = async (listingData) => {
+        // Check for user info before submitting
+        if (!userInfo || !userInfo.id) {
+            toast.error("User information not available. Please wait or try logging in again.");
+            return;
+        }
+
+        try {
+            await createListing(listingData);
+            // The success toast is already in the service, so no need to repeat it here.
+            navigate('/admin/landlord/listings');
+        } catch (error) {
+            // The service also toasts errors, so just logging here is fine.
+            console.error("Failed to create listing:", error);
+        }
     };
 
     return (

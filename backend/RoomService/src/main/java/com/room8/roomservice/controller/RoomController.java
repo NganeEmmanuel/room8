@@ -31,7 +31,7 @@ public class RoomController {
         return roomService.getRoom(listingRequest);
     }
 
-    @GetMapping("/get/listings")
+    @PostMapping("/get/listings")
     @ResponseStatus(HttpStatus.OK)
     public List<ListingDTO> getRooms(@RequestBody GetListingRequest listingRequest) {
         return roomService.getRooms(listingRequest);
