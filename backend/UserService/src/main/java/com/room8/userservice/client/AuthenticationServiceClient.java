@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
-@FeignClient(name = "auth-service", url = "http://auth-service.default.svc.cluster.local")
+@FeignClient(
+
+        name = "${auth-service.name}",
+        url = "${auth-service.url}"
+)
 public interface AuthenticationServiceClient {
     @GetMapping("/api/v1/auth/get-email-from-token")
     ResponseEntity<String> getUserEmailFromToken(@RequestParam String token);

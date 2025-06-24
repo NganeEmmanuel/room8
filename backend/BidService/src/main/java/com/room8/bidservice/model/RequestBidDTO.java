@@ -12,11 +12,11 @@ import java.util.Date;
 @Data
 @Builder
 public class RequestBidDTO {
-    private Long ListingId; // foreign key for listings
+    private Long listingId; // foreign key for listings
 
     private Long bidderId; // foreign key for user(bidder)
 
-    private UserInfo bidderInfo;
-
     private String proposal;
+
+    private Boolean isShareInfo;
 }

@@ -35,7 +35,7 @@ function LoginPage() {
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-4">
-          <img src="/logo.png" alt="Room8 Logo" className="h-12" />
+          <img src={import.meta.env.PROD ? '/room8/logo.png' : 'logo.png'} alt="Room8 Logo" className="h-12" />
         </div>
 
         {/* Headings */}

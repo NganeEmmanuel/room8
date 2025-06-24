@@ -15,6 +15,7 @@ function SignupPage() {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
+    userType: 'tenant', // default selection
   });
 
   const handleChange = (e) => {
@@ -26,7 +27,7 @@ function SignupPage() {
 
   const handleSignup = async () => {
     console.log("submitted")
-    const { firstname, lastname, email, phoneNumber, password, confirmPassword } = formData;
+    const { firstname, lastname, email, phoneNumber, password, confirmPassword, userType } = formData;
 
     if (password !== confirmPassword) {
       toast.warn('Passwords do not match please try again!');
@@ -40,7 +41,7 @@ function SignupPage() {
         email,
         phoneNumber,
         password,
-        userType: 'tenant', // or 'landlord' based on user choice in future
+        userType: userType, // or 'landlord' based on user choice in future
         otp: "1234",
       });
       navigate('/admin/dashboard');
@@ -53,7 +54,7 @@ function SignupPage() {
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-4">
-          <img src="/logo.png" alt="Room8 Logo" className="h-12" />
+          <img src={import.meta.env.PROD ? '/room8/logo.png' : 'logo.png'} alt="Room8 Logo" className="h-12" />
         </div>
 
         <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Create Your Account</h2>
@@ -136,6 +137,20 @@ function SignupPage() {
               required
             />
           </div>
+
+          <div className="relative">
+            <label className="block mb-1 text-sm font-medium text-gray-700">Account Type</label>
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="tenant">Tenant</option>
+              <option value="landlord">Landlord</option>
+            </select>
+          </div>
+
 
           <button
             type="button"

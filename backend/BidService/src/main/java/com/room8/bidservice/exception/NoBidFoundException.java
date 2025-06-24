@@ -7,4 +7,7 @@ public class NoBidFoundException extends RuntimeException {
     public NoBidFoundException(Long listingId, Long bidderId) {
         super("No bid found with listingId " + listingId + " and bidderId " + bidderId);
     }
+    public NoBidFoundException(String message) {
+        super(message);
+    }
 }

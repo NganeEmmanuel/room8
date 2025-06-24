@@ -8,29 +8,11 @@ import TenantLandlordDashboard from '../../../components/admin/TenantLandlordDas
 
 const Dashboard = () => {
   const { authDataState } = useAuth();
-  const { fetchCurrentUser } = useUserService(); // handles token + refresh
-  const [loading, setLoading] = useState(true);
+
 
   const { userRole = [], userInfo } = authDataState;
 
-  useEffect(() => {
-    const loadUserInfo = async () => {
-      try {
-        if (!userInfo) {
-          await fetchCurrentUser(); // uses context & sets userInfo inside
-        }
-      } catch (error) {
-        console.error("Failed to fetch user info:", error);
-        // optional: redirect to login or show a user-friendly error
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserInfo();
-  }, [userInfo, fetchCurrentUser]);
-
-  if (loading || !userInfo) return <Loader />;
+  if (!userInfo) return <Loader />;
 
   const hasTenant = userRole.includes("TENANT");
   const hasLandlord = userRole.includes("LANDLORD");

@@ -1,213 +1,187 @@
-import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
-import ListingCard from "../components/ListingCard/ListingCard"
-import mockListings from "../mock/mock.js"
-import Spinner from "./ListingDetailsPage/components/Spinner.jsx"
-import FilterSidebar from "../components/FilterSidebar"
+// src/pages/ListingsSearchResultsPage.jsx
+
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
+import ListingCard from "../components/ListingCard/ListingCard";
+import Spinner from "./ListingDetailsPage/components/Spinner.jsx";
+import FilterSidebar from "../components/FilterSidebar";
+import Pagination from "../components/Pagination";
+import { useSearchService } from '../services/useSearchService';
+import { Bars3Icon } from '@heroicons/react/24/solid';
 
 const ListingsSearchResultsPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [listings, setListings] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectedRoomTypes, setSelectedRoomTypes] = useState([])
-  const [priceMin, setPriceMin] = useState("")
-  const [priceMax, setPriceMax] = useState("")
-  const [sort, setSort] = useState("")
-  const [term, setTerm] = useState("")
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [allRoomTypes, setAllRoomTypes] = useState([])
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {searchListingsWithFilter } = useSearchService();
+
+  // Component State
+  const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // const [totalResults, setTotalResults] = useState(0);
+
+  // Define the master list of possible room types
+  const [allRoomTypes] = useState(['SingleRoom', 'Apartment', 'Studio']);
+
+  // A single state object to hold all the current filter values
+  const [filterValues, setFilterValues] = useState({
+    query: '', city: '', minPrice: '', maxPrice: '', sort: '', selectedRoomTypes: [],
+  });
+
+  // Effect 1: Sync the URL search parameters to our state when the page loads
+  useEffect(() => {
+    const params = Object.fromEntries(searchParams.entries());
+    setFilterValues({
+      query: params.query || '',
+      city: params.city || '',
+      minPrice: params.minPrice || '',
+      maxPrice: params.maxPrice || '',
+      sort: params.sort || '',
+      selectedRoomTypes: params.listingType ? params.listingType.split(',') : [],
+    });
+  }, [searchParams]);
+
+  // Effect 2: Fetch data from the backend whenever the URL changes
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = Object.fromEntries(searchParams.entries());
+      const page = parseInt(params.page || '0', 10);
+      const size = 12;
+
+      // Always build a filter object to send to the powerful POST endpoint
+      const filterDTO = {
+        query: params.query || null,
+        city: params.city || null,
+        minPrice: params.minPrice ? parseFloat(params.minPrice) : null,
+        maxPrice: params.maxPrice ? parseFloat(params.maxPrice) : null,
+        listingType: params.listingType ? params.listingType.split(',')[0] : null, // Backend seems to support one type, so we send the first
+        // You can add more filters to the DTO here as you expand
+      };
+
+      const data = await searchListingsWithFilter(filterDTO, page, size);
+      setListings(data);
+      // setTotalResults(response.totalElements); // When your backend provides total count
+    } catch (error) {
+      console.error("Failed to fetch search results:", error);
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchParams, searchListingsWithFilter]);
 
   useEffect(() => {
-    mockListings().then((all) => {
-      const types = [...new Set(all.map((l) => l.roomType))]
-      setAllRoomTypes(types)
-    })
-  }, [])
+    fetchData();
+  }, [fetchData]);
 
-  useEffect(() => {
-    setTerm(searchParams.get("term") || "")
-    setPriceMin(searchParams.get("priceMin") || "")
-    setPriceMax(searchParams.get("priceMax") || "")
-    setSort(searchParams.get("sort") || "")
-    const rt = searchParams.get("roomTypes")
-    setSelectedRoomTypes(rt ? rt.split(",") : [])
-  }, [searchParams])
+  // --- Event Handlers ---
 
-  useEffect(() => {
-    setLoading(true)
-    const filters = { term, priceMin, priceMax, sort }
+  const handleFilterChange = (filterName, value) => {
+    setFilterValues(prev => ({ ...prev, [filterName]: value }));
+  };
 
-    mockListings(filters).then((data) => {
-      let filtered = data
-      if (selectedRoomTypes.length) {
-        filtered = filtered.filter((l) => selectedRoomTypes.includes(l.roomType))
-      }
-      setListings(filtered)
-      setLoading(false)
-    })
-  }, [term, priceMin, priceMax, sort, selectedRoomTypes])
+  const handleApplyFilters = () => {
+    const newParams = new URLSearchParams();
+    if (filterValues.query) newParams.set("query", filterValues.query);
+    if (filterValues.city) newParams.set("city", filterValues.city);
+    if (filterValues.minPrice) newParams.set("minPrice", filterValues.minPrice);
+    if (filterValues.maxPrice) newParams.set("maxPrice", filterValues.maxPrice);
+    if (filterValues.sort) newParams.set("sort", filterValues.sort);
+    if (filterValues.selectedRoomTypes && filterValues.selectedRoomTypes.length > 0) {
+      newParams.set("listingType", filterValues.selectedRoomTypes.join(','));
+    }
+    setSearchParams(newParams);
+    setIsFilterOpen(false);
+  };
 
-  const applyFilters = () => {
-    const params = {}
-    if (term.trim()) params.term = term.trim()
-    if (priceMin) params.priceMin = priceMin
-    if (priceMax) params.priceMax = priceMax
-    if (sort) params.sort = sort
-    if (selectedRoomTypes.length) params.roomTypes = selectedRoomTypes.join(",")
-    params.page = 1
-    setSearchParams(params)
-    setIsFilterOpen(false)
-  }
-  const onClear = () => {
-  setPriceMin("")
-  setPriceMax("")
-  setSelectedRoomTypes([])
-  setSort("")
-}
+  const handleClearFilters = () => {
+    const clearedFilters = { query: '', city: '', minPrice: '', maxPrice: '', sort: '', selectedRoomTypes: [] };
+    setFilterValues(clearedFilters);
+    setSearchParams(new URLSearchParams());
+  };
 
-  const toggleRoomType = (type) => {
-    setSelectedRoomTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    )
-  }
-
-  // Pagination
-  const page = parseInt(searchParams.get("page") || "1", 10)
-  const resultsPerPage = 16
-  const totalResults = listings.length
-  const totalPages = Math.ceil(totalResults / resultsPerPage)
-  const paginatedListings = listings.slice(
-    (page - 1) * resultsPerPage,
-    page * resultsPerPage
-  )
-
-  const goToPage = (newPage) => {
-    setSearchParams((prev) => {
-      const params = Object.fromEntries(prev.entries())
-      params.page = newPage
-      return params
-    })
-  }
-
-  // Lock scroll when mobile filter is open
-  useEffect(() => {
-    document.body.style.overflow = isFilterOpen ? "hidden" : ""
-  }, [isFilterOpen])
+  // const handlePageChange = (newPage) => {
+  //   const newParams = new URLSearchParams(searchParams);
+  //   newParams.set('page', newPage - 1);
+  //   setSearchParams(newParams);
+  // };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar (desktop) */}
-      <aside className="hidden md:block w-64 sticky top-[60px] h-[calc(100vh-60px)] border-r bg-white shadow z-10">
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="hidden md:block w-72 sticky top-0 h-screen border-r bg-white shadow-sm">
         <FilterSidebar
-          roomTypes={allRoomTypes}
-          selectedTypes={selectedRoomTypes}
-          onToggleRoomType={toggleRoomType}
-          priceMin={priceMin}
-          setPriceMin={setPriceMin}
-          priceMax={priceMax}
-          setPriceMax={setPriceMax}
-          sort={sort}
-          setSort={setSort}
-          onApply={applyFilters}
-          onClear={onClear}
+          allRoomTypes={allRoomTypes}
+          filters={filterValues}
+          onFilterChange={handleFilterChange}
+          onApply={handleApplyFilters}
+          onClear={handleClearFilters}
         />
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1">
-        {/* Search bar (sticky) */}
-        <div className="sticky top-0 z-30 bg-white px-4 py-3 border-b shadow-sm flex items-center gap-3">
-          <button
-            className="md:hidden px-3 py-2 bg-blue-600 text-white rounded"
-            onClick={() => setIsFilterOpen(true)}
-          >
-            Filters
-          </button>
-          <input
-            type="text"
-            placeholder="Search listings..."
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-            className="flex-grow px-3 py-2 border border-gray-300 rounded focus:outline-blue-600"
-          />
-          <button
-            onClick={applyFilters}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Search
-          </button>
+      <main className="flex-1">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-sm border-b p-4 flex items-center gap-4">
+            <button
+                className="md:hidden p-2 rounded-md hover:bg-gray-200"
+                onClick={() => setIsFilterOpen(true)}
+            >
+                <Bars3Icon className="h-6 w-6" />
+            </button>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+                Search Results
+            </h1>
         </div>
 
-        {/* Page Content */}
-        <div className="px-4 py-6">
-          <h1 className="text-xl font-semibold mb-4">
-            {term || priceMin || priceMax || selectedRoomTypes.length
-              ? `Results (${totalResults})`
-              : `Recently Listed (${totalResults})`}
-          </h1>
-
-          {/* Listings */}
-          {loading ? (
+        <div className="p-4 sm:p-6">
+          {isLoading ? (
             <Spinner />
-          ) : paginatedListings.length ? (
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {paginatedListings.map((listing) => (
-                <ListingCard key={listing.id} {...listing} />
-              ))}
-            </div>
+          ) : listings.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {listings.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    listingId={listing.id}
+                    title={listing.title}
+                    location={`${listing.listingCity}, ${listing.listingState}`}
+                    price={listing.listingPrice}
+                    image={listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls[0] : undefined}
+                    roomType={listing.listingType}
+                    toilets={listing.numberOfBathrooms}
+                    kitchen={listing.numberOfKitchens}
+                    roommates={listing.numberOfHouseMates}
+                    rooms={listing.numberOfRooms}
+                    size={listing.roomArea ? `${listing.roomArea} sqm` : 'N/A'}
+                  />
+                ))}
+              </div>
+               {/*<Pagination currentPage={} totalPages={} onPageChange={handlePageChange()} /> */}
+            </>
           ) : (
-            <p className="text-center text-gray-600">No listings found.</p>
-          )}
-
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-8">
-              <button
-                onClick={() => goToPage(page - 1)}
-                disabled={page <= 1}
-                className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-              >
-                &lt;
-              </button>
-              <span className="text-gray-700 font-medium">
-                {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => goToPage(page + 1)}
-                disabled={page >= totalPages}
-                className="px-3 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-              >
-                &gt;
-              </button>
+            <div className="text-center py-16 px-4">
+              <p className="text-xl font-semibold text-gray-700">No listings found.</p>
+              <p className="text-gray-500 mt-2">Try adjusting or clearing your filters to see more results.</p>
             </div>
           )}
         </div>
-      </div>
+      </main>
 
-      {/* Mobile drawer overlay */}
+      {/* Mobile filter drawer */}
       {isFilterOpen && (
-        <div className="fixed inset-0 z-40 bg-blue-50 bg-opacity-25 md:hidden">
-          <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" onClick={() => setIsFilterOpen(false)}>
+          <div className="fixed top-0 left-0 h-full w-72 bg-white shadow-lg overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <FilterSidebar
-              roomTypes={allRoomTypes}
-              selectedTypes={selectedRoomTypes}
-              onToggleRoomType={toggleRoomType}
-              priceMin={priceMin}
-              setPriceMin={setPriceMin}
-              priceMax={priceMax}
-              setPriceMax={setPriceMax}
-              sort={sort}
-              setSort={setSort}
-              onApply={applyFilters}
+              allRoomTypes={allRoomTypes}
+              filters={filterValues}
+              onFilterChange={handleFilterChange}
+              onApply={handleApplyFilters}
+              onClear={handleClearFilters}
               onClose={() => setIsFilterOpen(false)}
             />
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ListingsSearchResultsPage
+export default ListingsSearchResultsPage;

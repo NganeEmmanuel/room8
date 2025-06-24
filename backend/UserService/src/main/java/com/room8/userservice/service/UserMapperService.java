@@ -19,6 +19,8 @@ public class UserMapperService implements MapperService<UserDTO, User> {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
+        userDTO.setIsEmailVerified(user.getIsEmailVerified());
+        userDTO.setIsPhoneVerified(user.getIsPhoneVerified());
         userDTO.setRole(user.getRole());
         return userDTO;
     }

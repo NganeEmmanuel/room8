@@ -1,9 +1,12 @@
 package com.room8.roomservice.service;
 
+import com.room8.roomservice.dto.GetListingRequest;
 import com.room8.roomservice.dto.ListingRequest;
 import com.room8.roomservice.exception.InvalidRequestException;
 import com.room8.roomservice.exception.NotFoundException;
 import com.room8.roomservice.dto.ListingDTO;
+
+import java.util.List;
 
 /**
  * The RoomService interface defines the contract for managing room listings
@@ -59,4 +62,12 @@ public interface RoomService {
      * @throws NotFoundException if no room listings are found for the user
      */
     void deleteAllRoomsByUserID(Long userId) throws NotFoundException;
+
+    /**
+     * Get all rooms for user
+     * @param listingRequest contains landlord id and pagination
+     * @return listing by the landlord
+     * @throws NotFoundException is no listings are found associated with teh landlord
+     */
+    List<ListingDTO> getRooms(GetListingRequest listingRequest) throws NotFoundException;
 }

@@ -4,8 +4,15 @@ import {
   InputField, SelectField, TextareaField, ToggleSwitch, TagInput, SectionCard
 } from './SettingsFieldComponents';
 import {User, Shield, Info, Palette, Eye, LogOut, Trash2, Settings2, Sparkles, FileText, Users2, Activity, TrendingUp} from 'lucide-react';
+import {toast} from "react-toastify";
 
 
+
+/**
+ * ----------------------------------------------------------
+ * [Personal information section start
+ * ----------------------------------------------------------
+ */
 export const PersonalInformationSection = ({ userData, handleChange }) => (
   <SectionCard title="Personal Information" icon={User}>
     <InputField label="First Name" id="firstName" name="firstName" value={userData.firstName} onChange={handleChange} required />
@@ -15,6 +22,13 @@ export const PersonalInformationSection = ({ userData, handleChange }) => (
   </SectionCard>
 );
 
+
+
+/**
+ * ----------------------------------------------------------
+ * Security section start
+ * ----------------------------------------------------------
+ */
 export const SecuritySettingsSection = () => {
 
     const [currentPassword, setCurrentPassword] = React.useState('');
@@ -24,10 +38,10 @@ export const SecuritySettingsSection = () => {
     const handlePasswordChange = (e) => {
         e.preventDefault();
         if (newPassword !== confirmNewPassword) {
-            alert("New passwords do not match!");
+            toast.error("New passwords do not match!");
             return;
         }
-        alert("Password change submitted (placeholder)!");
+        toast.success("Password change submitted ");
         setCurrentPassword(''); setNewPassword(''); setConfirmNewPassword('');
     };
 
@@ -47,6 +61,12 @@ export const SecuritySettingsSection = () => {
     );
 };
 
+
+/**
+ * ----------------------------------------------------------
+ * Account management section start
+ * ----------------------------------------------------------
+ */
 export const AccountManagementSection = () => (
     <SectionCard title="Account Management" icon={Settings2}>
         <div className="space-y-4">
@@ -64,6 +84,12 @@ export const AccountManagementSection = () => (
     </SectionCard>
 );
 
+
+/**
+ * ----------------------------------------------------------
+ * Basic info section start
+ * ----------------------------------------------------------
+ */
 export const BasicProfileInfoSection = ({ userData, handleChange }) => (
   <SectionCard title="Basic Personal Information" icon={Info}>
       <div>
@@ -80,29 +106,167 @@ export const BasicProfileInfoSection = ({ userData, handleChange }) => (
       <InputField label="Occupation" id="occupation" name="occupation" value={userData.occupation} onChange={handleChange} />
   </SectionCard>
 );
-export const LifestyleHabitsSection = ({ userData, handleChange }) => (
-  <SectionCard title="Lifestyle & Habits" icon={Sparkles}>
-    <SelectField label="Smoking Status" id="smokingStatus" name="smokingStatus" value={userData.smokingStatus} onChange={handleChange} options={["Non-smoker", "Smokes outside", "Smokes inside", "Occasionally smokes"]} />
-    <ToggleSwitch label="Do you have pets?" id="hasPets" name="hasPets" checked={!!userData.hasPets} onChange={handleChange} />
-    {userData.hasPets && (
-        <TagInput label="Pets Allowed/Owned" id="petsAllowed" name="petsAllowed" value={userData.petsAllowed} onChange={handleChange} placeholder="e.g., Cat" />
-    )}
-    <SelectField label="Cleanliness Level" id="cleanlinessLevel" name="cleanlinessLevel" value={userData.cleanlinessLevel} onChange={handleChange} options={["Very Tidy", "Moderately Tidy", "Average", "A Bit Relaxed"]} />
-    <SelectField label="Dietary Restrictions" id="dietaryRestrictions" name="dietaryRestrictions" value={userData.dietaryRestrictions} onChange={handleChange} options={["None", "Vegetarian", "Vegan", "Pescatarian", "Gluten-Free", "Halal", "Kosher", "Other"]} />
-    {userData.dietaryRestrictions === 'Other' && (
-      <TagInput label="Other Dietary Restrictions" id="otherDietaryRestrictions" name="otherDietaryRestrictions" value={userData.otherDietaryRestrictions} onChange={handleChange} placeholder="e.g., Nut Allergy" />
-    )}
-    <SelectField label="Sleep Schedule" id="sleepSchedule" name="sleepSchedule" value={userData.sleepSchedule} onChange={handleChange} options={["Early Bird (before 10 PM)", "Average (10 PM - 12 AM)", "Night Owl (after 12 AM)"]} />
-    <SelectField label="Comfortable With Guests" id="comfortableWithGuests" name="comfortableWithGuests" value={userData.comfortableWithGuests} onChange={handleChange} options={["No Guests", "Guests on Occasion", "Guests are Welcome"]} />
-    <SelectField label="Party Habits" id="partyHabits" name="partyHabits" value={userData.partyHabits} onChange={handleChange} options={["Never", "Rarely", "Sometimes", "Frequently"]} />
-    <SelectField label="Shares Food" id="sharesFood" name="sharesFood" value={userData.sharesFood} onChange={handleChange} options={["Yes, I'm happy to share", "Sometimes, if asked", "No, I prefer not to"]} />
-    <SelectField label="Preferred Room Temperature" id="preferredRoomTemperature" name="preferredRoomTemperature" value={userData.preferredRoomTemperature} onChange={handleChange} options={["Cool (below 68°F/20°C)", "Moderate (68-74°F/20-23°C)", "Warm (above 74°F/23°C)"]} />
-    <ToggleSwitch label="Willing to Share Bathroom" id="willingToShareBathroom" name="willingToShareBathroom" checked={!!userData.willingToShareBathroom} onChange={handleChange} />
-  </SectionCard>
-);
 
+
+/**
+ * ----------------------------------------------------------
+ * Lifestyle and habbits section start
+ * ----------------------------------------------------------
+ */
+
+
+export const LifestyleHabitsSection = ({ userData, handleChange }) => {
+  const smokingOptions = [
+  { label: "Never Smoked", value: "NEVER" },
+  { label: "Smokes Occasionally", value: "OCCASIONAL" },
+  { label: "Smokes Frequently", value: "FREQUENT" },
+  { label: "Used to Smoke (Quit)", value: "QUIT" },
+  { label: "Only Smokes Outside", value: "ONLY_OUTSIDE" }
+];
+
+const cleanlinessOptions = [
+  { label: "Messy", value: "MESSY" },
+  { label: "Average", value: "AVERAGE" },
+  { label: "Very Clean", value: "VERY_CLEAN" },
+  { label: "OCD Clean", value: "OCD_CLEAN" }
+];
+
+const dietaryOptions = [
+  { label: "None", value: "NONE" },
+  { label: "Vegetarian", value: "VEGETARIAN" },
+  { label: "Vegan", value: "VEGAN" },
+  { label: "Pescatarian", value: "PESCATARIAN" },
+  { label: "Gluten-Free", value: "GLUTEN_FREE" },
+  { label: "Halal", value: "HALAL" },
+  { label: "Kosher", value: "KOSHER" },
+  { label: "Dairy-Free", value: "DAIRY_FREE" },
+  { label: "Nut Allergy", value: "NUT_ALLERGY" },
+  { label: "Other", value: "OTHER" }
+];
+
+const sleepScheduleOptions = [
+  { label: "Early Bird", value: "EARLY_BIRD" },
+  { label: "Night Owl", value: "NIGHT_OWL" },
+  { label: "Flexible", value: "FLEXIBLE" },
+  { label: "Light Sleeper", value: "LIGHT_SLEEPER" },
+  { label: "Heavy Sleeper", value: "HEAVY_SLEEPER" }
+];
+
+const comfortableWithGuestsOptions = [
+  { label: "Frequent Guests", value: "FREQUENT_GUESTS" },
+  { label: "Occasional Guests", value: "OCCASIONAL_GUESTS" },
+  { label: "Prefers Privacy", value: "PREFERS_PRIVACY" },
+  { label: "Only Approved Guests", value: "ONLY_APPROVED_GUESTS" }
+];
+
+const partyHabitsOptions = [
+  { label: "Frequently", value: "FREQUENTLY" },
+  { label: "Occasionally", value: "OCCASIONALLY" },
+  { label: "Never", value: "NEVER" },
+  { label: "Hosts Parties", value: "HOSTS_PARTIES" },
+  { label: "Attends but Does Not Host", value: "ATTENDS_BUT_DOES_NOT_HOST" }
+];
+
+const sharesFoodOptions = [
+  { label: "Willing to Share All", value: "WILLING_TO_SHARE_ALL" },
+  { label: "Willing to Share Some", value: "WILLING_TO_SHARE_SOME" },
+  { label: "Prefers Own Food", value: "PREFERS_OWN_FOOD" }
+];
+
+const preferredRoomTemperatureOptions = [
+  { label: "Cold", value: "COLD" },
+  { label: "Warm", value: "WARM" },
+  { label: "Neutral", value: "NEUTRAL" },
+  { label: "Any", value: "ANY" }
+];
+
+
+  
+  return (
+    <SectionCard title="Lifestyle & Habits" icon={Sparkles}>
+      <SelectField
+        label="Smoking Status"
+        id="smokingStatus"
+        name="smokingStatus"
+        value={userData.smokingStatus}
+        onChange={handleChange}
+        options={smokingOptions}
+      />
+
+      <ToggleSwitch
+        label="Do you have pets?"
+        id="hasPets"
+        name="hasPets"
+        checked={!!userData.hasPets}
+        onChange={handleChange}
+      />
+      {userData.hasPets && (
+        <TagInput
+          label="Pets Allowed/Owned"
+          id="petsAllowed"
+          name="petsAllowed"
+          value={userData.petsAllowed}
+          onChange={handleChange}
+          placeholder="e.g., Cat"
+        />
+      )}
+
+      <SelectField
+        label="Cleanliness Level"
+        id="cleanlinessLevel"
+        name="cleanlinessLevel"
+        value={userData.cleanlinessLevel}
+        onChange={handleChange}
+        options={cleanlinessOptions}
+      />
+
+      <SelectField
+        label="Dietary Restrictions"
+        id="dietaryRestrictions"
+        name="dietaryRestrictions"
+        value={userData.dietaryRestrictions}
+        onChange={handleChange}
+        options={dietaryOptions}
+      />
+      {userData.dietaryRestrictions === 'OTHER' && (
+        <TagInput
+          label="Other Dietary Restrictions"
+          id="otherDietaryRestrictions"
+          name="otherDietaryRestrictions"
+          value={userData.otherDietaryRestrictions}
+          onChange={handleChange}
+          placeholder="e.g., Nut Allergy"
+        />
+      )}
+      <SelectField label="Sleep Schedule" id="sleepSchedule" name="sleepSchedule" value={userData.sleepSchedule} onChange={handleChange} options={sleepScheduleOptions} />
+      <SelectField label="Comfortable With Guests" id="comfortableWithGuests" name="comfortableWithGuests" value={userData.comfortableWithGuests} onChange={handleChange} options={comfortableWithGuestsOptions} />
+      <SelectField label="Party Habits" id="partyHabits" name="partyHabits" value={userData.partyHabits} onChange={handleChange} options={partyHabitsOptions} />
+      <SelectField label="Shares Food" id="sharesFood" name="sharesFood" value={userData.sharesFood} onChange={handleChange} options={sharesFoodOptions} />
+      <SelectField label="Preferred Room Temperature" id="preferredRoomTemperature" name="preferredRoomTemperature" value={userData.preferredRoomTemperature} onChange={handleChange} options={preferredRoomTemperatureOptions} />
+      <ToggleSwitch label="Willing to Share Bathroom" id="willingToShareBathroom" name="willingToShareBathroom" checked={!!userData.willingToShareBathroom} onChange={handleChange} />
+    </SectionCard>
+  )
+};
+
+
+/**
+ * ----------------------------------------------------------
+ * Health information section start
+ * ----------------------------------------------------------
+ */
 // NEW SECTION
-export const HealthInformationSection = ({ userData, handleChange }) => (
+export const HealthInformationSection = ({ userData, handleChange }) =>{ 
+
+  const addictionStatusOptions = [
+    { label: "None", value: "NONE" },
+    { label: "Alcohol", value: "ALCOHOL" },
+    { label: "Drugs", value: "DRUGS" },
+    { label: "Nicotine", value: "NICOTINE" },
+    { label: "Multiple", value: "MULTIPLE" }
+  ];
+
+
+  return (
     <SectionCard title="Health & Accessibility" icon={Activity}>
         <ToggleSwitch label="Have existing medical conditions?" id="hasMedicalConditions" name="hasMedicalConditions" checked={!!userData.hasMedicalConditions} onChange={handleChange} />
         {userData.hasMedicalConditions && (
@@ -113,16 +277,50 @@ export const HealthInformationSection = ({ userData, handleChange }) => (
             <InputField label="Disability Details" id="disability" name="disability" value={userData.disability} onChange={handleChange} placeholder="e.g., Wheelchair user" />
         )}
     </SectionCard>
-);
+)};
 
+
+/**
+ * ----------------------------------------------------------
+ * Personality and social habit section start
+ * ----------------------------------------------------------
+ */
 // NEW SECTION
-export const PersonalitySocialHabitsSection = ({ userData, handleChange }) => (
+export const PersonalitySocialHabitsSection = ({ userData, handleChange }) => {
+  const personalityTypeOptions = [
+    { label: "Introvert", value: "INTROVERT" },
+    { label: "Extrovert", value: "EXTROVERT" },
+    { label: "Ambivert", value: "AMBIVERT" }
+  ];
+
+  const noiseToleranceOptions = [
+    { label: "High", value: "HIGH" },
+    { label: "Medium", value: "MEDIUM" },
+    { label: "Low", value: "LOW" }
+  ];
+
+  const enjoysSocializingWithRoommatesOptions = [
+    { label: "Yes", value: "YES" },
+    { label: "No", value: "NO" },
+    { label: "Sometimes", value: "SOMETIMES" }
+  ];
+
+
+  
+  return (
     <SectionCard title="Personality & Social Habits" icon={Users2}>
-        <SelectField label="Personality Type" id="personalityType" name="personalityType" value={userData.personalityType} onChange={handleChange} options={["Introvert", "Extrovert", "Ambivert"]} />
-        <SelectField label="Noise Tolerance" id="noiseTolerance" name="noiseTolerance" value={userData.noiseTolerance} onChange={handleChange} options={["Very Low", "Low", "Moderate", "High"]} />
-        <SelectField label="Socializing with Roommates" id="enjoysSocializingWithRoommates" name="enjoysSocializingWithRoommates" value={userData.enjoysSocializingWithRoommates} onChange={handleChange} options={["A lot, I'd like a friend", "Sometimes, I'm open to it", "Not really, I keep to myself"]} />
+        <SelectField label="Personality Type" id="personalityType" name="personalityType" value={userData.personalityType} onChange={handleChange} options={personalityTypeOptions} />
+        <SelectField label="Noise Tolerance" id="noiseTolerance" name="noiseTolerance" value={userData.noiseTolerance} onChange={handleChange} options={noiseToleranceOptions} />
+        <SelectField label="Socializing with Roommates" id="enjoysSocializingWithRoommates" name="enjoysSocializingWithRoommates" value={userData.enjoysSocializingWithRoommates} onChange={handleChange} options={enjoysSocializingWithRoommatesOptions} />
     </SectionCard>
-);
+)};
+
+
+/**
+ * ----------------------------------------------------------
+ * Financial section start
+ * ----------------------------------------------------------
+ */
 
 // NEW SECTION
 export const FinancialResponsibilitySection = ({ userData, handleChange }) => (
@@ -135,17 +333,37 @@ export const FinancialResponsibilitySection = ({ userData, handleChange }) => (
   </SectionCard>
 );
 
+
+/**
+ * ----------------------------------------------------------
+ * About me section start
+ * ----------------------------------------------------------
+ */
 export const AboutMePrefSection = ({ userData, handleChange }) => (
   <SectionCard title="About Me" icon={FileText}>
     <TextareaField label="Bio / About Me" id="aboutMe" name="aboutMe" value={userData.aboutMe} onChange={handleChange} rows={5} maxLength={5000} />
   </SectionCard>
 );
 
+
+/**
+ * ----------------------------------------------------------
+ * Accessibility section section start
+ * ----------------------------------------------------------
+ */
+
 export const DisplayAccessibilitySection = ({ userData, handleChange }) => (
   <SectionCard title="Display & Accessibility" icon={Palette}>
     <SelectField label="Theme" id="theme" name="theme" value={userData.theme} onChange={handleChange} options={["Light Mode", "Dark Mode", "System Default"]} />
   </SectionCard>
 );
+
+
+/**
+ * ----------------------------------------------------------
+ * Privacy section start
+ * ----------------------------------------------------------
+ */
 
 export const PrivacySettingsSection = ({ userData, handleChange }) => (
   <SectionCard title="Privacy Settings" icon={Eye}>

@@ -26,6 +26,12 @@ spring:
             - Path=/room-service/**
           filters:
             - StripPrefix=1
+        - id: bid-service
+          uri: http://bid-service.default.svc.cluster.local
+          predicates:
+            - Path=/bid-service/**
+          filters:
+            - StripPrefix=1
         - id: search-service
           uri: http://search-service.default.svc.cluster.local
           predicates:
@@ -38,8 +44,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://service-registry:8761/eureka/
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
 
 
 cors:

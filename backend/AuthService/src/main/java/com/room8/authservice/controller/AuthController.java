@@ -63,8 +63,13 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(
-            @RequestBody String refreshToken) {
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            return ResponseEntity.ok(authService.refreshToken(token));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/me")

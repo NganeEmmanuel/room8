@@ -34,6 +34,9 @@ import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
 import AuthRestorer from './auth/AuthRestorer.jsx';
+import {useEffect} from "react";
+import {useUserService} from "./services/userService/userService.js";
+import SearchPage from "./pages/SearchPage.jsx";
 
 
 // This layout wraps all authenticated admin routes
@@ -44,28 +47,38 @@ import AuthRestorer from './auth/AuthRestorer.jsx';
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
 
-    const { isAuthenticated} = useAuth();
+    const {  authDataState, isAuthenticated} = useAuth();
 
     // const isAuthenticated = true; // Override for now to test admin section
     // localStorage.setItem("userRole", JSON.stringify(["tenant"]));
+
+      const { fetchCurrentUser } = useUserService();
+
+      // This useEffect ensures user info is loaded for all authenticated pages.
+      useEffect(() => {
+        // If user has a token but we don't have their details yet, fetch them.
+        if (isAuthenticated && !authDataState.userInfo) {
+          fetchCurrentUser().catch(error => {
+            console.error("Failed to initialize user session on app load:", error);
+          });
+        }
+      }, [isAuthenticated, authDataState.userInfo, fetchCurrentUser]);
 
 
   return (
       <BidsProvider>
         <AuthRestorer />
-        <Router>
+        <Router basename={import.meta.env.PROD ? "/room8" : "/"}>
           <Routes>
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
               <Route path="/" element={<Navigate to="/home" replace />} />
+
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
               <Route path="/listings" element={<ListingsPage />} />
-              <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
-              {/*  have /listingDetails and also use a query param ?listingId=...
-                  Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
-                  or continue using query params. For simplicity, /listingDetails is kept.
-              */}
-              <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+              <Route path="/listingDetails/:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
+
+              <Route path="/search/:term" element={<ListingsSearchResultsPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search" element={<ListingsSearchResultsPage />} />
               <Route path="/ourservices" element={<OurServicesPage />} />

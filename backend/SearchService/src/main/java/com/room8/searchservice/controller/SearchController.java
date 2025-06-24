@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(allowedHeaders = "*")
 @RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
 public class SearchController {
@@ -26,6 +25,16 @@ public class SearchController {
         List<ListingDocument> results = searchService.searchListings(query, city, page, size);
         return ResponseEntity.ok(results);
     }
+
+    @PostMapping("/filter")
+    public ResponseEntity<List<ListingDocument>> searchListingsWithFilter(
+            @RequestBody SearchFilterDTO filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<ListingDocument> results = searchService.searchListings(filter, page, size);
+        return ResponseEntity.ok(results);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteListing(@PathVariable String id) {

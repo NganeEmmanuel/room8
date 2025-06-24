@@ -125,7 +125,7 @@ const Sidebar = ({ role }) => {
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-200">
         <Link to="/admin/dashboard">
-          <img src="/logo.png" alt="Room8 Logo" className="h-10" />
+          <img src={import.meta.env.PROD ? '/room8/logo.png' : 'logo.png'} alt="Room8 Logo" className="h-10" />
         </Link>
         {role && (
           <div className="mt-3">
