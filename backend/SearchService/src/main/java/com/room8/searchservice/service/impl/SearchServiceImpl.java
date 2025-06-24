@@ -196,6 +196,27 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
+    @Override
+    public ListingDocument findListingById(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Listing ID cannot be null or empty");
+        }
+
+        try {
+            var getRequest = new org.opensearch.action.get.GetRequest(INDEX_NAME, id);
+            var getResponse = openSearchClient.get(getRequest, RequestOptions.DEFAULT);
+
+            if (getResponse.isExists()) {
+                return objectMapper.readValue(getResponse.getSourceAsString(), ListingDocument.class);
+            } else {
+                log.warn("⚠️ No listing found with ID: {}", id);
+                return null;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("❌ Failed to retrieve listing by ID", e);
+        }
+    }
+
 
 
     @Override

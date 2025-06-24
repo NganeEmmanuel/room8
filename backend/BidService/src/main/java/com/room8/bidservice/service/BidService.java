@@ -54,4 +54,13 @@ public interface BidService {
      * @throws NoBidFoundException if no bid was found
      */
     List<ResponseBidDTO> getAllBidsByUserId(Long userId) throws NoBidFoundException;
+
+    /**
+     *
+     * @param userId bidder id
+     * @param listingId listing id
+     * @return the bid made on the listing with listingId by user with userId
+     * @throws NoBidFoundException if no bid is found
+     */
+    ResponseBidDTO getBidByUserIdListingId(Long userId, Long listingId) throws NoBidFoundException;
 }
