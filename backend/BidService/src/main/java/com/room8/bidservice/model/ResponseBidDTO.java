@@ -1,5 +1,6 @@
 package com.room8.bidservice.model;
 
+import com.room8.bidservice.enums.BidStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class ResponseBidDTO {
     private Boolean isShareInfo; // whether the bidder wants to share their information with the listing owner
 
     private String proposal;
+
+    private BidStatus bidStatus;
 
     private Date bidDate;
 

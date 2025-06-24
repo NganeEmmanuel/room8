@@ -1,5 +1,6 @@
 package com.room8.bidservice.model;
 
+import com.room8.bidservice.enums.BidStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,10 @@ public class Bid {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private Date bidDate;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BidStatus bidStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;

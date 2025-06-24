@@ -1,6 +1,7 @@
 package com.room8.bidservice.service;
 
 import com.room8.bidservice.client.UserAuthServiceInterface;
+import com.room8.bidservice.enums.BidStatus;
 import com.room8.bidservice.model.Bid;
 import com.room8.bidservice.model.RequestBidDTO;
 import com.room8.bidservice.model.ResponseBidDTO;
@@ -32,6 +33,7 @@ public class BidMapperService implements MapperService<ResponseBidDTO, Bid, Requ
                 .isShareInfo(bid.getIsShareInfo())
                 .proposal(bid.getProposal())
                 .bidDate(bid.getBidDate())
+                .bidStatus(bid.getBidStatus())
                 .lastUpdated(bid.getLastUpdated())
                 .build();
     }
@@ -43,6 +45,7 @@ public class BidMapperService implements MapperService<ResponseBidDTO, Bid, Requ
                 .bidderId(requestBidDTO.getBidderId())
                 .proposal(requestBidDTO.getProposal())
                 .isShareInfo(requestBidDTO.getIsShareInfo())
+                .bidStatus(BidStatus.PENDING)
                 .build();
     }
 

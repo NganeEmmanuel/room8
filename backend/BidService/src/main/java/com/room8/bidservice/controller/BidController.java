@@ -45,4 +45,9 @@ public class BidController {
     ResponseEntity<List<ResponseBidDTO>> getBidsByUserId(@RequestParam Long userId) throws NoBidFoundException {
         return ResponseEntity.ok(bidService.getAllBidsByUserId(userId));
     }
+
+    @GetMapping("/get-bid-by-userId-listingId")
+    ResponseEntity<ResponseBidDTO> getBidsByUserIdListingId(@RequestParam Long userId, @RequestParam Long listingId) throws NoBidFoundException {
+        return ResponseEntity.ok(bidService.getBidByUserIdListingId(userId, listingId));
+    }
 }

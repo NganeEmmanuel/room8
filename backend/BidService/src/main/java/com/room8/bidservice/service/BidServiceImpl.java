@@ -71,4 +71,11 @@ public class BidServiceImpl implements BidService{
                 .map(bidMapperService::toDTO)
                 .toList();
     }
+
+    @Override
+    public ResponseBidDTO getBidByUserIdListingId(Long userId, Long listingId) throws NoBidFoundException {
+        return bidMapperService.toDTO(bidRepository.findByBidderIdAndListingId(userId, listingId)
+                .orElseThrow(() -> new NoBidFoundException("no bid found for user with id: " + userId + "on listing with id: " +listingId)
+                ));
+    }
 }
