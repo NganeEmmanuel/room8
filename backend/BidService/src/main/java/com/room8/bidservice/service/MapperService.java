@@ -12,14 +12,14 @@ public interface MapperService<T,U,V> {
      * @param u entity to be converted to a DTO object
      * @return The specified DTO object
      */
-    T toResponseDTO(U u);
+    T toDTO(U u);
 
     /**
      *
      * @param v the DTO object to convert to an entity object
      * @return the specified entity object
      */
-    U requestDTOToEntity(V v);
+    U toEntity(V v);
 
     /**
      *

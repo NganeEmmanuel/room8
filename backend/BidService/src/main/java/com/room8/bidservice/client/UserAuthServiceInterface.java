@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
-@FeignClient("USER-AUTH")
+@FeignClient(
+        name = "${user-service.name}",
+        url = "${user-service.url}"
+)
 public interface UserAuthServiceInterface {
-    @GetMapping("/api/v1/auth/get-user")
+    @GetMapping("/api/v1/user/get-user/id")
     ResponseEntity<UserDTO> getUserFromId(@RequestParam Long id);
 }

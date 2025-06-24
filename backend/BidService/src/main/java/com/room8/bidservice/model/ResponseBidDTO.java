@@ -14,11 +14,11 @@ import java.util.Date;
 public class ResponseBidDTO {
     private Long id;
 
-    private Long ListingId; // foreign key for listings
+    private Long listingId; // foreign key for listings
 
-    private String bidderFullName; // foreign key for user(bidder)
+    private Long bidderId; // foreign key for bidders
 
-    private UserInfo bidderInfo;
+    private Boolean isShareInfo; // whether the bidder wants to share their information with the listing owner
 
     private String proposal;
 

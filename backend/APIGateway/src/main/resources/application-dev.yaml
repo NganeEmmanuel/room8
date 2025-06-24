@@ -26,6 +26,12 @@ spring:
             - Path=/room-service/**
           filters:
             - StripPrefix=1
+        - id: bid-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/bid-service/**
+          filters:
+            - StripPrefix=1
         - id: search-service
           uri: http://localhost:8086
           predicates:

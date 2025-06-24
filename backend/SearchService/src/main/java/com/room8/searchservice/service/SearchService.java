@@ -16,6 +16,7 @@ public interface SearchService {
 
     List<ListingDocument> searchListings(SearchFilterDTO filter, int page, int size);
 
+    public ListingDocument findListingById(String id);
 
     // Delete a listing document by id
     void deleteListingById(String id);
