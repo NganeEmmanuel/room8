@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import {
-  ChevronLeft, User, Mail, Phone, Home, FileText, Check, X, Trash2,
-  Building, Languages, Droplets, Utensils, BedDouble, Thermometer,
-  UserCheck, Heart, Users, DollarSign, Snowflake, EyeOff, PlusCircle,
-  Bath, PartyPopper
-} from 'lucide-react';
-import { useBids } from '../../../context/BidContext.jsx';
-import {toast} from "react-toastify"; // Import the context hook
+import { toast } from 'react-toastify';
+import { useBidService } from '../../../services/useBidService';
+import ConfirmModal from '../../../components/shared/ConfirmModal';
 
-// Helper: Toggle Switch Component
+// --- ICON IMPORTS (Complete List) ---
+import {
+  ChevronLeft, User, Mail, Phone, FileText, Check, X, Trash2, EyeOff, Home,
+  Building, Languages, Droplets, Utensils, BedDouble, Thermometer,
+  UserCheck, Heart, Users, DollarSign, Snowflake, PlusCircle, Bath, PartyPopper
+} from 'lucide-react';
+
+// --- HELPER COMPONENTS ---
+
 const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
     <div className="flex items-center justify-between p-4 rounded-lg bg-gray-100 border border-gray-200">
         <div className="pr-4">
@@ -32,7 +35,6 @@ const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
     </div>
 );
 
-// Helper: Info Item Component
 const InfoItem = ({ icon: Icon, label, value, isBoolean = false }) => {
     let displayValue = value;
     if (isBoolean) {
@@ -51,7 +53,6 @@ const InfoItem = ({ icon: Icon, label, value, isBoolean = false }) => {
     );
 };
 
-// Helper: Section Wrapper
 const InfoSection = ({ title, children }) => (
     <section className="bg-white shadow rounded-lg p-6 mb-8">
         <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">{title}</h3>
@@ -62,67 +63,86 @@ const InfoSection = ({ title, children }) => (
 );
 
 
+// --- MAIN PAGE COMPONENT ---
+
 const BidDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { updateBidSharing } = useBids(); // Get the update function from context
-  const { bid, isTenantView } = location.state || {};
+  const { removeBid, updateBid } = useBidService();
 
-  // This state is still needed for the immediate visual feedback of the toggle switch
-  const [shareInfo, setShareInfo] = useState(bid?.shareUserInfo || false);
+  const { bid, isTenantView, isLandlordView } = location.state || {};
+
+  const [shareInfo, setShareInfo] = useState(bid?.isShareInfo || false);
+  const [isConfirmingWithdraw, setIsConfirmingWithdraw] = useState(false);
 
   if (!bid) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         <h2 className="text-2xl font-bold text-red-500">Bid Not Found</h2>
-        <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md"> Go Back </button>
+        <p className="text-gray-600 mt-2">Please go back and select a bid to view.</p>
+        <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md">
+          Go Back
+        </button>
       </div>
     );
   }
 
-  const { listingTitle, bidderInfo, proposal, status, ListingId } = bid;
-  const userInfo = bidderInfo.userInfo || {};
+  const { listingTitle, bidderInfo, proposal, bidStatus, listingId, id: bidId } = bid;
+  const userInfo = bidderInfo?.userInfo || {};
+  const shouldDisplayInfo = isLandlordView && shareInfo;
 
-  // This logic remains the same, but now `bid.shareUserInfo` will be up-to-date from the context
-  const shouldDisplayInfo = isTenantView || bid.shareUserInfo;
-
-  const handleWithdraw = () => { toast.success(`Your bid for ${listingTitle} has been withdrawn.`); navigate(-1); };
-  const handleAccept = () => { toast.success(`Accepted bid from ${bidderInfo.name}.`); navigate(-1); };
-  const handleReject = () => { toast.success(`Rejected bid from ${bidderInfo.name}.`); navigate(-1); };
-
-  // UPDATED HANDLER
-  const handleSharingToggle = (newSharingStatus) => {
-    // 1. Update the local state for instant UI change
-    setShareInfo(newSharingStatus);
-
-    // 2. Update the GLOBAL state so the change is persistent
-    updateBidSharing(bid.id, newSharingStatus);
-
-    toast.success("your information sharing preference has bben updated")
+  const handleWithdraw = async () => {
+    try {
+      await removeBid(bidId);
+      toast.success(`Your bid for "${listingTitle}" has been withdrawn.`);
+      navigate(-1);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsConfirmingWithdraw(false);
+    }
   };
+
+  const handleSharingToggle = async (newSharingStatus) => {
+    setShareInfo(newSharingStatus);
+    try {
+        const updatedBidData = {
+            proposal: bid.proposal,
+            shareUserInfo: newSharingStatus,
+        };
+        await updateBid(bidId, updatedBidData, listingId);
+        toast.success("Information sharing preference has been updated.");
+    } catch(error) {
+        console.error("Failed to update sharing preference:", error);
+        setShareInfo(!newSharingStatus);
+    }
+  };
+
+  const handleAccept = () => toast.info("Backend endpoint for accepting a bid is not yet implemented.");
+  const handleReject = () => toast.info("Backend endpoint for rejecting a bid is not yet implemented.");
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <button onClick={() => navigate(-1)} className="flex items-center text-sm font-medium text-gray-600 hover:text-blue-600"><ChevronLeft size={20} className="mr-1" /> Back to Bids</button>
-            <div className="text-right"><p className="text-xs text-gray-500">Bid for</p><Link to={`/listingDetails?listingId=${ListingId}`} className="text-md font-semibold text-blue-600 truncate hover:underline">{listingTitle}</Link></div>
+            <div className="text-right"><p className="text-xs text-gray-500">Bid for</p><Link to={`/listingDetails/${listingId}`} className="text-md font-semibold text-blue-600 truncate hover:underline">{listingTitle}</Link></div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center">
-              <img className="h-16 w-16 rounded-full object-cover mr-4" src={bidderInfo.profileImage || `https://ui-avatars.com/api/?name=${bidderInfo.name.replace(/\s/g, '+')}`} alt="Bidder" />
+              <img className="h-16 w-16 rounded-full object-cover mr-4" src={bidderInfo?.profileImage || `https://ui-avatars.com/api/?name=${bidderInfo?.name.replace(/\s/g, '+')}`} alt="Bidder" />
               <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{bidderInfo.name}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{bidderInfo?.name}</h1>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-gray-500 mt-1">
-                      <span className="flex items-center"><Mail size={14} className="mr-1.5" /> {bidderInfo.email}</span>
-                      <span className="flex items-center mt-1 sm:mt-0"><Phone size={14} className="mr-1.5" /> {bidderInfo.phoneNumber}</span>
+                      <span className="flex items-center"><Mail size={14} className="mr-1.5" /> {bidderInfo?.email}</span>
+                      <span className="flex items-center mt-1 sm:mt-0"><Phone size={14} className="mr-1.5" /> {bidderInfo?.phoneNumber}</span>
                   </div>
               </div>
           </div>
-          <div className={`px-3 py-1 text-sm font-semibold rounded-full shrink-0 ${status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>Status: {status.charAt(0).toUpperCase() + status.slice(1)}</div>
+          <div className={`px-3 py-1 text-sm font-semibold rounded-full shrink-0 ${bidStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{bidStatus ? bidStatus.charAt(0).toUpperCase() + bidStatus.slice(1).toLowerCase() : 'Unknown'}</div>
         </div>
 
         <section className="bg-white shadow rounded-lg p-6 mb-8">
@@ -197,12 +217,12 @@ const BidDetailsPage = () => {
 
       <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-lg z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-end space-x-4">
-            {isTenantView && status === 'pending' && (
-              <button onClick={handleWithdraw} className="px-6 py-3 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 flex items-center">
-                <Trash2 size={18} className="mr-2" /> Withdraw Proposal
+            {isTenantView && bidStatus === 'PENDING' && (
+              <button onClick={() => setIsConfirmingWithdraw(true)} className="px-6 py-3 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 flex items-center">
+                <Trash2 size={18} className="mr-2" /> Withdraw Bid
               </button>
             )}
-            {!isTenantView && status === 'pending' && (
+            {!isTenantView && bidStatus === 'PENDING' && (
               <>
                 <button onClick={handleReject} className="px-6 py-3 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center"><X size={18} className="mr-2" /> Reject</button>
                 <button onClick={handleAccept} className="px-6 py-3 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 flex items-center"><Check size={18} className="mr-2" /> Accept Bid</button>
@@ -210,6 +230,15 @@ const BidDetailsPage = () => {
             )}
           </div>
         </footer>
+
+      <ConfirmModal
+        isOpen={isConfirmingWithdraw}
+        onClose={() => setIsConfirmingWithdraw(false)}
+        onConfirm={handleWithdraw}
+        title="Confirm Withdrawal"
+      >
+        Are you sure you want to withdraw this bid? This cannot be undone.
+      </ConfirmModal>
     </div>
   );
 };
