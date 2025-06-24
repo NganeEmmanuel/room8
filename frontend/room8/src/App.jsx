@@ -34,6 +34,8 @@ import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
 import AuthRestorer from './auth/AuthRestorer.jsx';
+import {useEffect} from "react";
+import {useUserService} from "./services/userService/userService.js";
 
 
 // This layout wraps all authenticated admin routes
@@ -44,10 +46,22 @@ import AuthRestorer from './auth/AuthRestorer.jsx';
 function App() {
   // This is a basic check. A robust solution would use an AuthContext.
 
-    const { isAuthenticated} = useAuth();
+    const {  authDataState, isAuthenticated} = useAuth();
 
     // const isAuthenticated = true; // Override for now to test admin section
     // localStorage.setItem("userRole", JSON.stringify(["tenant"]));
+
+      const { fetchCurrentUser } = useUserService();
+
+      // This useEffect ensures user info is loaded for all authenticated pages.
+      useEffect(() => {
+        // If user has a token but we don't have their details yet, fetch them.
+        if (isAuthenticated && !authDataState.userInfo) {
+          fetchCurrentUser().catch(error => {
+            console.error("Failed to initialize user session on app load:", error);
+          });
+        }
+      }, [isAuthenticated, authDataState.userInfo, fetchCurrentUser]);
 
 
   return (

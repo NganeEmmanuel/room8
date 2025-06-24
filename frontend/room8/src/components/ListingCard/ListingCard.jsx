@@ -1,297 +1,289 @@
-
-
 import React from 'react';
-
 import { Link } from 'react-router-dom';
 
-// Changed FaLocationArrow to FaLocationDot as it's a more common location icon
+        // Changed FaLocationArrow to FaLocationDot as it's a more common location icon
 
-import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined} from 'react-icons/fa'; // Added FaLocationDot
+        import { FaBed, FaBath, FaUsers, FaUtensils, FaRulerCombined} from 'react-icons/fa'; // Added FaLocationDot
 
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+        import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
-import { PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+        import { PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 
-import { CurrencyDollarIcon as SolidCurrencyDollarIcon } from '@heroicons/react/24/solid';
+        import { CurrencyDollarIcon as SolidCurrencyDollarIcon } from '@heroicons/react/24/solid';
 
-import {FaLocationDot} from "react-icons/fa6";
+        import {FaLocationDot} from "react-icons/fa6";
+        const ListingCard = ({
 
+        listingId,
 
+        title,
 
+        location,
 
+        price,
 
-const ListingCard = ({
+        image,
 
-listingId,
+        roomType,
 
-title,
+        toilets,
 
-location,
+        kitchen,
 
-price,
+        roommates,
 
-image,
+        rooms,
 
-roomType,
+        size,
 
-toilets,
+        views,
 
-kitchen,
+        bids,
 
-roommates,
+        isWishlisted,
 
-rooms,
+        onWishlistClick,
 
-size,
+        isLandlordView = false,
 
-views,
+        onEditListing,
 
-bids,
+        onDeleteListing,
 
-isWishlisted,
+        }) => {
 
-onWishlistClick,
+        const defaultImage = 'https://via.placeholder.com/400x250?text=No+Image';
 
-isLandlordView = false,
 
-onEditListing,
 
-onDeleteListing,
 
-}) => {
 
-const defaultImage = 'https://via.placeholder.com/400x250?text=No+Image';
+        const cardLinkPath = `/listingDetails?listingId=${listingId}`;
 
 
 
+        return (
 
+        <div className="relative block rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white w-full group border border-gray-200">
 
-const cardLinkPath = `/listingDetails?listingId=${listingId}`;
+        <div className="relative">
 
+        <Link to={cardLinkPath} className="block">
 
+        <img
 
-return (
+        src={image || defaultImage}
 
-<div className="relative block rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white w-full group border border-gray-200">
+        alt={title || "Listing Image"}
 
-<div className="relative">
+        className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
 
-<Link to={cardLinkPath} className="block">
+        />
 
-<img
+        </Link>
 
-src={image || defaultImage}
 
-alt={title || "Listing Image"}
 
-className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
+        {!isLandlordView && onWishlistClick && (
 
-/>
+        <div
 
-</Link>
+        className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg cursor-pointer z-10 hover:bg-gray-100 transition-colors"
 
+        onClick={(e) => {
 
+        e.preventDefault();
 
-{!isLandlordView && onWishlistClick && (
+        e.stopPropagation();
 
-<div
+        onWishlistClick(listingId, isWishlisted);
 
-className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg cursor-pointer z-10 hover:bg-gray-100 transition-colors"
+        }}
 
-onClick={(e) => {
+        title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
 
-e.preventDefault();
+        >
 
-e.stopPropagation();
+        {isWishlisted ? (
 
-onWishlistClick(listingId, isWishlisted);
+        <AiFillHeart className="text-blue-600 text-xl" />
 
-}}
+        ) : (
 
-title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        <AiOutlineHeart className="text-gray-600 text-xl" />
 
->
+        )}
 
-{isWishlisted ? (
+        </div>
 
-<AiFillHeart className="text-blue-600 text-xl" />
+        )}
 
-) : (
 
-<AiOutlineHeart className="text-gray-600 text-xl" />
 
-)}
+        {isLandlordView && (
 
-</div>
+        <div className="absolute top-3 right-3 flex gap-2 z-10">
 
-)}
+        <button
 
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEditListing?.(listingId); }}
 
+        className="p-2 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-colors"
 
-{isLandlordView && (
+        title="Edit Listing"
 
-<div className="absolute top-3 right-3 flex gap-2 z-10">
+        >
 
-<button
+        <PencilSquareIcon className="w-5 h-5" />
 
-onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEditListing?.(listingId); }}
+        </button>
 
-className="p-2 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-colors"
+        <button
 
-title="Edit Listing"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDeleteListing?.(listingId); }}
 
->
+        className="p-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-600 transition-colors"
 
-<PencilSquareIcon className="w-5 h-5" />
+        title="Delete Listing"
 
-</button>
+        >
 
-<button
+        <TrashIcon className="w-5 h-5" />
 
-onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDeleteListing?.(listingId); }}
+        </button>
 
-className="p-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-600 transition-colors"
+        </div>
 
-title="Delete Listing"
+        )}
 
->
+        </div>
 
-<TrashIcon className="w-5 h-5" />
 
-</button>
 
-</div>
+        <div className="p-4 space-y-2">
 
-)}
+        <div className="flex justify-between items-start mb-1">
 
-</div>
+        <h3 className="text-lg font-semibold text-gray-800 truncate pr-2 group-hover:text-blue-600 transition-colors">
 
+        <Link to={cardLinkPath} className="block">
 
+        {title || "Untitled Listing"}
 
-<div className="p-4 space-y-2">
+        </Link>
 
-<div className="flex justify-between items-start mb-1">
+        </h3>
 
-<h3 className="text-lg font-semibold text-gray-800 truncate pr-2 group-hover:text-blue-600 transition-colors">
+        {roomType && (
 
-<Link to={cardLinkPath} className="block">
+        <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full whitespace-nowrap font-medium">
 
-{title || "Untitled Listing"}
+        {roomType}
 
-</Link>
+        </span>
 
-</h3>
+        )}
 
-{roomType && (
+        </div>
 
-<span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full whitespace-nowrap font-medium">
 
-{roomType}
 
-</span>
+        {/* Replaced location emoji with FaLocationDot icon */}
 
-)}
+        <p className="text-sm text-gray-500 truncate flex items-center gap-1">
 
-</div>
+        <FaLocationDot className="w-4 h-4 text-gray-400" /> {location || "No location"}
 
+        </p>
 
+        <p className="text-blue-600 font-bold text-xl">{price + ' FCFA'}</p>
 
-{/* Replaced location emoji with FaLocationDot icon */}
 
-<p className="text-sm text-gray-500 truncate flex items-center gap-1">
 
-<FaLocationDot className="w-4 h-4 text-gray-400" /> {location || "No location"}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-gray-600 pt-2 border-t border-gray-100 mt-2">
 
-</p>
 
-<p className="text-blue-600 font-bold text-xl">{price + ' FCFA'}</p>
 
+                        <span className="flex items-center gap-1.5 truncate">
 
+                        <FaBed className="text-gray-400 w-4 h-4" /> {rooms} room{rooms !== 1 ? 's' : ''}
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-gray-600 pt-2 border-t border-gray-100 mt-2">
+                        </span>
 
 
 
-                <span className="flex items-center gap-1.5 truncate">
 
-                <FaBed className="text-gray-400 w-4 h-4" /> {rooms} room{rooms !== 1 ? 's' : ''}
 
-                </span>
+                        <span className="flex items-center gap-1.5 truncate">
 
+                        <FaBath className="text-gray-400 w-4 h-4" /> {toilets} toilet{toilets !== 1 ? 's' : ''}
 
+                        </span>
 
 
 
-                <span className="flex items-center gap-1.5 truncate">
 
-                <FaBath className="text-gray-400 w-4 h-4" /> {toilets} toilet{toilets !== 1 ? 's' : ''}
 
-                </span>
+                        <span className="flex items-center gap-1.5 truncate">
 
+                        <FaUsers className="text-gray-400 w-4 h-4" /> {roommates} roommate{roommates !== 1 ? 's' : ''}
 
+                        </span>
 
 
 
-                <span className="flex items-center gap-1.5 truncate">
 
-                <FaUsers className="text-gray-400 w-4 h-4" /> {roommates} roommate{roommates !== 1 ? 's' : ''}
 
-                </span>
+                        <span className="flex items-center gap-1.5 truncate">
 
+                        <FaUtensils className="text-gray-400 w-4 h-4" /> {kitchen} kitchen{kitchen !== 1 ? 's' : ''}
 
+                        </span>
 
 
 
-                <span className="flex items-center gap-1.5 truncate">
 
-                <FaUtensils className="text-gray-400 w-4 h-4" /> {kitchen} kitchen{kitchen !== 1 ? 's' : ''}
 
-                </span>
+                        <span className="flex items-center gap-1.5 truncate col-span-2 sm:col-span-1">
 
+                        <FaRulerCombined className="text-gray-400 w-4 h-4" /> {size}
 
+                        </span>
 
 
 
-                <span className="flex items-center gap-1.5 truncate col-span-2 sm:col-span-1">
+        </div>
 
-                <FaRulerCombined className="text-gray-400 w-4 h-4" /> {size}
 
-                </span>
 
+        {isLandlordView && (
 
+        <div className="flex justify-between items-center text-sm text-gray-600 border-t border-gray-100 pt-3 mt-3">
 
-</div>
+        <span className="flex items-center gap-1">
 
+        <EyeIcon className="w-4 h-4 text-gray-400" /> Views: <span className="font-semibold">{views || 0}</span>
 
+        </span>
 
-{isLandlordView && (
+        <span className="flex items-center gap-1">
 
-<div className="flex justify-between items-center text-sm text-gray-600 border-t border-gray-100 pt-3 mt-3">
+        <SolidCurrencyDollarIcon className="w-4 h-4 text-gray-400" /> Bids: <span className="font-semibold">{bids || 0}</span>
 
-<span className="flex items-center gap-1">
+        </span>
 
-<EyeIcon className="w-4 h-4 text-gray-400" /> Views: <span className="font-semibold">{views || 0}</span>
+        </div>
 
-</span>
+        )}
 
-<span className="flex items-center gap-1">
+        </div>
 
-<SolidCurrencyDollarIcon className="w-4 h-4 text-gray-400" /> Bids: <span className="font-semibold">{bids || 0}</span>
+        </div>
 
-</span>
+        );
 
-</div>
+        };
 
-)}
 
-</div>
 
-</div>
-
-);
-
-};
-
-
-
-export default ListingCard;
+        export default ListingCard;

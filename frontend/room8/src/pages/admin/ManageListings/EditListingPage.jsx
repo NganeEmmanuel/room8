@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ListingForm from './ListingForm';
 import { toast } from "react-toastify";
-import { useListingService } from '../../../services/ListingService';
+import { useListingService } from '../../../services/useListingService.js';
 // Add this line
 import { mapDtoToInitialData } from '../../../constants/listingUtils';
 

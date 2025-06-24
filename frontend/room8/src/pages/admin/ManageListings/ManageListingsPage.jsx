@@ -1,63 +1,59 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Landlord/ManageListings/ManageListingsPage.jsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../../components/shared/DashboardHeader';
 import ListingCard from '../../../components/ListingCard/ListingCard';
 import { PlusCircleIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import ConfirmModal from '../../../components/shared/ConfirmModal';
-import { useListingService } from '../../../services/ListingService';
+import { useListingService } from '../../../services/useListingService'; // <-- Use the new service hook
+import { useAuth } from '../../../context/AuthContext';
 
 const ManageListingsPage = ({ isLandlordView = true }) => {
     // --- Hooks ---
     const navigate = useNavigate();
     const { getMyListings, deleteListing } = useListingService();
+    const { authDataState } = useAuth(); // <-- Get authDataState correctly
 
     // --- State Management ---
     const [listings, setListings] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isListingsLoading, setIsListingsLoading] = useState(true); // Renamed for clarity
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [listingToDelete, setListingToDelete] = useState(null);
 
     // --- Data Fetching ---
-    // This hook runs once when the component mounts to fetch your listings
-   // In ManageListingsPage.jsx
-
-useEffect(() => {
-    const fetchListings = async () => {
-        setIsLoading(true);
+    const fetchListings = useCallback(async () => {
+        setIsListingsLoading(true);
         try {
-            const responseData = await getMyListings();
-            console.log("1. DATA FROM API:", responseData); // This will now show the object with the "content" array
-
-            // --- THIS IS THE FIX ---
-            // Get the array from the 'content' property of the response.
-            // The `|| []` is a safety net in case the response is ever empty.
-            setListings(responseData.content || []);
-
+            const data = await getMyListings();
+            setListings(data);
         } catch (error) {
+            // The service hook now handles error toasts
             console.error("Error fetching listings:", error);
-            setListings([]); // On error, ensure listings is an empty array
+            setListings([]);
         } finally {
-            setIsLoading(false);
+            setIsListingsLoading(false);
         }
-    };
+    }, [getMyListings]);
 
-    fetchListings();
-}, []); // The empty array [] means this runs only once// The empty array [] means this runs only once
+    useEffect(() => {
+        // Only fetch if the user info has been loaded by the App-level component
+        if (authDataState.userInfo) {
+            fetchListings();
+        }
+    }, [authDataState.userInfo ]);
 
-    // --- Event Handlers ---
+    // --- Event Handlers (Your function names are preserved) ---
     const handleCreateNewListing = () => {
         navigate('/admin/landlord/listings/new');
     };
 
     const handleEditListing = (listing) => {
-        // Navigates to the edit page and passes the entire listing object in the state
-        // This makes the edit page load instantly without a new API call.
         navigate(`/admin/landlord/listings/${listing.id}/edit`, { state: { listingToEdit: listing } });
     };
 
     const handleDeleteClick = (listing) => {
-        // Opens the confirmation modal before deleting
         setListingToDelete(listing);
         setIsModalOpen(true);
     };
@@ -67,29 +63,39 @@ useEffect(() => {
 
         try {
             await deleteListing(listingToDelete.id, listingToDelete.listingType);
-
-            // Remove the deleted listing from the state to update the UI instantly
-            setListings(prevListings => prevListings.filter(listing => listing.id !== listingToDelete.id));
-
+            // The success toast can be in the service, but keeping it here is also fine.
             toast.success(`Listing "${listingToDelete.title}" has been deleted.`);
+            setListings(prevListings => prevListings.filter(listing => listing.id !== listingToDelete.id));
         } catch (error) {
+            // Service handles the error toast
             console.error(`Failed to delete listing ${listingToDelete.id}:`, error);
         } finally {
-            // Close the modal and reset the state
             setIsModalOpen(false);
             setListingToDelete(null);
         }
     };
 
     // --- JSX Rendering ---
-    if (isLoading) {
+
+    // GUARD 1: Wait for the App component to load user info into the context.
+    if (!authDataState.userInfo) {
         return (
-             <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-gray-500">
+                <p>Loading User Data...</p>
+            </div>
+        );
+    }
+
+    // GUARD 2: Show a loader while fetching the listings specifically.
+    if (isListingsLoading) {
+        return (
+            <div className="p-8 text-center text-gray-500">
                 <p>Loading your listings...</p>
             </div>
         );
     }
 
+    // Your original JSX is preserved below
     return (
         <>
             <div className="space-y-6">
@@ -111,35 +117,28 @@ useEffect(() => {
                 {listings.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {listings.map(listing => (
-
-                        <ListingCard
-                key={listing.id}
-                listingId={listing.id}
-
-                // --- This section now correctly maps your data to the card's props ---
-                title={listing.title}
-                location={`${listing.listingCity}, ${listing.listingState}`}
-                price={listing.listingPrice} // Use the correct source property
-                image={listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls[0] : undefined} // Use the first image from the array
-                roomType={listing.listingType} // Pass the listingType to the roomType prop
-                toilets={listing.numberOfBathrooms} // Map numberOfBathrooms to toilets
-                kitchen={listing.numberOfKitchens} // Map numberOfKitchens to kitchen
-                roommates={listing.numberOfHouseMates} // Map numberOfHouseMates to roommates
-                rooms={listing.numberOfRooms} // Map numberOfRooms to rooms
-                size={`${listing.roomArea} sqm`} // Build the size string from roomArea
-
-                // Props that are in your card but not your DTO can be given default values
-                views={listing.views || 0}
-                bids={listing.bids || 0}
-                isWishlisted={false}
-
-                // Function props
-                isLandlordView={isLandlordView}
-                onEditListing={() => handleEditListing(listing)}
-                onDeleteListing={() => handleDeleteClick(listing)}
-                onWishlistClick={() => { /* Placeholder function */ }}
-            />
-        ))}
+                            <ListingCard
+                                key={listing.id}
+                                listingId={listing.id}
+                                title={listing.title}
+                                location={`${listing.listingCity}, ${listing.listingState}`}
+                                price={listing.listingPrice}
+                                image={listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls[0] : undefined}
+                                roomType={listing.listingType}
+                                toilets={listing.numberOfBathrooms}
+                                kitchen={listing.numberOfKitchens}
+                                roommates={listing.numberOfHouseMates}
+                                rooms={listing.numberOfRooms}
+                                size={`${listing.roomArea} sqm`}
+                                views={listing.views || 0}
+                                bids={listing.bids || 0}
+                                isWishlisted={false}
+                                isLandlordView={isLandlordView}
+                                onEditListing={() => handleEditListing(listing)}
+                                onDeleteListing={() => handleDeleteClick(listing)}
+                                onWishlistClick={() => { /* Placeholder */ }}
+                            />
+                        ))}
                     </div>
                 ) : (
                     <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">

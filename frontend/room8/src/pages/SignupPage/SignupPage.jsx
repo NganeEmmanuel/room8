@@ -40,7 +40,7 @@ function SignupPage() {
         email,
         phoneNumber,
         password,
-        userType: 'tenant', // or 'landlord' based on user choice in future
+        userType: 'landlord', // or 'landlord' based on user choice in future
         otp: "1234",
       });
       navigate('/admin/dashboard');

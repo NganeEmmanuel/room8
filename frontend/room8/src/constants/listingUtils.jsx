@@ -60,4 +60,6 @@ export const mapDtoToInitialData = (dto) => {
         numberOfLivingRooms: dto.numberOfLivingRooms || 1,
         livingRoomArea: dto.livingRoomArea || '',
     };
+
 };
+
