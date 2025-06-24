@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useBidService } from '../../../services/useBidService';
+import { useBidService } from '../../../services/useBidService.js';
 import ConfirmModal from '../../../components/shared/ConfirmModal';
 
 // --- ICON IMPORTS (Complete List) ---

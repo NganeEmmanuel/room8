@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useBidService } from '../../../services/useBidService';
+import { useBidService } from '../../../services/useBidService.js';
 import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-toastify';
 

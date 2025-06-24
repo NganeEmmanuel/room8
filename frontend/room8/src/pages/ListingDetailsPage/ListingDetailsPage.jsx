@@ -9,7 +9,7 @@ import PropertyDetails from "./components/PropertyDetails";
 import Spinner from "./components/Spinner.jsx";
 import PlaceBidPanel from "../../components/bids/PlaceBidPanel.jsx";
 import { useListingService } from "../../services/useListingService.js";
-import {useBidService} from "../../services/useBidService.jsx";
+import {useBidService} from "../../services/useBidService.js";
 import {useAuth} from "../../context/AuthContext.jsx";
 
 const ListingDetailsPage = () => {
