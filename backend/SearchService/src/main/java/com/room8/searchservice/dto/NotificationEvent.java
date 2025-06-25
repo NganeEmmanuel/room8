@@ -5,12 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
-@Data
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
-public class BidsEvent {
+@Builder
+@Data
+public class NotificationEvent {
     private Long bidId;
-    private String eventType; // notify landlord (NOTIFY_LANDLORD)
+    private Long userId;
     private Long listingId;
+    private String message;
+    private Date dateCreated;
+    private String status;
+
 }

@@ -77,10 +77,10 @@ const ListingCard = ({
             )}
             {isLandlordView && (
                 <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEditListing?.(); }} className="p-2 bg-blue-500 ...">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEditListing?.(); }} className="p-2 bg-blue-500 text-white rounded-xl ...">
                         <PencilSquareIcon className="w-5 h-5" />
                     </button>
-                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDeleteListing?.(); }} className="p-2 bg-red-600 ...">
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDeleteListing?.(); }} className="p-2 bg-red-400 text-white rounded-xl ...">
                         <TrashIcon className="w-5 h-5" />
                     </button>
                 </div>

@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BidsEvent {
+    private Long bidId;
     private String eventType; // notify landlord (NOTIFY_LANDLORD)
     private Long listingId;
 }

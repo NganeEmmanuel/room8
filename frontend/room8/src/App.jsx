@@ -34,6 +34,7 @@ import PublicLayout from './layouts/PublicLayout/PublicLayout';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import {BidsProvider} from "./context/BidContext.jsx";
 import AuthRestorer from './auth/AuthRestorer.jsx';
+import VerifyPhoneNumberPage from './pages/VerifyPhoneNumberPage/VerifyPhoneNumberPage.jsx';
 
 
 // This layout wraps all authenticated admin routes
@@ -75,6 +76,7 @@ function App() {
             {/* Auth Routes (typically no shared layout or a very minimal one) */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/verify/number" element={<VerifyPhoneNumberPage />} />
 
             {/* Admin Routes (Protected by AdminLayout which should enforce auth) */}
             {/* The AdminLayout itself can handle redirecting if not authenticated,
