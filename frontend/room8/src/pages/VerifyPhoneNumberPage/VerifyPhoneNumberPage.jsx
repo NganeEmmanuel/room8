@@ -10,7 +10,7 @@ const VerifyPhoneNumberPage = () => {
   const [timer, setTimer] = useState(0);
   const navigate = useNavigate();
   const { authDataState } = useAuth();
-  const { verifyPhoneNumber /*, resendOTP */ } = useAuthService(); // Add resendOTP if available
+  const { verifyPhoneNumber, resendCode } = useAuthService(); // Add resendOTP if available
 
   const userDTO  = getData();
   const phoneNumber = userDTO?.phoneNumber;
@@ -40,7 +40,7 @@ const VerifyPhoneNumberPage = () => {
 
   const handleResendCode = async () => {
     try {
-      // await resendOTP(phoneNumber); // Uncomment and use your resend method
+       await resendCode(phoneNumber); // Uncomment and use your resend method
       toast.success('OTP resent!');
       setTimer(60);
     } catch (error) {

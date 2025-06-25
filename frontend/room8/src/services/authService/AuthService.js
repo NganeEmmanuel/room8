@@ -127,8 +127,6 @@ export const useAuthService = () => {
         },
       }
     );
-
-    toast.success('Verification code resent!');
     return response.data; // Boolean true/false
   } catch (err) {
     toast.error(err.response?.data?.message || 'Failed to resend verification code');
