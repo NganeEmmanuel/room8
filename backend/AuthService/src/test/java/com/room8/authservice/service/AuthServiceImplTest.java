@@ -77,7 +77,7 @@ class AuthServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        registerRequest = new RegisterRequest("John", "Doe", "john.doe@example.com", "password123", "1234567890", "1234");
+        registerRequest = new RegisterRequest("John", "Doe", "john.doe@example.com", "password123", "1234567890");
         authenticationRequest = new AuthenticationRequest("john.doe@example.com", "password123");
         user = new Tenant();
         returnUser = new Tenant();
