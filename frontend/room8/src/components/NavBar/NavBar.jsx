@@ -17,7 +17,7 @@ const Navbar = ({ isAuthenticated, userRole, toggleSidebar, userFirstName }) => 
       setUserName(userFirstName);
     } else {
       setUserName('Guest');
-      navigate('/home')
+     // navigate('/home')
        
     }
 

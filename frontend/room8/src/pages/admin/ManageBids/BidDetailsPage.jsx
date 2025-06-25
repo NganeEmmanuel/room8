@@ -68,7 +68,7 @@ const InfoSection = ({ title, children }) => (
 const BidDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { removeBid, updateBid } = useBidService();
+  const { removeBid, updateBid, updateBidStatus } = useBidService();
 
   const { bid, isTenantView, isLandlordView } = location.state || {};
 
@@ -118,9 +118,25 @@ const BidDetailsPage = () => {
     }
   };
 
-  const handleAccept = () => toast.info("Backend endpoint for accepting a bid is not yet implemented.");
-  const handleReject = () => toast.info("Backend endpoint for rejecting a bid is not yet implemented.");
+const handleAccept = async () => {
+        try {
+            await updateBidStatus(bidId, 'ACCEPTED');
+            // Navigate back to the list of bids, which will now show the updated status
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to accept bid:", error);
+            // The service handles the user-facing toast
+        }
+    };
 
+    const handleReject = async () => {
+        try {
+            await updateBidStatus(bidId, 'REJECTED');
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to reject bid:", error);
+        }
+    };
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="bg-white shadow-sm sticky top-0 z-20">

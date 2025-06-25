@@ -186,6 +186,23 @@ export const useBidService = () => {
     }
   }, [authDataState, executeRequest]);
 
+   const updateBidStatus = useCallback(async (bidId, status) => {
+        try {
+            const response = await executeRequest(token =>
+                // Call the new backend endpoint
+                apiClient.put(`${API_URL}/${bidId}/status`,
+                    { status: status.toUpperCase() }, // The request body
+                    { headers: { Authorization: `Bearer ${token}` } }
+                )
+            );
+            toast.success(`Bid status successfully updated to ${status}.`);
+            return response.data;
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update bid status.');
+            throw err;
+        }
+    }, [executeRequest]);
+
 
   return {
     addBid,
@@ -194,5 +211,6 @@ export const useBidService = () => {
     getBid,
     getBidsByListingId,
     getMyBids,
+      updateBidStatus
   };
 };
