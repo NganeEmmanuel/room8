@@ -58,11 +58,11 @@ function App() {
           <Routes>
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
-              {/* <Route path="/" element={<Navigate to="/home" replace />} /> */}
+               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
               <Route path="/verify/number" element={<VerifyPhoneNumberPage />} />
               <Route path="/listings" element={<ListingsPage />} />
-              <Route path="/listingDetails:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
+              <Route path="/listingDetails/:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
               {/*  have /listingDetails and also use a query param ?listingId=...
                   Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
                   or continue using query params. For simplicity, /listingDetails is kept.

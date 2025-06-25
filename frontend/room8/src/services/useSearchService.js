@@ -6,9 +6,11 @@ import apiClient from '../api/apiClient';
 import { withRetry } from '../utils/retryUtils';
 
 const SEARCH_BASE_URL =
-  typeof window !== 'undefined' && window._env_?.VITE_SEARCH_BASE_URL
-    ? window._env_.VITE_SEARCH_BASE_URL
-    : import.meta.env.VITE_SEARCH_BASE_URL || 'http://localhost:8765';
+  typeof window !== 'undefined' && window._env_?.VITE_AUTH_BASE_URL
+    ? window._env_.VITE_AUTH_BASE_URL
+    : import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8765';
+
+
 
 export const useSearchService = () => {
 

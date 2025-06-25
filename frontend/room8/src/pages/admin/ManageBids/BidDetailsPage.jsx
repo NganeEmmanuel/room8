@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate, Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useBidService } from '../../../services/useBidService.js';
+import { useBidService } from '../../../services/useBidService';
+import { useUserService } from '../../../services/userService/userService.js';
 import ConfirmModal from '../../../components/shared/ConfirmModal';
+import Spinner from '../../ListingDetailsPage/components/Spinner';
 
-// --- ICON IMPORTS (Complete List) ---
+// --- ICON IMPORTS ---
 import {
   ChevronLeft, User, Mail, Phone, FileText, Check, X, Trash2, EyeOff, Home,
   Building, Languages, Droplets, Utensils, BedDouble, Thermometer,
@@ -12,89 +14,92 @@ import {
 } from 'lucide-react';
 
 // --- HELPER COMPONENTS ---
-
 const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
     <div className="flex items-center justify-between p-4 rounded-lg bg-gray-100 border border-gray-200">
         <div className="pr-4">
             <label htmlFor={id} className="font-medium text-gray-900">{label}</label>
             <p className="text-sm text-gray-500">{description}</p>
         </div>
-        <button
-            type="button"
-            id={id}
-            onClick={() => onChange(!checked)}
-            className={`${checked ? 'bg-blue-600' : 'bg-gray-200'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-            role="switch"
-            aria-checked={checked}
-        >
-            <span
-                aria-hidden="true"
-                className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-            />
+        <button type="button" id={id} onClick={() => onChange(!checked)} className={`${checked ? 'bg-blue-600' : 'bg-gray-200'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`} role="switch" aria-checked={checked}>
+            <span aria-hidden="true" className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}/>
         </button>
     </div>
 );
-
 const InfoItem = ({ icon: Icon, label, value, isBoolean = false }) => {
     let displayValue = value;
-    if (isBoolean) {
-        displayValue = value ? 'Yes' : 'No';
-    }
+    if (isBoolean) displayValue = value ? 'Yes' : 'No';
     return (
-        <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-start space-x-3">
-            {Icon && <Icon className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />}
-            <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
-                <p className="text-md font-medium text-gray-800 break-words">{displayValue || 'N/A'}</p>
-            </div>
-            </div>
-        </div>
+        <div className="p-4 bg-gray-50 rounded-lg"><div className="flex items-start space-x-3">{Icon && <Icon className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />}<div><p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p><p className="text-md font-medium text-gray-800 break-words">{displayValue || 'N/A'}</p></div></div></div>
     );
 };
-
 const InfoSection = ({ title, children }) => (
-    <section className="bg-white shadow rounded-lg p-6 mb-8">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">{title}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {children}
-        </div>
-    </section>
+    <section className="bg-white shadow rounded-lg p-6 mb-8"><h3 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">{title}</h3><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{children}</div></section>
 );
 
 
 // --- MAIN PAGE COMPONENT ---
-
 const BidDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { removeBid, updateBid, updateBidStatus } = useBidService();
+  const { bidId } = useParams();
 
-  const { bid, isTenantView, isLandlordView } = location.state || {};
+  const { removeBid, updateBid, updateBidStatus, getBid } = useBidService();
+  const { getUserData } = useUserService();
 
-  const [shareInfo, setShareInfo] = useState(bid?.isShareInfo || false);
+  const [bid, setBid] = useState(location.state?.bid || null);
+  const [detailedUserInfo, setDetailedUserInfo] = useState(bid?.bidderInfo?.userInfo || null);
+  const [isLoading, setIsLoading] = useState(!bid);
   const [isConfirmingWithdraw, setIsConfirmingWithdraw] = useState(false);
 
-  if (!bid) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h2 className="text-2xl font-bold text-red-500">Bid Not Found</h2>
-        <p className="text-gray-600 mt-2">Please go back and select a bid to view.</p>
-        <button onClick={() => navigate(-1)} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md">
-          Go Back
-        </button>
-      </div>
-    );
-  }
+  const [shareInfo, setShareInfo] = useState(bid?.isShareInfo || false);
 
-  const { listingTitle, bidderInfo, proposal, bidStatus, listingId, id: bidId } = bid;
-  const userInfo = bidderInfo?.userInfo || {};
-  const shouldDisplayInfo = isLandlordView && shareInfo;
+  const fetchBidAndUserDetails = useCallback(async () => {
+      setIsLoading(true);
+      try {
+        const bidData = await getBid(bidId);
+        setBid(bidData);
+        setShareInfo(bidData.isShareInfo);
+
+        // If sharing is enabled, fetch the detailed user profile.
+        if (bidData.isShareInfo) {
+          const profileData = await getUserData(bidData.bidderId);
+          setDetailedUserInfo(profileData);
+        }
+      } catch (error) {
+        toast.error("Could not load bid details.");
+        navigate("/admin/dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    }, [bidId, navigate, getBid, getUserData]);
+
+  useEffect(() => {
+    // If we have the basic bid data but not the user details (e.g., from a previous page),
+    // or if we have nothing at all (e.g., page refresh), we need to fetch.
+    if (!bid || (bid.isShareInfo && !detailedUserInfo)) {
+        fetchBidAndUserDetails();
+    }
+  }, [bid, detailedUserInfo, fetchBidAndUserDetails]);
+
+
+  const handleSharingToggle = async (newSharingStatus) => {
+    if (!bid) return;
+    setShareInfo(newSharingStatus);
+    try {
+        const updatedBidData = { proposal: bid.proposal, shareUserInfo: newSharingStatus };
+        await updateBid(bid.id, updatedBidData, bid.listingId);
+        toast.success("Sharing preference updated.");
+    } catch(error) {
+        toast.error("Failed to update preference.");
+        setShareInfo(!newSharingStatus);
+    }
+  };
 
   const handleWithdraw = async () => {
+    if (!bid) return;
     try {
-      await removeBid(bidId);
-      toast.success(`Your bid for "${listingTitle}" has been withdrawn.`);
+      await removeBid(bid.id);
+      toast.success(`Your bid for "${bid.listingTitle}" has been withdrawn.`);
       navigate(-1);
     } catch (error) {
       console.error(error);
@@ -103,42 +108,40 @@ const BidDetailsPage = () => {
     }
   };
 
-  const handleSharingToggle = async (newSharingStatus) => {
-    setShareInfo(newSharingStatus);
-    try {
-        const updatedBidData = {
-            proposal: bid.proposal,
-            shareUserInfo: newSharingStatus,
-        };
-        await updateBid(bidId, updatedBidData, listingId);
-        toast.success("Information sharing preference has been updated.");
-    } catch(error) {
-        console.error("Failed to update sharing preference:", error);
-        setShareInfo(!newSharingStatus);
-    }
+  const handleAccept = async () => {
+      if (!bid) return;
+      try {
+          await updateBidStatus(bid.id, 'ACCEPTED');
+          navigate(-1);
+      } catch (error) {
+          console.error("Failed to accept bid:", error);
+      }
   };
 
-const handleAccept = async () => {
-        try {
-            await updateBidStatus(bidId, 'ACCEPTED');
-            // Navigate back to the list of bids, which will now show the updated status
-            navigate(-1);
-        } catch (error) {
-            console.error("Failed to accept bid:", error);
-            // The service handles the user-facing toast
-        }
-    };
+  const handleReject = async () => {
+      if (!bid) return;
+      try {
+          await updateBidStatus(bid.id, 'REJECTED');
+          navigate(-1);
+      } catch (error) {
+          console.error("Failed to reject bid:", error);
+      }
+  };
 
-    const handleReject = async () => {
-        try {
-            await updateBidStatus(bidId, 'REJECTED');
-            navigate(-1);
-        } catch (error) {
-            console.error("Failed to reject bid:", error);
-        }
-    };
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!bid) {
+    return <div className="p-8 text-center text-red-500">Bid not found. Please go back.</div>;
+  }
+
+  const { listingTitle, bidderInfo, proposal, bidStatus, listingId } = bid;
+  const userInfoToDisplay = detailedUserInfo || bid?.bidderInfo?.userInfo || {};
+  const shouldDisplayInfo = location.state?.isLandlordView && shareInfo;
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-32">
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <button onClick={() => navigate(-1)} className="flex items-center text-sm font-medium text-gray-600 hover:text-blue-600"><ChevronLeft size={20} className="mr-1" /> Back to Bids</button>
@@ -166,7 +169,7 @@ const handleAccept = async () => {
             <p className="text-gray-700 whitespace-pre-line leading-relaxed">{proposal}</p>
         </section>
 
-        {isTenantView && (
+        {location.state?.isTenantView && (
           <InfoSection title="Profile Sharing Settings">
               <div className="md:col-span-2 lg:col-span-3">
                 <p className="text-gray-600 mb-4 text-sm">You control whether the landlord can see your detailed profile. This can be changed any time before the bid is actioned.</p>
@@ -182,44 +185,45 @@ const handleAccept = async () => {
         )}
 
         {shouldDisplayInfo ? (
+
           <>
             <InfoSection title="Basic & Professional Information">
-                <InfoItem icon={Building} label="Occupation" value={userInfo.occupation} />
-                <InfoItem icon={UserCheck} label="Employment Status" value={userInfo.employmentStatus} />
-                <InfoItem icon={Home} label="Nationality" value={userInfo.nationality} />
-                <InfoItem icon={Languages} label="Languages Spoken" value={Array.isArray(userInfo.languagesSpoken) ? userInfo.languagesSpoken.join(', ') : 'N/A'} />
+                <InfoItem icon={Building} label="Occupation" value={userInfoToDisplay.occupation}  />
+                <InfoItem icon={UserCheck} label="Employment Status" value={userInfoToDisplay.employmentStatus} />
+                <InfoItem icon={Home} label="Nationality" value={userInfoToDisplay.nationality} />
+                <InfoItem icon={Languages} label="Languages Spoken" value={Array.isArray(userInfoToDisplay.languagesSpoken) ? userInfoToDisplay.languagesSpoken.join(', ') : 'N/A'} />
             </InfoSection>
             <InfoSection title="Lifestyle & Habits">
-                <InfoItem icon={Snowflake} label="Smoking Status" value={userInfo.smokingStatus} />
-                <InfoItem icon={EyeOff} label="Addiction Status" value={userInfo.addictionStatus} />
-                <InfoItem icon={Heart} label="Has Pets" value={userInfo.hasPets ? `Yes (${userInfo.petPreference || 'unspecified'})` : 'No'} />
-                <InfoItem icon={Droplets} label="Cleanliness Level" value={userInfo.cleanlinessLevel} />
-                <InfoItem icon={BedDouble} label="Sleep Schedule" value={userInfo.sleepSchedule} />
-                <InfoItem icon={Users} label="Comfortable With Guests" value={userInfo.comfortableWithGuests} />
-                <InfoItem icon={PartyPopper} label="Party Habits" value={userInfo.partyHabits} />
-                <InfoItem icon={Utensils} label="Shares Food" value={userInfo.sharesFood} />
-                <InfoItem icon={Thermometer} label="Preferred Room Temperature" value={userInfo.preferredRoomTemperature} />
-                <InfoItem icon={Bath} label="Willing to Share Bathroom" isBoolean value={userInfo.willingToShareBathroom} />
-                <InfoItem icon={Utensils} label="Dietary Restrictions" value={userInfo.dietaryRestrictions} />
+                <InfoItem icon={Snowflake} label="Smoking Status" value={userInfoToDisplay.smokingStatus} />
+                <InfoItem icon={EyeOff} label="Addiction Status" value={userInfoToDisplay.addictionStatus} />
+                <InfoItem icon={Heart} label="Has Pets" value={userInfoToDisplay.hasPets ? `Yes (${userInfoToDisplay.petPreference || 'unspecified'})` : 'No'} />
+                <InfoItem icon={Droplets} label="Cleanliness Level" value={userInfoToDisplay.cleanlinessLevel} />
+                <InfoItem icon={BedDouble} label="Sleep Schedule" value={userInfoToDisplay.sleepSchedule} />
+                <InfoItem icon={Users} label="Comfortable With Guests" value={userInfoToDisplay.comfortableWithGuests} />
+                <InfoItem icon={PartyPopper} label="Party Habits" value={userInfoToDisplay.partyHabits} />
+                <InfoItem icon={Utensils} label="Shares Food" value={userInfoToDisplay.sharesFood} />
+                <InfoItem icon={Thermometer} label="Preferred Room Temperature" value={userInfoToDisplay.preferredRoomTemperature} />
+                <InfoItem icon={Bath} label="Willing to Share Bathroom" isBoolean value={userInfoToDisplay.willingToShareBathroom} />
+                <InfoItem icon={Utensils} label="Dietary Restrictions" value={userInfoToDisplay.dietaryRestrictions} />
             </InfoSection>
             <InfoSection title="Health Information">
-                <InfoItem icon={PlusCircle} label="Has Medical Conditions" isBoolean value={userInfo.hasMedicalConditions} />
-                {userInfo.hasMedicalConditions && <InfoItem icon={Heart} label="Conditions" value={Array.isArray(userInfo.medicalConditions) ? userInfo.medicalConditions.join(', ') : 'N/A'} />}
-                <InfoItem icon={User} label="Has Disability" isBoolean value={userInfo.isDisabled} />
-                {userInfo.isDisabled && <InfoItem icon={FileText} label="Disability Details" value={userInfo.disability} />}
+                <InfoItem icon={PlusCircle} label="Has Medical Conditions" isBoolean value={userInfoToDisplay.hasMedicalConditions} />
+                {userInfoToDisplay.hasMedicalConditions && <InfoItem icon={Heart} label="Conditions" value={Array.isArray(userInfoToDisplay.medicalConditions) ? userInfoToDisplay.medicalConditions.join(', ') : 'N/A'} />}
+                <InfoItem icon={User} label="Has Disability" isBoolean value={userInfoToDisplay.isDisabled} />
+                {userInfoToDisplay.isDisabled && <InfoItem icon={FileText} label="Disability Details" value={userInfoToDisplay.disability} />}
             </InfoSection>
             <InfoSection title="Personality & Social Habits">
-                <InfoItem icon={User} label="Personality Type" value={userInfo.personalityType} />
-                <InfoItem icon={UserCheck} label="Noise Tolerance" value={userInfo.noiseTolerance} />
-                <InfoItem icon={Users} label="Enjoys Socializing?" value={userInfo.enjoysSocializingWithRoommates} />
+                <InfoItem icon={User} label="Personality Type" value={userInfoToDisplay.personalityType} />
+                <InfoItem icon={UserCheck} label="Noise Tolerance" value={userInfoToDisplay.noiseTolerance} />
+                <InfoItem icon={Users} label="Enjoys Socializing?" value={userInfoToDisplay.enjoysSocializingWithRoommates} />
             </InfoSection>
             <InfoSection title="Financial Responsibility">
-                <InfoItem icon={DollarSign} label="Willing to Split Utilities" isBoolean value={userInfo.willingToSplitUtilities} />
-                <InfoItem icon={DollarSign} label="Monthly Income" value={userInfo.monthlyIncome ? `${userInfo.incomeCurrency} ${userInfo.monthlyIncome.toLocaleString()}` : 'Not Disclosed'} />
+                <InfoItem icon={DollarSign} label="Willing to Split Utilities" isBoolean value={userInfoToDisplay.willingToSplitUtilities} />
+                <InfoItem icon={DollarSign} label="Monthly Income" value={userInfoToDisplay.monthlyIncome ? `${userInfoToDisplay.incomeCurrency} ${userInfoToDisplay.monthlyIncome.toLocaleString()}` : 'Not Disclosed'} />
             </InfoSection>
           </>
         ) : (
-          !isTenantView && (
+          !location.state?.isTenantView && (
             <div className="text-center py-12 px-6 bg-white rounded-lg shadow border">
                 <EyeOff className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-800">Detailed Profile is Private</h3>
@@ -233,12 +237,12 @@ const handleAccept = async () => {
 
       <footer className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-lg z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-end space-x-4">
-            {isTenantView && bidStatus === 'PENDING' && (
+            {location.state?.isTenantView && bidStatus === 'PENDING' && (
               <button onClick={() => setIsConfirmingWithdraw(true)} className="px-6 py-3 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 flex items-center">
                 <Trash2 size={18} className="mr-2" /> Withdraw Bid
               </button>
             )}
-            {!isTenantView && bidStatus === 'PENDING' && (
+            {location.state?.isLandlordView && bidStatus === 'PENDING' && (
               <>
                 <button onClick={handleReject} className="px-6 py-3 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center"><X size={18} className="mr-2" /> Reject</button>
                 <button onClick={handleAccept} className="px-6 py-3 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 flex items-center"><Check size={18} className="mr-2" /> Accept Bid</button>
@@ -260,3 +264,4 @@ const handleAccept = async () => {
 };
 
 export default BidDetailsPage;
+

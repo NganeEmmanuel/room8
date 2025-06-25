@@ -9,11 +9,12 @@ import { withRetry } from '../utils/retryUtils'; // Import the retry utility
 import { uploadImages } from './S3Service';
 
 const ROOM_SERVICE_URL =
-  typeof window !== 'undefined' && window._env_?.VITE_ROOM_SERVICE_BASE_URL
-    ? window._env_.VITE_ROOM_SERVICE_BASE_URL
-    : import.meta.env.VITE_ROOM_SERVICE_BASE_URL || 'http://localhost:8765';
+  typeof window !== 'undefined' && window._env_?.VITE_AUTH_BASE_URL
+    ? window._env_.VITE_AUTH_BASE_URL
+    : import.meta.env.VITE_AUTH_BASE_URL || 'http://localhost:8765';
 
 const API_BASE_URL = `${ROOM_SERVICE_URL}/room-service/api/v1/listings`;
+
 
 export const useListingService = () => {
   const { refreshToken } = useAuthService();
