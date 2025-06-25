@@ -93,6 +93,15 @@
 			<version>5.11.0</version>
 			<scope>test</scope>
 		</dependency>
+
+
+
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>9.13.0</version> <!-- latest stable -->
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

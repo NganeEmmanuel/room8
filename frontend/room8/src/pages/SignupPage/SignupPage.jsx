@@ -42,7 +42,6 @@ function SignupPage() {
         phoneNumber,
         password,
         userType: userType, // or 'landlord' based on user choice in future
-        otp: "1234",
       });
       navigate('/admin/dashboard');
     } catch (err) {

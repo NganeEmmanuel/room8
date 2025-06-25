@@ -94,4 +94,11 @@ public interface AuthService {
      */
     Boolean markedAsPhoneVerified(String phoneNumber, String otp) throws UserNotFoundException;
 
+    /**
+     *
+     * @param mediumValue medium like phone or email values (e.g +2376XXXXXXXX or example@domain.com)
+     * @param type the code type (phone or email)
+     * @return true if the code was resent
+     */
+    Boolean resentCode(String mediumValue, String type);
 }

@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class UserRegistrationService {
     private final ContactServiceClient contactServiceClient;
     private final EmailUtils emailUtils;
     private final RoleUtil roleUtil;
+    private final OtpService otpService;
 
     /**
      * Registers a new user in the system.
@@ -74,7 +77,7 @@ public class UserRegistrationService {
         var roleStringList = roleUtil.getRoleList(user.getRole());
 
         // Generate JWT tokens (normal token and refresh token) using the username
-        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 5); //5 minutes
+        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 30); //5 minutes
         var refreshToken = jwtService.generateTokenWithRoles(user.getEmail(), roleStringList, 1000 * 60 * 60 * 24); // 24hrs
 
         // Store new jwtToken and refresh token
@@ -84,8 +87,10 @@ public class UserRegistrationService {
         var emailToken = jwtService.generateJwtToken(user.getEmail(), 1000 * 60 * 30);  // 30 minutes expiration
 
         // save the email verification and the OTP in the cache
+//        String otp = String.format("%04d", new Random().nextInt(10000));
         emailVerificationRedisService.storeEmailToken(user.getEmail(), emailToken, 30);
-        otpRedisService.storeOTP(request.getPhoneNumber(), request.getOtp(), 30);
+        otpService.sendOtp(request.getPhoneNumber());
+//        otpRedisService.storeOTP(request.getPhoneNumber(), otp, 30);
 
         //build verification request objects to use to send email request to contact service
         var verificationRequest = VerificationRequest.builder()

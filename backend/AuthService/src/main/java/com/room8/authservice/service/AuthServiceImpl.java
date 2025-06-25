@@ -28,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final OTPRedisService otpRedisService;
     private final UserRegistrationService userRegistrationService;
     private final RoleUtil roleUtil;
+    private final OtpService otpService;
 
     @Override
     public AuthenticationResponse tenantSignup(RegisterRequest request) {
@@ -196,20 +197,24 @@ public class AuthServiceImpl implements AuthService {
             return Boolean.TRUE;
         }
 
-        // get the store otp from the cache
-        var storedOTP = otpRedisService.getOTP(phoneNumber);
 
-        // verify that the number exist and the opt matches
-        if (storedOTP.isBlank() || !storedOTP.equals(otp)) {
-            throw new InvalidPhoneVerificationTokenException("Invalid ene time pass code(OTP)");
+        if(!otpService.verifyOtp(phoneNumber, otp)){
+            throw new InvalidPhoneVerificationTokenException("Invalid one-time pass code (OTP)");
         }
+        // get the store otp from the cache
+//        var storedOTP = otpRedisService.getOTP(phoneNumber);
+//
+//        // verify that the number exist and the opt matches
+//        if (storedOTP.isBlank() || !storedOTP.equals(otp)) {
+//            throw new InvalidPhoneVerificationTokenException("Invalid ene time pass code(OTP)");
+//        }
 
         // update user information in the database to indicate phone is verified
         user = userServiceClient.markUserAsPhoneVerified(phoneNumber).getBody();
         assert user != null;
 
         // Invalidate OTP
-        otpRedisService.invalidateOTP(phoneNumber);
+//        otpRedisService.invalidateOTP(phoneNumber);
 
         //update cache with new expiration date of 5hrs
         userRedisService.updateUserInformation(user.getEmail(), user, 60 * 5);
@@ -217,6 +222,22 @@ public class AuthServiceImpl implements AuthService {
         return user.getIsPhoneVerified();
     }
 
+    @Override
+    public Boolean resentCode(String mediumValue, String type) {
+        if (type.equals("phone")) {
+            if (mediumValue.isEmpty()) {
+                throw new BadCredentialsException("Invalid phone number");
+            }
+
+            otpService.sendOtp(mediumValue);
+            return Boolean.TRUE;
+        }else if (type.equals("email")) {
+            return true;
+        }else {
+            throw new BadCredentialsException("resend type");
+        }
+
+    }
 
 
 }

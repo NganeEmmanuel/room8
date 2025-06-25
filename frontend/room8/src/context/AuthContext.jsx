@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { getAccessToken, getRefreshToken, clearTokens, saveTokens } from '../utils/tokenUtils';
 import { decodeJwt } from '../utils/jwtUtils';
 import { clearRole, getRole, saveRole } from '../utils/roleUtils';
+import { saveData } from '../utils/userDataUtil';
 
 const AuthContext = createContext();
 
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const setUserInfo = (userDTO) => {
+    saveData(userDTO)
     setAuthDataState(prev => ({ ...prev, userInfo: userDTO }));
   };
 
