@@ -1,28 +1,56 @@
-// src/pages/admin/ManageListings/EditListingPage.jsx
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ListingForm from './ListingForm';
+import { toast } from "react-toastify";
+import { useListingService } from '../../../services/useListingService.js';
+// Add this line
+import { mapDtoToInitialData } from '../../../constants/listingUtils';
+
 
 const EditListingPage = () => {
-  const { listingId } = useParams();
-  const navigate = useNavigate();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Listing ${listingId} updated (simulation)!`);
-    navigate(`/admin/landlord/listings`); // Or back to listing details
-  };
-  return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Edit Listing: {listingId}</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Add your form fields here, pre-filled with listing data */}
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-          <input type="text" id="title" name="title" defaultValue={`Existing Title for ${listingId}`} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-        </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
-        <button type="button" onClick={() => navigate(-1)} className="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Cancel</button>
-      </form>
-    </div>
-  );
+    const navigate = useNavigate();
+    const location = useLocation(); // Hook to access the state passed during navigation
+
+    // Get the listing object from the navigation state
+    const listingToEdit = location.state?.listingToEdit;
+
+    const { updateListing } = useListingService();
+
+    // Set the initial data for the form directly from the object we received
+    const [initialData] = useState(mapDtoToInitialData(listingToEdit));
+
+    // This handles the case where the user refreshes the edit page or accesses it directly.
+    // In that case, `listingToEdit` will be null.
+    useEffect(() => {
+        if (!listingToEdit) {
+            toast.error("Could not find listing data. Returning to list.");
+            navigate('/admin/landlord/listings');
+        }
+    }, [listingToEdit, navigate]);
+
+    const handleUpdateSubmit = async (listingData) => {
+        try {
+            await updateListing(listingData);
+            navigate('/admin/landlord/listings');
+        } catch (error) {
+            console.error(`Failed to update listing:`, error);
+        }
+    };
+
+    // This will show a fallback message while redirecting if the page was refreshed
+    if (!initialData) {
+        return <div className="p-8 text-center">Redirecting...</div>;
+    }
+
+    // The form receives the data instantly and is ready for editing
+    return (
+        <ListingForm
+            initialData={initialData}
+            onFormSubmit={handleUpdateSubmit}
+            pageTitle="Edit Listing"
+            submitButtonText="Save Changes"
+        />
+    );
 };
+
 export default EditListingPage;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import {toast} from "react-toastify";
 
 const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
     <div className="flex items-center justify-between p-4 rounded-lg bg-gray-100">
@@ -33,11 +34,11 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
     e.preventDefault();
     // MODIFIED: Added validation for proposal and amount
     if (proposal.trim() === '') {
-        alert('Please write a proposal before submitting.');
+        toast.info('Please write a proposal before submitting.');
         return;
     }
     if (!amount || Number(amount) <= 0) {
-        alert('Please enter a valid bid amount.');
+        toast.info("please enter a valid amount")
         return;
     }
     // MODIFIED: Pass the bid data, including the amount, up to the parent component
