@@ -1,18 +1,29 @@
-# Use OpenJDK 21 as the base image
-FROM openjdk:21-jdk
+# --- Stage 1: Build the JAR ---
+FROM maven:3.9.4-eclipse-temurin-21 AS builder
 
-
-# Add a label (optional but good for metadata)
-LABEL maintainer="emmanuelngane06@gmail.com"
-
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the JAR file to the container
-COPY target/BidService-0.0.1-SNAPSHOT.jar /app/bidService.jar
+# Copy build configuration files and prepare dependencies
+COPY backend/BidService/pom.xml ./
+COPY backend/BidService/.mvn .mvn
+COPY backend/BidService/mvnw ./
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
 
-# Expose the port that the service will run on
+# Copy source code
+COPY backend/BidService ./
+
+# Package the application
+RUN ./mvnw clean package -DskipTests
+
+# --- Stage 2: Package the app ---
+FROM openjdk:21-jdk
+
+WORKDIR /app
+ENV SPRING_PROFILES_ACTIVE=prod
+
+COPY --from=builder /app/target/BidService-0.0.1-SNAPSHOT.jar /app/bidService.jar
+
 EXPOSE 8084
 
-# Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/bidService.jar"]
