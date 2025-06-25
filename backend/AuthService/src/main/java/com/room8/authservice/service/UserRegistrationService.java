@@ -89,7 +89,7 @@ public class UserRegistrationService {
         // save the email verification and the OTP in the cache
 //        String otp = String.format("%04d", new Random().nextInt(10000));
         emailVerificationRedisService.storeEmailToken(user.getEmail(), emailToken, 30);
-        otpService.sendOtp(request.getPhoneNumber());
+//        otpService.sendOtp(request.getPhoneNumber());
 //        otpRedisService.storeOTP(request.getPhoneNumber(), otp, 30);
 
         //build verification request objects to use to send email request to contact service

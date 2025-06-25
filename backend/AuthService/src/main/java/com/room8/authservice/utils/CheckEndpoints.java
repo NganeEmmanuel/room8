@@ -9,7 +9,6 @@ public class CheckEndpoints {
                 path.equals("/api/v1/auth/signup/landlord") ||
                 path.equals("/api/v1/auth/get-email-from-token") ||
                 path.equals("/api/v1/auth/login") ||
-                path.equals("/api/v1/auth/login") ||
                 path.equals("/api/v1/auth/authenticate") ||
                 path.startsWith("/swagger") || // Optional: for Swagger UI access
                 path.equals("/v3/api-docs");   // Optional: for OpenAPI access

@@ -1,0 +1,18 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092  # Use embedded Kafka for tests if available
+    consumer:
+      group-id: test-search-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    properties:
+      spring:
+        kafka:
+          consumer:
+            auto-offset-reset: earliest
+    listener:
+      missing-topics-fatal: false
+
+eureka:
+  client:
+    enabled: false  # Disable Eureka during tests

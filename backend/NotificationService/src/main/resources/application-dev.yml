@@ -1,0 +1,17 @@
+spring:
+  # Kafka (consumer only config)
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    admin:
+      properties:
+        default.replication.factor: 1
+        num.partitions: 1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
