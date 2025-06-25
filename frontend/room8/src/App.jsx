@@ -62,12 +62,12 @@ function App() {
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
               <Route path="/verify/number" element={<VerifyPhoneNumberPage />} />
               <Route path="/listings" element={<ListingsPage />} />
-              <Route path="/listingDetails" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
+              <Route path="/listingDetails:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
               {/*  have /listingDetails and also use a query param ?listingId=...
                   Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
                   or continue using query params. For simplicity, /listingDetails is kept.
               */}
-              <Route path="/listings/search/:term" element={<ListingsSearchResultsPage />} />
+              <Route path="/search/:term" element={<ListingsSearchResultsPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search" element={<ListingsSearchResultsPage />} />
               <Route path="/ourservices" element={<OurServicesPage />} />
