@@ -71,15 +71,15 @@ public class UserServiceImpl implements UserService {
     public UserInfoDTO getUserInfo(String token, Long userId) {
         checkNullValue(token);
         checkNullValue(userId);
-        String requesterEmail = authenticationServiceClient.getUserEmailFromToken(token).getBody();
-        User requester = findUserByEmail(requesterEmail);
+//        String requesterEmail = authenticationServiceClient.getUserEmailFromToken(token).getBody();
+//        User requester = findUserByEmail(requesterEmail);
         User targetUser = findUserById(userId);
 
-        // Users can only view their own info unless they are an ADMIN
-        if (!requester.getEmail().equals(targetUser.getEmail()) &&
-                requester.getRole().stream().noneMatch(r -> r.getUserAuthority() == UserAuthority.ADMIN)) {
-            throw new UserNotAuthorizedException("User not authorized to access this information");
-        }
+//        // Users can only view their own info unless they are an ADMIN
+//        if (!requester.getEmail().equals(targetUser.getEmail()) &&
+//                requester.getRole().stream().noneMatch(r -> r.getUserAuthority() == UserAuthority.ADMIN)) {
+//            throw new UserNotAuthorizedException("User not authorized to access this information");
+//        }
 
         var userInfo = userInfoRepository.findByUser(targetUser)
                 .orElseThrow(() -> new UserInfoNotFoundException("UserInfo not found for user ID: " + userId));
