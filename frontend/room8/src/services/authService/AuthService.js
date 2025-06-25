@@ -31,7 +31,7 @@ const validateSignup = ({ firstName, lastName, email, phoneNumber, password }) =
 };
 
 export const useAuthService = () => {
-  const { setAuthDataState, clearAuthData } = useAuth();
+  const { setAuthDataState, clearAuthData, authDataState } = useAuth();
 
   const signup = async (data) => {
     try {
@@ -85,5 +85,55 @@ export const useAuthService = () => {
     }
   };
 
-  return { signup, login, refreshToken };
+  const verifyPhoneNumber = async (otpCode, phoneNumber) => {
+    console.log("sending requst")
+    try {
+      const token = authDataState?.accessToken;
+      if (!token) throw new Error('User not authenticated.');
+
+      const res = await apiClient.put(
+        '/auth-service/api/v1/auth/marked-as-verified/phone',
+        { otpCode, phoneNumber },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return true;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'OTP verification failed');
+      return false;
+    }
+  };
+
+
+  const resendCode = async ({ phoneNumber, email }) => {
+  try {
+    const token = authDataState?.accessToken;
+    if (!token) throw new Error('User not authenticated.');
+
+    if (!phoneNumber && !email) {
+      throw new Error('Phone number or email is required to resend the code.');
+    }
+
+    const response = await apiClient.put(
+      '/auth-service/api/v1/auth/resend-code',
+      null,
+      {
+        params: { phoneNumber, email },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; // Boolean true/false
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to resend verification code');
+    return false;
+  }
+};
+
+
+  return { signup, login, refreshToken, verifyPhoneNumber, resendCode  };
 };

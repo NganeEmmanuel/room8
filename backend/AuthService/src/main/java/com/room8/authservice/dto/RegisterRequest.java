@@ -27,6 +27,5 @@ public class RegisterRequest {
             message = "Phone number must be in the format +237XXXXXXXXX"
     )
     private String phoneNumber;
-    private String otp;
 
 }

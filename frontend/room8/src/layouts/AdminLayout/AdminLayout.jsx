@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../../components/NavBar/NavBar.jsx";
 import Sidebar from "../../components/Sidebar/Sidebar.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -33,6 +33,8 @@ const AdminLayout = ({ isAuthenticated }) => {
   }, [userInfo, fetchCurrentUser]);
 
   if (loading || !userInfo) return <Loader />;
+
+  if (!userInfo.isPhoneVerified) return <Navigate to="/verify/number" replace />;
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

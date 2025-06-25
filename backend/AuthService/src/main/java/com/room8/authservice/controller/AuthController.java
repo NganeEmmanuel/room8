@@ -1,10 +1,8 @@
 package com.room8.authservice.controller;
 
 
-import com.room8.authservice.dto.AuthenticationRequest;
-import com.room8.authservice.dto.AuthenticationResponse;
-import com.room8.authservice.dto.RegisterRequest;
-import com.room8.authservice.dto.UserDTO;
+import com.room8.authservice.dto.*;
+import com.room8.authservice.exception.BadCredentialsException;
 import com.room8.authservice.service.AuthService;
 import com.room8.authservice.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -102,12 +102,31 @@ public class AuthController {
     }
 
     @PutMapping("/marked-as-verified/phone")
-    public ResponseEntity<Boolean> markUserAsPhoneVerified(@RequestParam String phone, @RequestParam String otp) {
-        return ResponseEntity.ok(authService.markedAsPhoneVerified(phone, otp));
+    public ResponseEntity<Boolean> markUserAsPhoneVerified(@RequestBody VerifyOtpRequest request) {
+        return ResponseEntity.ok(authService.markedAsPhoneVerified(request.getPhoneNumber(), request.getOtpCode()));
+    }
+
+    @PutMapping("/resend-code")
+    public ResponseEntity<Boolean> resentCode(@RequestParam(required = false) String phoneNumber, @RequestParam(required = false) String email) {
+        if (phoneNumber == null) {
+            throw new BadCredentialsException("require phoneNumber or email");
+        }
+
+        if (email == null) {
+            throw new BadCredentialsException("require phoneNumber or email");
+        }
+
+        if (phoneNumber.isBlank() && email.isBlank()) {
+            throw new BadCredentialsException("At least one of phoneNumber or email must not be blank");
+        }
+
+        return ResponseEntity.ok(authService.resentCode(!phoneNumber.isBlank()? phoneNumber: email, !phoneNumber.isBlank()? "phone" : "email"));
     }
 
     @GetMapping("/get-email-from-token")
     ResponseEntity<String> getUserEmailFromToken(@RequestParam String token){
         return ResponseEntity.ok(emailUtils.extractEmailFromToken(token));
     }
+
+
 }
