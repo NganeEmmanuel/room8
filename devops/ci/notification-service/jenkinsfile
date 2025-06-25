@@ -26,7 +26,7 @@ pipeline {
         stage('Build and Push Docker Images') {
             steps {
                 script {
-                    def services = ["ServiceRegistry", "APIGateway","AuthService","UserService","RoomService","SearchService","NotificationService"]
+                    def services = ["NotificationService"]
 
                     services.each { service ->
                         def serviceSlug = service.toLowerCase()
@@ -59,13 +59,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github-cred', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                     script {
                         def services = [
-                            "apigateway"      : "api-gateway",
-                            "serviceregistry" : "service-registry",
-                            "authservice"     : "auth-service",
-                            "userservice"     : "user-service",
-                            "roomservice"     : "room-service",
-                            "searchservice"     : "search-service",
-                            "notificationservice" : "notification-service"
+                            "notificationservice": "notification-service",
                         ]
 
                         echo "🔁 Cloning room8-deployments repo..."
