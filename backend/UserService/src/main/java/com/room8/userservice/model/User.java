@@ -1,5 +1,6 @@
 package com.room8.userservice.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +62,7 @@ public class User {
     )
     private List<UserRole> role;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private UserInfo userInfo;
 

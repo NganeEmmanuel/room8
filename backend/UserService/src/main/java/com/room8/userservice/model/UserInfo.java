@@ -1,6 +1,8 @@
 package com.room8.userservice.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.room8.userservice.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true) // Foreign key in UserInfo table
     private User user;

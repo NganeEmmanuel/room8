@@ -101,7 +101,7 @@ public class BidServiceImpl implements BidService{
         Bid updatedBid = bidRepository.save(existingBid);
 
         // 4. Publish an event to Kafka to notify the tenant
-        bidsEventPublisher.publishListingEvent(updatedBid.getListingId(), "BID_STATUS_CHANGED");
+        bidsEventPublisher.publishListingEvent(updatedBid.getListingId(), "BID_STATUS_CHANGED", updatedBid.getId());
 
         // 5. Map the result back to a DTO and return it
         return bidMapperService.toDTO(updatedBid);
