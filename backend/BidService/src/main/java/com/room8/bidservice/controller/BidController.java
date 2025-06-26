@@ -3,6 +3,7 @@ package com.room8.bidservice.controller;
 import com.room8.bidservice.exception.NoBidFoundException;
 import com.room8.bidservice.model.RequestBidDTO;
 import com.room8.bidservice.model.ResponseBidDTO;
+import com.room8.bidservice.model.UpdateBidStatusDTO;
 import com.room8.bidservice.service.BidService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +50,14 @@ public class BidController {
     @GetMapping("/get-bid-by-userId-listingId")
     ResponseEntity<ResponseBidDTO> getBidsByUserIdListingId(@RequestParam Long userId, @RequestParam Long listingId) throws NoBidFoundException {
         return ResponseEntity.ok(bidService.getBidByUserIdListingId(userId, listingId));
+    }
+
+    @PutMapping("/{bidId}/status")
+    public ResponseEntity<ResponseBidDTO> updateBidStatus(
+            @PathVariable Long bidId,
+            @RequestBody UpdateBidStatusDTO statusUpdate) throws NoBidFoundException {
+
+        ResponseBidDTO updatedBid = bidService.updateBidStatus(bidId, statusUpdate.getStatus());
+        return ResponseEntity.ok(updatedBid);
     }
 }

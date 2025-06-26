@@ -106,7 +106,7 @@ const ListingDetailsPage = () => {
 
           <div className="mt-8">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Similar Listings</h2>
-            {/* <SimilarListings listings={listing.similarListings} /> */}
+             <SimilarListings listings={listing.similarListings} />
           </div>
         </div>
 
@@ -131,6 +131,7 @@ const ListingDetailsPage = () => {
         onClose={() => setIsBidPanelOpen(false)}
         onSubmit={handleBidSubmit} // <-- Pass the updated handler
         listingTitle={listing.title}
+        listingPrice={listing.listingPrice}
       />
     </div>
   );

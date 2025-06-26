@@ -167,7 +167,7 @@ const ListingsSearchResultsPage = () => {
 
       {/* Mobile filter drawer */}
       {isFilterOpen && (
-        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" onClick={() => setIsFilterOpen(false)}>
+        <div className="fixed inset-0 z-40  md:hidden" onClick={() => setIsFilterOpen(false)}>
           <div className="fixed top-0 left-0 h-full w-72 bg-white shadow-lg overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <FilterSidebar
               allRoomTypes={allRoomTypes}

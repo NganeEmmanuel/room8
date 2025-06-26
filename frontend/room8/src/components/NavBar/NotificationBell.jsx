@@ -62,9 +62,9 @@ const NotificationBell = () => {
 
   const handleNotificationClick = async (notif) => {
     if (notif.status === "UNREAD") {
-      await markNotificationAsRead(notif.id, userInfo.id, refreshToken);
+      await markNotificationAsRead(notif.bidId, userInfo.id, refreshToken);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === notif.id ? { ...n, status: "READ" } : n))
+        prev.map((n) => (n.bidId === notif.bidId ? { ...n, status: "READ" } : n))
       );
     }
 

@@ -25,9 +25,8 @@ const ToggleSwitch = ({ id, checked, onChange, label, description }) => (
 );
 
 
-const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
+const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle, listingPrice }) => {
   const [proposal, setProposal] = useState('');
-  const [amount, setAmount] = useState(''); // ADDED: State for the bid amount
   const [shareUserInfo, setShareUserInfo] = useState(true);
 
   const handleSubmit = (e) => {
@@ -37,17 +36,13 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
         toast.info('Please write a proposal before submitting.');
         return;
     }
-    if (!amount || Number(amount) <= 0) {
-        toast.info("please enter a valid amount")
-        return;
-    }
+
     // MODIFIED: Pass the bid data, including the amount, up to the parent component
-    onSubmit({ proposal, amount: Number(amount), shareUserInfo });
+    onSubmit({ proposal, amount: listingPrice, shareUserInfo });
   };
 
   const handleCancel = () => {
     setProposal('');
-    setAmount(''); // ADDED: Reset amount on cancel
     setShareUserInfo(true);
     onClose();
   };
@@ -77,20 +72,18 @@ const PlaceBidPanel = ({ isOpen, onClose, onSubmit, listingTitle }) => {
             <form onSubmit={handleSubmit} className="flex-grow p-6 overflow-y-auto space-y-6">
 
                 {/* ADDED: Amount Input Field with validation */}
-                <div>
+              <div>
                     <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-                        Bid Amount (in FCFA)
+                        Listing Price (in FCFA)
                     </label>
                     <input
-                        type="number"
+                        type="text" // Changed to text to display formatted currency
                         id="amount"
                         name="amount"
-                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 55000"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        required
-                        min="1" // Browser-level validation for positive numbers
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-700 focus:outline-none focus:ring-0"
+                        // Format the number with commas and append currency
+                        value={typeof listingPrice === 'number' ? listingPrice.toLocaleString() + ' FCFA' : 'N/A'}
+                        readOnly // This makes the field non-editable
                     />
                 </div>
 
