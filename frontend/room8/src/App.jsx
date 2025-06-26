@@ -58,15 +58,12 @@ function App() {
           <Routes>
             {/* Public Routes with PublicLayout */}
             <Route element={<PublicLayout isAuthenticated={isAuthenticated} />}>
-               <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+
               <Route path="/admin/browse" element={<Navigate to="/search" replace />} />
-              <Route path="/verify/number" element={<VerifyPhoneNumberPage />} />
               <Route path="/listings" element={<ListingsPage />} />
               <Route path="/listingDetails/:listingId" element={<ListingDetailsPage />} /> {/* Route for specific listing details */}
-              {/*  have /listingDetails and also use a query param ?listingId=...
-                  Ensure ListingDetailsPage can handle fetching data based on a URL param if you go with /listing/:listingId
-                  or continue using query params. For simplicity, /listingDetails is kept.
-              */}
+
               <Route path="/search/:term" element={<ListingsSearchResultsPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search" element={<ListingsSearchResultsPage />} />
@@ -79,6 +76,7 @@ function App() {
             {/* Auth Routes (typically no shared layout or a very minimal one) */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/verify/number" element={<VerifyPhoneNumberPage />} />
 
             {/* Admin Routes (Protected by AdminLayout which should enforce auth) */}
             {/* The AdminLayout itself can handle redirecting if not authenticated,

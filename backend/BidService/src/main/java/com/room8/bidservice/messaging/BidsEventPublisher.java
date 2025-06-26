@@ -20,9 +20,9 @@ public class BidsEventPublisher {
 
     private static final String TOPIC = "bid-events";
 
-    public void publishListingEvent(Long listingId, String eventType) {
+    public void publishListingEvent(Long listingId, String eventType, Long bidId) {
         try {
-            BidsEvent event = new BidsEvent(eventType, listingId);
+            BidsEvent event = new BidsEvent( bidId, eventType, listingId);
             String json = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(TOPIC, json);
             log.info("Published bid event: {}, type: {}", listingId, eventType);

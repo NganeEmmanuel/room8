@@ -1,0 +1,10 @@
+- name: Create twilio secret
+  template:
+    src: twilio-secret.yaml.j2
+    dest: /tmp/twilio-secret.yaml
+
+- name: Apply twilio secret to Kubernetes
+  shell: kubectl apply -f /tmp/twilio-secret.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+

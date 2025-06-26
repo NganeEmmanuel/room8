@@ -34,7 +34,7 @@ const AdminLayout = ({ isAuthenticated }) => {
 
   if (loading || !userInfo) return <Loader />;
 
-  //if (!userInfo.isPhoneVerified) return <Navigate to="/verify/number" replace />
+  // if (!userInfo.isPhoneVerified) return <Navigate to="/verify/number" replace />;
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 

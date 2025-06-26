@@ -25,7 +25,7 @@ public class BidServiceImpl implements BidService{
         var bidDto =  bidMapperService.toDTO(
                 bidRepository.save(bidMapperService.toEntity(requestBidDTO))
         );
-        bidsEventPublisher.publishListingEvent(bidDto.getListingId(), "NOTIFY_LANDLORD");
+        bidsEventPublisher.publishListingEvent(bidDto.getListingId(), "NOTIFY_LANDLORD", bidDto.getId());
         return bidDto;
     }
 

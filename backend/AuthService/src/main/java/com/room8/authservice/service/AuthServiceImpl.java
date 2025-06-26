@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
         List<String> roles = roleUtil.getRoleList(user.getRole());
 
         // Generate JWT token using the email
-        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roles, 1000 * 60 * 5);
+        var jwtToken =  jwtService.generateTokenWithRoles(user.getEmail(), roles, 1000 * 60 * 30);
         var refreshToken = jwtService.generateTokenWithRoles(user.getEmail(), roles, 1000 * 60 * 60 * 24);
 
         // Store new jwtToken and refresh token

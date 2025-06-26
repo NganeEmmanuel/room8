@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ public class BidsEventListener {
 
     private final SearchService searchService;
     private final ObjectMapper objectMapper;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @KafkaListener(topics = "bid-events", groupId = "search-service-group")
     public void listenBidEvents(String message) {
@@ -25,7 +28,16 @@ public class BidsEventListener {
             String eventType = event.getEventType();
 
             if (eventType.equals("NOTIFY_LANDLORD")) {
-                var Listing =  searchService.findListingById(event.getListingId().toString());
+                var listing =  searchService.findListingById(event.getListingId().toString());
+                var notifMessage = "You have a new bid for your listing ("+ listing.getTitle() +"). click to view proposal";
+                notificationEventPublisher.publishListingEvent(
+                        event.getListingId(),
+                        listing.getLandlordId(),
+                        notifMessage,
+                        "UNREAD",
+                        new Date(),
+                        event.getBidId()
+                        );
                 //todo: notify landlord about new bid (publish to a topic for notification service)
                 log.info("emitting notify user event...: {}", event.getListingId());
             } else {
