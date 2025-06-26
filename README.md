@@ -60,7 +60,7 @@ The project follows a **microservices-based architecture**, where different serv
 - API gateway uses **Spring Cloud Gateway** for request routing.
 - Authentication is handled using **Spring Security and JWT**.
 - Uses **PostgreSQL and MongoDB** for data storage.
-- hello
+- hello guys
 
 ### 3. **DevOps & Deployment**
 - **CI/CD Pipeline**: Implemented using **GitHub Actions, Jenkins, and ArgoCD**.
