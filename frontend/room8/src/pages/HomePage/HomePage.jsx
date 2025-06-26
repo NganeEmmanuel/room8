@@ -81,10 +81,10 @@ const HomePage = () => {
           style={{ backgroundImage: `url(${heroImage})` }}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-blue-400" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}>
               Easily Find Rooms, Apartments and Roommates
             </h1>
-            <p className="text-lg sm:text-2xl font-medium mb-8 text-white" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.6)' }}>
+            <p className="text-lg sm:text-2xl font-medium mb-8 text-blue-400" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.6)' }}>
               Simple, Fast, Trusted by Renters & Landlords
             </p>
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row justify-center items-center font-bold gap-3">
