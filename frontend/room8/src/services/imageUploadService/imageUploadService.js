@@ -1,3 +1,5 @@
+import {toast} from "react-toastify";
+
 export async function uploadImageToS3(base64Image) {
     try {
         const res = await fetch(base64Image);

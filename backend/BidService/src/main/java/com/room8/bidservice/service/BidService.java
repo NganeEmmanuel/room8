@@ -63,4 +63,13 @@ public interface BidService {
      * @throws NoBidFoundException if no bid is found
      */
     ResponseBidDTO getBidByUserIdListingId(Long userId, Long listingId) throws NoBidFoundException;
+
+     /**
+     * Updates the status of a specific bid.
+     * @param id The ID of the bid to update.
+     * @param status The new status (e.g., "ACCEPTED", "REJECTED").
+     * @return The updated bid information.
+     * @throws NoBidFoundException if no bid is found with the given ID.
+     */
+    ResponseBidDTO updateBidStatus(Long id, String status) throws NoBidFoundException;
 }

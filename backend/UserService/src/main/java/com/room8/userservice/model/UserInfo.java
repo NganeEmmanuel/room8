@@ -1,5 +1,6 @@
 package com.room8.userservice.model;
 
+
 import com.room8.userservice.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
