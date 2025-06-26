@@ -12,6 +12,7 @@ import java.util.Date;
 @Builder
 @Data
 public class NotificationEvent {
+    private String title;
     private Long bidId;
     private Long userId;
     private Long listingId;

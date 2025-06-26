@@ -24,7 +24,7 @@ public class NotificationEventPublisher {
 
     public void publishListingEvent(Long listingId, Long userId, String message, String status, Date dateCreated, Long bidId ) {
         try {
-            NotificationEvent event = new NotificationEvent(bidId, userId, listingId, message,dateCreated, status);
+            NotificationEvent event = new NotificationEvent("New Bid Received", bidId, userId, listingId, message,dateCreated, status);
             String json = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(TOPIC, json);
             log.info("Published notification event: {}, message: {}", userId, event);

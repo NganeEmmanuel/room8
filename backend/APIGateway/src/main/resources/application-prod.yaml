@@ -41,7 +41,7 @@ spring:
         - id: notification-service
           uri: http://notification-service.default.svc.cluster.local
           predicates:
-            - Path=/search-service/**
+            - Path=/notification-service/**
           filters:
             - StripPrefix=1
 

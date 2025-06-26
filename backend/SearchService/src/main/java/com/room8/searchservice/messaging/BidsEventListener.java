@@ -29,7 +29,7 @@ public class BidsEventListener {
 
             if (eventType.equals("NOTIFY_LANDLORD")) {
                 var listing =  searchService.findListingById(event.getListingId().toString());
-                var notifMessage = "You have a new bid for your listing ("+ listing.getTitle() +"). click to view listing";
+                var notifMessage = "You have a new bid for your listing ("+ listing.getTitle() +"). click to view proposal";
                 notificationEventPublisher.publishListingEvent(
                         event.getListingId(),
                         listing.getLandlordId(),
